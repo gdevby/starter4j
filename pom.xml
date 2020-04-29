@@ -11,6 +11,7 @@
     <modules>
         <module>starter-core</module>
         <module>desktop-common-util</module>
+        <module>examples</module>
     </modules>
 
 
