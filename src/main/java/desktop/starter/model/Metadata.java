@@ -1,13 +1,15 @@
-package desktop.starter.component.config;
+package desktop.starter.model;
 
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class Metadata {
     private String sha1;
     private long size;
     private String path;
-    private String url;
+    private List<String> urls ;
     /**
      * Related url, first check url after relUrl
      */
