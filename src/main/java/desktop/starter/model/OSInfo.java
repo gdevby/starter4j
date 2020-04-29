@@ -32,21 +32,21 @@ public class OSInfo {
     }
 
     public static OSType getOSType() throws SecurityException {
-        String var0 = System.getProperty(OS_NAME);
-        if (var0 != null) {
-            if (var0.toLowerCase().contains("windows")) {
+        String osName = System.getProperty(OS_NAME);
+        if (osName != null) {
+            if (osName.toLowerCase().contains("windows")) {
                 return OSType.WINDOWS;
             }
 
-            if (var0.toLowerCase().contains("os x") || var0.toLowerCase().contains("mac")) {
+            if (osName.toLowerCase().contains("os x") || osName.toLowerCase().contains("mac")) {
                 return OSType.MACOSX;
             }
 
-            if (var0.toLowerCase().contains("linux") || var0.toLowerCase().contains("unix")) {
+            if (osName.toLowerCase().contains("linux") || osName.toLowerCase().contains("unix")) {
                 return OSType.LINUX;
             }
 
-            if (var0.toLowerCase().contains("solaris") || var0.toLowerCase().contains(("sunos"))) {
+            if (osName.toLowerCase().contains("solaris") || osName.toLowerCase().contains(("sunos"))) {
                 return OSType.SOLARIS;
             }
         }

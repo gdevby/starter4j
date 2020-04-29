@@ -1,7 +1,5 @@
 package desktop.starter.component;
 
-import desktop.starter.component.config.ConfigManager;
-import desktop.starter.model.OSInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +10,6 @@ import org.slf4j.LoggerFactory;
 public class Starter {
 
     private Logger log;
-    private OSInfo.OSType osType;
-    private ConfigManager cfg;
 
     public Starter() {
         log = LoggerFactory.getLogger(getClass());
@@ -23,22 +19,9 @@ public class Starter {
      * Get information about current OS
      */
     public void collectOSInfo() {
-        osType = OSInfo.getOSType();
+
 
         log.info("call method {}", "collectOSInfo");
-    }
-
-    /**
-     * Load config
-     */
-    public void loadConfig() throws Exception {
-        //todo init in main class
-        cfg = new ConfigManager(osType);
-        cfg.load();
-        cfg.parse();
-        //todo we can describe in this place without config manager
-
-        log.info("call method {}", "loadConfig");
     }
 
     public void checkCommonProblems() {
