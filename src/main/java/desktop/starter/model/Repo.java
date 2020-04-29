@@ -1,7 +1,5 @@
 package desktop.starter.model;
 
-import desktop.starter.component.config.Metadata;
-
 import java.util.List;
 
 /**
@@ -10,8 +8,8 @@ import java.util.List;
  */
 public class Repo {
     /**
-     * Example : https://github.com
+     * Example : https://github.com , ...
      */
-    String repo;
+    List<String> repo;
     List<Metadata> resources;
 }

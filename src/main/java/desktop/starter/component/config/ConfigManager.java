@@ -2,6 +2,7 @@ package desktop.starter.component.config;
 
 import com.google.gson.*;
 import desktop.starter.Settings;
+import desktop.starter.model.Metadata;
 import desktop.starter.model.OSInfo;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
