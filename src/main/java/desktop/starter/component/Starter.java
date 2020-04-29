@@ -32,9 +32,11 @@ public class Starter {
      * Load config
      */
     public void loadConfig() throws Exception {
+        //todo init in main class
         cfg = new ConfigManager(osType);
         cfg.load();
         cfg.parse();
+        //todo we can describe in this place without config manager
 
         log.info("call method {}", "loadConfig");
     }
