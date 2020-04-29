@@ -11,4 +11,5 @@ import java.util.Map;
 public class AppConfig {
     List<Repo> data;
     Map<OSInfo.OSType,String> defaultAppDirectories;
+    String mainClass;
 }
