@@ -1,7 +1,9 @@
 package desktop.starter;
 
 import desktop.starter.component.Starter;
+import desktop.starter.component.config.ConfigManager;
 import desktop.starter.component.factory.FactoryMethod;
+import desktop.starter.component.settings.SettingsManager;
 
 public class Main {
     /*
@@ -11,12 +13,18 @@ public class Main {
         try {
             new FactoryMethod().createOsExecutor().execute();
 
+            //read settings.json
+            new SettingsManager();
+
+            //load config from web
+            ConfigManager cfg = new ConfigManager();
+            cfg.load();
+            cfg.parse();
+
             Starter s = new Starter();
             //union two lines in separated class. This is more common then validate and prepare resources
             s.collectOSInfo();
 
-            //load config
-            s.loadConfig();
 
             s.checkCommonProblems();
             //
