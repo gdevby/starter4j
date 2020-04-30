@@ -1,16 +1,41 @@
 package desktop.starter;
 
-import desktop.starter.component.Starter;
+import com.google.gson.Gson;
 import desktop.starter.component.config.ConfigManager;
 import desktop.starter.component.factory.FactoryMethod;
 import desktop.starter.component.settings.SettingsManager;
+import desktop.starter.model.AppConfig;
+import desktop.starter.model.Metadata;
+import desktop.starter.model.Repo;
+import desktop.starter.util.ConfigUtil;
+import desktop.starter.util.DesktopUtil;
+import desktop.starter.util.OSInfo;
+import desktop.starter.component.Starter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class Main {
+    static Logger LOGGER = LoggerFactory.getLogger(Main.class);
     /*
     todo reuse args to run and
      */
     public static void main(String[] args) {
         try {
+            //todo add special util args4j and parse args and properties and union them
+
+            Gson g = new Gson();
+            AppConfig a  = g.fromJson(new InputStreamReader(Main.class.getResourceAsStream("/settings.json"))
+                    ,AppConfig.class);
+            /*AppConfig a = ConfigUtil.generateTest(p.getProperty("app.name","starter"));
+//
+            LOGGER.info(g.toJson(a));*/
+            LOGGER.info("working directory: " +DesktopUtil.getSystemPath(OSInfo.getOSType(),a.getAppName()));
             new FactoryMethod().createOsExecutor().execute();
 
             //read settings.json
@@ -38,7 +63,7 @@ public class Main {
         } catch (Throwable t) {
             //send error log on server. This is safely. We want to improve our desktop.starter.starter.
             //todo need to develop log consumer i have. i config on my server
-            System.out.println("Shutting down...");
+            t.printStackTrace();
             System.exit(-1);
         }
     }

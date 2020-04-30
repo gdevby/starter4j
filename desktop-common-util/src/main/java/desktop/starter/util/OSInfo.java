@@ -1,4 +1,4 @@
-package desktop.starter.model;
+package desktop.starter.util;
 
 import java.security.PrivilegedAction;
 import java.util.HashMap;
