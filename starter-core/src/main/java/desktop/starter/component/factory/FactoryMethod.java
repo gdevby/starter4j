@@ -1,6 +1,6 @@
 package desktop.starter.component.factory;
 
-import desktop.starter.model.OSInfo;
+import desktop.starter.util.OSInfo;
 
 /**
  * Used to createOsExecutor special classes for every operation system

@@ -3,7 +3,7 @@ package desktop.starter.component.config;
 import com.google.gson.*;
 import desktop.starter.component.settings.SettingsManager;
 import desktop.starter.model.Metadata;
-import desktop.starter.model.OSInfo;
+import desktop.starter.util.OSInfo;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -51,6 +51,7 @@ public class ConfigManager {
 
         try (CloseableHttpResponse response = httpclient.execute(httpget)) {
             if (response.getStatusLine().getStatusCode() != 200) {
+                //todo we need to add message to any exception to understand
                 throw new Exception();
             }
             HttpEntity entity = response.getEntity();
