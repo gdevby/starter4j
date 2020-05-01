@@ -1,4 +1,4 @@
-# desktop-desktop.starter.starter
+# desktop-desktop.starter
 We want to create java desktop desktop.starter.starter which can help to run java app faster and better. Do updating more easy with low traffic (save data of your app and download only what you need once). 
 <br><br>
 <b>It works for: Linux, MacOS, Windows.</b>
