@@ -1,6 +1,7 @@
 package desktop.starter.model;
 
 import desktop.starter.util.OSInfo;
+import desktop.starter.util.model.ArgumentType;
 import lombok.Data;
 
 import java.util.List;
@@ -16,8 +17,7 @@ public class AppConfig {
     private String comment = "_comment : Config file for desktop-starter example";
     private String appName;
     private String mainClass;
-    private String jvmArgs;
-    private String appArgs;
+    private Map<ArgumentType,List<String>> arguments;
     private Map<OSInfo,Repo> jvms;
     /**
      * images and other files are used an app
