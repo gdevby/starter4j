@@ -18,6 +18,7 @@ public class AppConfig {
     private String mainClass;
     private String jvmArgs;
     private String appArgs;
+    private Map<OSInfo,Repo> jvms;
     /**
      * images and other files are used an app
      */
