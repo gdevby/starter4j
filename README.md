@@ -1,6 +1,6 @@
 # desktop-desktop.starter
-Our current tasks are https://github.com/users/robertmakrytski/projects/1
-Status: not ready
+Our current tasks are https://github.com/users/robertmakrytski/projects/1<br>
+Status: not ready<br>
 We want to create java desktop desktop.starter.starter which can help to run java app faster and better. Do updating more easy with low traffic (save data of your app and download only what you need once). 
 <br><br>
 <b>It works for: Linux, MacOS, Windows.</b>
