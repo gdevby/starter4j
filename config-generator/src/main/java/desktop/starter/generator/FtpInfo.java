@@ -1,4 +1,4 @@
-package desktop.starter;
+package desktop.starter.generator;
 
 import lombok.Data;
 

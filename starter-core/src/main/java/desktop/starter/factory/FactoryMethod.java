@@ -1,4 +1,4 @@
-package desktop.starter.component.factory;
+package desktop.starter.factory;
 
 import desktop.starter.util.OSInfo;
 

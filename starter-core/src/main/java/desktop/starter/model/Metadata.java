@@ -11,8 +11,8 @@ public class Metadata {
     private String path;
     private List<String> urls ;
     /**
-     * Related url, first check url after relUrl
+     * Related url, first check url after relativeUrl
      */
-    private String relUrl;
+    private String relativeUrl;
 
 }

@@ -13,6 +13,11 @@ public class Repo {
     /**
      * Example : https://github.com , ...
      */
-    private List<String> repo;
+    private List<String> repositories;
     private List<Metadata> resources;
+    /**
+     * Saves sha1 on the server allow to add more flexibility
+     * todo implement low priority
+     */
+    private boolean remoteServerSHA1;
 }

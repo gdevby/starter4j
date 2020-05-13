@@ -1,4 +1,4 @@
-package desktop.starter.component.factory;
+package desktop.starter.factory;
 
 /**
  * Used unique methods or info to get info about every os.

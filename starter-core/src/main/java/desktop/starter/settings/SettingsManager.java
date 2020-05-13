@@ -1,4 +1,4 @@
-package desktop.starter.component.settings;
+package desktop.starter.settings;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

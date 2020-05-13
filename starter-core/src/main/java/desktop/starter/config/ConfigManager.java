@@ -1,7 +1,7 @@
-package desktop.starter.component.config;
+package desktop.starter.config;
 
 import com.google.gson.*;
-import desktop.starter.component.settings.SettingsManager;
+import desktop.starter.settings.SettingsManager;
 import desktop.starter.model.Metadata;
 import desktop.starter.util.OSInfo;
 import org.apache.http.HttpEntity;

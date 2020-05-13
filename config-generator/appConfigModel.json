@@ -1,0 +1,9 @@
+{
+  "_comment":"example configuration of any app",
+  "appName":"starter-app",
+  "mainClass":"desktop.starter.app.Main",
+  "arguments":{"JVM":[],"APP":[]},
+  "jvms":{},
+  "resourcesPath": "./src",
+  "dependenciesPath":"./src"
+}
