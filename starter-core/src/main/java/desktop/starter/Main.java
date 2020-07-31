@@ -1,11 +1,10 @@
 package desktop.starter;
 
 import com.google.gson.Gson;
-import desktop.starter.config.ConfigManager;
-import desktop.starter.factory.FactoryMethod;
-import desktop.starter.settings.SettingsManager;
-import desktop.starter.model.AppConfig;
 import desktop.starter.component.Starter;
+import desktop.starter.config.ConfigManager;
+import desktop.starter.model.AppConfig;
+import desktop.starter.settings.SettingsManager;
 import desktop.starter.util.DesktopUtil;
 import desktop.starter.util.OSInfo;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class Main {
 //
             LOGGER.info(g.toJson(a));*/
             LOGGER.info("working directory: " + DesktopUtil.getSystemPath(OSInfo.getOSType(),a.getAppName()));
-            new FactoryMethod().createOsExecutor().execute();
+//            new OSExecutorFactoryMethod().createOsExecutor().execute();
 
             //read settings.json
             new SettingsManager();

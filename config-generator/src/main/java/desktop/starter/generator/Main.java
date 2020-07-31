@@ -3,18 +3,14 @@ package desktop.starter.generator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.sun.xml.internal.ws.api.model.CheckedException;
 import desktop.starter.model.AppConfig;
-import desktop.starter.model.Repo;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.function.Function;
 
 import static desktop.starter.generator.AppConfigCreator.APP_CONFIG_GENERATOR;
 import static desktop.starter.generator.AppConfigCreator.FTP_CONFIG;

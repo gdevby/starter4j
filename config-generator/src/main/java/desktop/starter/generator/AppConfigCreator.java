@@ -2,8 +2,9 @@ package desktop.starter.generator;
 
 import desktop.starter.generator.util.Util;
 import desktop.starter.model.AppConfig;
-import desktop.starter.model.Metadata;
-import desktop.starter.model.Repo;
+import desktop.starter.util.DesktopUtil;
+import desktop.starter.util.model.download.Metadata;
+import desktop.starter.util.model.download.Repo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,10 +34,10 @@ public class AppConfigCreator {
         AppConfig appConfig = new AppConfig();
         appConfig.setAppName(configFile.getAppName());
         appConfig.setArguments(configFile.getArguments());
-        appConfig.setJvms(configFile.getJvms());
+//        appConfig.setJvms(configFile.getJvms());
         appConfig.setMainClass(configFile.getMainClass());
-        appConfig.setDependencies(createRepo(Paths.get(configFile.getDependenciesPath()), ftpInfos));
-        appConfig.setResources(createRepo(Paths.get(configFile.getResourcesPath()), ftpInfos));
+//        appConfig.setDependencies(createRepo(Paths.get(configFile.getDependenciesPath()), ftpInfos));
+//        appConfig.setResources(createRepo(Paths.get(configFile.getResourcesPath()), ftpInfos));
         return appConfig;
     }
 
@@ -177,13 +178,13 @@ public class AppConfigCreator {
             Path s = e.subpath(1, e.getNameCount());
             Metadata m = new Metadata();
             m.setRelativeUrl(s.toString());
-            m.setSha1(Util.getChecksum(e.toFile(), "SHA-1"));
+            m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
             m.setSize(e.toFile().length());
             m.setPath(s.toString());
             return m;
         })).collect(Collectors.toList());
         Repo r = new Repo();
-        r.setResources(metadataList);
+//        r.setResources(metadataList);
         r.setRepositories(domains);
         return r;
     }
