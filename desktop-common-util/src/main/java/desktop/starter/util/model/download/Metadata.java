@@ -1,4 +1,4 @@
-package desktop.starter.model;
+package desktop.starter.util.model.download;
 
 import lombok.Data;
 
@@ -11,7 +11,7 @@ public class Metadata {
     private String path;
     private List<String> urls ;
     /**
-     * Related url, first check url after relativeUrl
+     * Related url, first check urls after relativeUrl
      */
     private String relativeUrl;
 
