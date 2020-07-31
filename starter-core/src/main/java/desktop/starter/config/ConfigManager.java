@@ -2,8 +2,8 @@ package desktop.starter.config;
 
 import com.google.gson.*;
 import desktop.starter.settings.SettingsManager;
-import desktop.starter.model.Metadata;
 import desktop.starter.util.OSInfo;
+import desktop.starter.util.model.download.Metadata;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;

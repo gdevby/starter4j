@@ -1,8 +1,8 @@
 package desktop.starter.generator;
 
-import desktop.starter.model.Repo;
 import desktop.starter.util.OSInfo;
 import desktop.starter.util.model.ArgumentType;
+import desktop.starter.util.model.download.Repo;
 import lombok.Data;
 
 import java.util.List;

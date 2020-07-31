@@ -2,6 +2,7 @@ package desktop.starter.model;
 
 import desktop.starter.util.OSInfo;
 import desktop.starter.util.model.ArgumentType;
+import desktop.starter.util.model.download.Repo;
 import lombok.Data;
 
 import java.util.List;
