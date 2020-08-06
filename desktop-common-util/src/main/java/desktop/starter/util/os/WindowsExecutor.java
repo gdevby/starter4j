@@ -1,5 +1,7 @@
 package desktop.starter.util.os;
 
+import com.sun.jna.Memory;
+import com.sun.jna.platform.win32.*;
 import desktop.starter.util.model.CUDAVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
@@ -17,6 +19,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class WindowsExecutor implements OSExecutor {
+    private Memory mem = new Memory(WinDef.ULONG.SIZE);
+    private long lastCheckExecutionState;
+    private long lastExecutionStateNotIdle;
     @Override
     public String execute(String command, int seconds) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec("cmd.exe /C chcp 437 & " + command);
@@ -70,5 +75,40 @@ public class WindowsExecutor implements OSExecutor {
     @Override
     public CUDAVersion getCUDAVersion() {
         return null;
+    }
+
+    @Override
+    public int getSystemHibernateDelay() {
+        int size = new WinNT.SYSTEM_POWER_INFORMATION().size();
+        Memory mem = new Memory(size);
+        PowrProf.INSTANCE.CallNtPowerInformation(PowrProf.POWER_INFORMATION_LEVEL.SystemPowerInformation,
+                null, 0, mem, (int) mem.size());
+        WinNT.SYSTEM_POWER_INFORMATION powerInfo = new WinNT.SYSTEM_POWER_INFORMATION(mem);
+        return powerInfo.TimeRemaining;
+    }
+
+    @Override
+    public boolean isIdleWithoutInputEventsMoreThan(int seconds) {
+        WinUser.LASTINPUTINFO lastinputinfo = new WinUser.LASTINPUTINFO();
+        User32.INSTANCE.GetLastInputInfo(lastinputinfo);
+        long time = Kernel32.INSTANCE.GetTickCount64() - (long) lastinputinfo.dwTime;
+        return (time / 1000) > seconds;
+    }
+
+    @Override
+    public boolean isIdleWithoutExecutionStateMoreThan(int seconds) {
+        if ((System.currentTimeMillis() - lastCheckExecutionState) > 1000) {
+            PowrProf.INSTANCE.CallNtPowerInformation(PowrProf.POWER_INFORMATION_LEVEL.SystemExecutionState,
+                    null, 0, mem, (int) mem.size());
+            if (mem.getInt(0) != 0)
+                lastExecutionStateNotIdle = System.currentTimeMillis();
+            lastCheckExecutionState = System.currentTimeMillis();
+        }
+        return (System.currentTimeMillis() - lastExecutionStateNotIdle) > seconds * 1000;
+    }
+
+    @Override
+    public int setThreadExecutionState(int code) {
+        return Kernel32.INSTANCE.SetThreadExecutionState(code);
     }
 }

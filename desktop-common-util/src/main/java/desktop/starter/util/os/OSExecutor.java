@@ -15,5 +15,18 @@ public interface OSExecutor {
 
     CUDAVersion getCUDAVersion() throws IOException;
 
+    /**
+     * @return system switches off power computer after some time
+     * @throws IOException
+     */
+    int getSystemHibernateDelay();
+
+    boolean isIdleWithoutInputEventsMoreThan(int seconds);
+
+    boolean isIdleWithoutExecutionStateMoreThan(int seconds);
+
+    int setThreadExecutionState(int code);
+
+
 
 }
