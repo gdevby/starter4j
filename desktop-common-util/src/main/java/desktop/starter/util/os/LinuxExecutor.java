@@ -1,5 +1,10 @@
 package desktop.starter.util.os;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Structure;
+import com.sun.jna.platform.unix.X11;
 import desktop.starter.util.model.CUDAVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
@@ -12,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -19,6 +25,21 @@ import java.util.stream.Collectors;
 public class LinuxExecutor implements OSExecutor {
 
     private static final Path CUDA_VERSION_PATH = Paths.get("/usr/local/cuda/version.txt");
+    private X11.Display dpy;
+    private X11.Window win;
+    private Xss.XScreenSaverInfo info;
+    private boolean init = false;
+
+    private void initVariable() {
+        if (init)
+            return;
+        init = true;
+        dpy = X11.INSTANCE.XOpenDisplay(null);
+        if (Objects.isNull(dpy))
+            return;
+        win = X11.INSTANCE.XDefaultRootWindow(dpy);
+        info = Xss.INSTANCE.XScreenSaverAllocInfo();
+    }
 
     @Override
     public String execute(String command, int seconds) throws IOException, InterruptedException {
@@ -42,12 +63,37 @@ public class LinuxExecutor implements OSExecutor {
         if (res.length == 3) {
             Optional<CUDAVersion> op = Arrays.stream(CUDAVersion.values()).
                     filter(f -> res[2].startsWith(f.getValue())).findFirst();
-            if (op.isPresent()){
+            if (op.isPresent()) {
                 return op.get();
             }
         }
         return null;
     }
+
+    @Override
+    public int getSystemHibernateDelay() {
+        return 0;
+    }
+
+    @Override
+    public boolean isIdleWithoutInputEventsMoreThan(int seconds) {
+        initVariable();
+        if (Objects.isNull(dpy))
+            return true;
+        Xss.INSTANCE.XScreenSaverQueryInfo(dpy, win, info);
+        return info.idle.longValue() / 1000 > seconds;
+    }
+
+    @Override
+    public boolean isIdleWithoutExecutionStateMoreThan(int seconds) {
+        return true;
+    }
+
+    @Override
+    public int setThreadExecutionState(int code) {
+        return 0;
+    }
+
     @SuppressWarnings("WeakerAccess")
     protected GPUsDescriptionDTO getGPUInfo1(String res, String stringStart) {
         String[] params = res.split(System.lineSeparator());
@@ -63,4 +109,29 @@ public class LinuxExecutor implements OSExecutor {
         gpusDescriptionDTO.setGpus(gpus);
         return gpusDescriptionDTO;
     }
+
+    interface Xss extends Library {
+        Xss INSTANCE = Native.load("Xss", Xss.class);
+
+        XScreenSaverInfo XScreenSaverAllocInfo();
+
+        int XScreenSaverQueryInfo(X11.Display dpy, X11.Drawable drawable,
+                                  XScreenSaverInfo saver_info);
+
+        class XScreenSaverInfo extends Structure {
+            public X11.Window window; /* screen saver window */
+            public int state; /* ScreenSaver{Off,On,Disabled} */
+            public int kind; /* ScreenSaver{Blanked,Internal,External} */
+            public NativeLong til_or_since; /* milliseconds */
+            public NativeLong idle; /* milliseconds */
+            public NativeLong event_mask; /* events */
+
+            @Override
+            protected List<String> getFieldOrder() {
+                return Arrays.asList("window", "state", "kind", "til_or_since",
+                        "idle", "event_mask");
+            }
+        }
+    }
+
 }

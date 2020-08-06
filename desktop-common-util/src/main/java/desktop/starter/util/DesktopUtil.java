@@ -5,7 +5,6 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,10 +14,21 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class DesktopUtil {
+    public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {{
+        add(PosixFilePermission.OWNER_READ);
+        add(PosixFilePermission.OWNER_WRITE);
+        add(PosixFilePermission.OWNER_EXECUTE);
+
+        add(PosixFilePermission.OTHERS_READ);
+        add(PosixFilePermission.OTHERS_WRITE);
+        add(PosixFilePermission.OTHERS_EXECUTE);
+
+        add(PosixFilePermission.GROUP_READ);
+        add(PosixFilePermission.GROUP_WRITE);
+        add(PosixFilePermission.GROUP_EXECUTE);
+    }};
 
     public static File getSystemPath(OSInfo.OSType type, String path) {
         String userHome = System.getProperty("user.home", ".");
