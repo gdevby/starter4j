@@ -15,6 +15,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+/**
+ * add https://github.com/wille/startuplib/blob/master/src/startuplib/WindowsStartup.java
+ * or merge
+ * and https://github.com/wille/oslib
+ */
 public class DesktopUtil {
     public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {{
         add(PosixFilePermission.OWNER_READ);
@@ -73,7 +78,7 @@ public class DesktopUtil {
                         }
                     } else {
                         int count;
-                        byte data[] = new byte[BUFFER_SIZE];
+                        byte[] data = new byte[BUFFER_SIZE];
                         Path entryPath = Paths.get(".", temp_dir, entry.getName());
                         Files.createDirectories(entryPath.getParent());
                         FileOutputStream fos = new FileOutputStream(entryPath.toFile(), false);
@@ -91,6 +96,7 @@ public class DesktopUtil {
             throw e;
         }
     }
+
     public static <T> T uncheckCall(Callable<T> callable) {
         try {
             return callable.call();
@@ -98,6 +104,7 @@ public class DesktopUtil {
             throw new RuntimeException(e);
         }
     }
+
     public static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
         byte[] b = createChecksum(file, algorithm);
         StringBuilder result = new StringBuilder();
