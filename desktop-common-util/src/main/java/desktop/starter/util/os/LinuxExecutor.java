@@ -134,4 +134,11 @@ public class LinuxExecutor implements OSExecutor {
         }
     }
 
+    @Override
+    public void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException {
+    }
+
+    @Override
+    public void deactivateStartupAppWithSystem(String name) throws IOException {
+    }
 }

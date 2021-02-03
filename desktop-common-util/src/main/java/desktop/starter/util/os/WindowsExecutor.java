@@ -5,6 +5,7 @@ import com.sun.jna.platform.win32.*;
 import desktop.starter.util.model.CUDAVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
+import mslinks.ShellLink;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,16 +13,22 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/*
+implemented services for win and linux
+* */
 public class WindowsExecutor implements OSExecutor {
-    private Memory mem = new Memory(WinDef.ULONG.SIZE);
+    private final Memory mem = new Memory(WinDef.ULONG.SIZE);
+    private final String windowsStartUpFolder = "AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup";
     private long lastCheckExecutionState;
     private long lastExecutionStateNotIdle;
+
     @Override
     public String execute(String command, int seconds) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec("cmd.exe /C chcp 437 & " + command);
@@ -110,5 +117,23 @@ public class WindowsExecutor implements OSExecutor {
     @Override
     public int setThreadExecutionState(int code) {
         return Kernel32.INSTANCE.SetThreadExecutionState(code);
+    }
+
+    @Override
+    public void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException {
+        ShellLink sl = ShellLink.createLink(startUpAppPath.getFileName().toString())
+                .setWorkingDir(folder.toString());
+        sl.saveTo(Paths.get(buildStartUpFolder().toString(), name + ".lnk").toString());
+        System.out.println(sl.getWorkingDir());
+        System.out.println(sl.resolveTarget());
+    }
+
+    private Path buildStartUpFolder() {
+        return Paths.get(System.getProperty("user.home"), windowsStartUpFolder).toAbsolutePath();
+    }
+
+    @Override
+    public void deactivateStartupAppWithSystem(String name) throws IOException {
+        Files.deleteIfExists(Paths.get(buildStartUpFolder().toString(), name + ".lnk"));
     }
 }
