@@ -73,5 +73,16 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>remote_deploy</id>
+            <distributionManagement>
+                <repository>
+                    <id>archiva1</id>
+                    <name>releases</name>
+                    <url>http://82.209.205.127:8333/repository/internal</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
