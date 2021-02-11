@@ -15,16 +15,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class LinuxExecutor implements OSExecutor {
 
     private static final Path CUDA_VERSION_PATH = Paths.get("/usr/local/cuda/version.txt");
+    private static final String USER_AUTOSTART_FOLDER = ".config/autostart";
     private X11.Display dpy;
     private X11.Window win;
     private Xss.XScreenSaverInfo info;
@@ -136,9 +134,22 @@ public class LinuxExecutor implements OSExecutor {
 
     @Override
     public void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException {
+        Map<String, String> map = new HashMap<>();
+        map.put("Type", "Application");
+        map.put("Version", "1.0");
+        map.put("Name", name);
+        map.put("Path", folder.toString());
+        map.put("Exec", "/usr/bin/java -jar " + startUpAppPath.toString());
+        map.put("Terminal", "false");
+        map.put("Categories", "Java;");
+        Path desktopFile = Paths.get(System.getProperty("user.home"), USER_AUTOSTART_FOLDER, name + ".desktop");
+        StringBuilder b = new StringBuilder().append("[Desktop Entry]").append(System.lineSeparator());
+        map.entrySet().forEach(e -> b.append(e.getKey()).append("=").append(e.getValue()).append(System.lineSeparator()));
+        Files.write(desktopFile, b.toString().getBytes());
     }
 
     @Override
     public void deactivateStartupAppWithSystem(String name) throws IOException {
+        Files.deleteIfExists(Paths.get(System.getProperty("user.home"), USER_AUTOSTART_FOLDER, name + ".desktop"));
     }
 }
