@@ -47,32 +47,34 @@ public class WindowsExecutor implements OSExecutor {
             execute(command, 60);
             //wait before file will be written full
             long size = -1;
-            for(int i = 0; i < 60; i ++){
+            for (int i = 0; i < 60; i++) {
                 Thread.sleep(500L);
-                if(Files.exists(path))
-                    if(size == path.toFile().length())
+                if (Files.exists(path))
+                    if (size == path.toFile().length())
                         break;
                     else size = path.toFile().length();
             }
             List<String> list = Files.readAllLines(path, Charset.forName("437"));
             List<GPUDescription> gpus = new ArrayList<>();
-            for(String s: list.stream().map(String::toLowerCase).collect(Collectors.toList())){
-                if(StringUtils.contains(s,"card name:")){
+            GPUsDescriptionDTO desc = new GPUsDescriptionDTO();
+            desc.setRawDescription(list.stream().collect(Collectors.joining(System.lineSeparator())));
+            for (String s : list.stream().map(String::toLowerCase).collect(Collectors.toList())) {
+                if (StringUtils.contains(s, "card name:")) {
                     GPUDescription g = new GPUDescription();
                     g.setName(s.split(":")[1]);
                     gpus.add(g);
                 }
-                if(gpus.size() > 0){
-                    if(StringUtils.contains(s,"chip type:")){
-                       gpus.get(gpus.size()-1).setChipType(s.split(":")[1]);
-                    }else if(StringUtils.contains(s,"display memory:")){
-                        gpus.get(gpus.size()-1).setMemory(s.split(":")[1]);
+                if (gpus.size() > 0) {
+                    if (StringUtils.contains(s, "chip type:")) {
+                        gpus.get(gpus.size() - 1).setChipType(s.split(":")[1]);
+                    } else if (StringUtils.contains(s, "display memory:")) {
+                        gpus.get(gpus.size() - 1).setMemory(s.split(":")[1]);
                     }
                 }
             }
-            GPUsDescriptionDTO GPUsDescriptionDTO1 = new GPUsDescriptionDTO();
-            GPUsDescriptionDTO1.setGpus(gpus);
-            return GPUsDescriptionDTO1;
+
+            desc.setGpus(gpus);
+            return desc;
         } finally {
             if (Objects.nonNull(path))
                 Files.deleteIfExists(path);
