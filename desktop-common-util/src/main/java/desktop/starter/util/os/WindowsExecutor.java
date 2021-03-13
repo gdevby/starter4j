@@ -5,6 +5,7 @@ import com.sun.jna.platform.win32.*;
 import desktop.starter.util.model.CUDAVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
+import lombok.extern.slf4j.Slf4j;
 import mslinks.ShellLink;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,18 +15,18 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /*
 implemented services for win and linux
 * */
+@Slf4j
 public class WindowsExecutor implements OSExecutor {
     private final Memory mem = new Memory(WinDef.ULONG.SIZE);
     private final String windowsStartUpFolder = "AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup";
+    private final static String UNKNOWN = "unknown";
     private long lastCheckExecutionState;
     private long lastExecutionStateNotIdle;
 
@@ -55,34 +56,63 @@ public class WindowsExecutor implements OSExecutor {
                     else size = path.toFile().length();
             }
             List<String> list = Files.readAllLines(path, Charset.forName("437"));
-            List<GPUDescription> gpus = new ArrayList<>();
-            GPUsDescriptionDTO desc = new GPUsDescriptionDTO();
-            desc.setRawDescription(list.stream().collect(Collectors.joining(System.lineSeparator())));
-            for (String s : list.stream().map(String::toLowerCase).collect(Collectors.toList())) {
-                if (StringUtils.contains(s, "card name:")) {
-                    GPUDescription g = new GPUDescription();
-                    g.setName(s.split(":")[1]);
-                    gpus.add(g);
-                }
-                if (gpus.size() > 0) {
-                    if (StringUtils.contains(s, "chip type:")) {
-                        gpus.get(gpus.size() - 1).setChipType(s.split(":")[1]);
-                    } else if (StringUtils.contains(s, "display memory:")) {
-                        gpus.get(gpus.size() - 1).setMemory(s.split(":")[1]);
-                    }
-                }
-            }
-
-            desc.setGpus(gpus);
-            return desc;
+            return processSystemInfoLines(list);
         } finally {
             if (Objects.nonNull(path))
                 Files.deleteIfExists(path);
         }
     }
 
+    public GPUsDescriptionDTO processSystemInfoLines(List<String> list) {
+
+        Set<String> set = new HashSet<>();
+        set.add(UNKNOWN);
+        List<GPUDescription> gpus = new ArrayList<>();
+        GPUsDescriptionDTO desc = new GPUsDescriptionDTO();
+        desc.setRawDescription(list.stream().collect(Collectors.joining(System.lineSeparator())));
+        for (String s : list.stream().map(String::toLowerCase).collect(Collectors.toList())) {
+            if (StringUtils.contains(s, "card name:")) {
+                GPUDescription g = new GPUDescription();
+                g.setName(s.split(":")[1]);
+                gpus.add(g);
+            }
+            if (gpus.size() > 0) {
+                if (StringUtils.contains(s, "chip type:")) {
+                    gpus.get(gpus.size() - 1).setChipType(s.split(":")[1]);
+                } else if (StringUtils.contains(s, "display memory:")) {
+                    gpus.get(gpus.size() - 1).setMemory(s.split(":")[1]);
+                } else if (StringUtils.contains(s, "current mode:")) {
+                    String cm = s.split(":")[1].trim();
+                    if (!UNKNOWN.equalsIgnoreCase(cm) && set.size() > 1)
+                        gpus.remove(gpus.size() - 1);
+                    else set.add(cm);
+                }
+            }
+        }
+
+        desc.setGpus(gpus);
+        return desc;
+    }
+
     @Override
-    public CUDAVersion getCUDAVersion() {
+    public CUDAVersion getCUDAVersion() throws IOException, InterruptedException {
+        String res = execute("nvcc --version", 60);
+        log.trace("nvcc --version -> {}", res);
+        String[] array = res.split(System.lineSeparator());
+        if (array.length == 5) {
+            String[] array1 = array[4].split(",");
+            if (array1.length == 3) {
+                String[] array2 = array1[1].split(" ");
+                if (array2.length == 2) {
+                    String rawCudaVersion = array2[1];
+                    try {
+                        return CUDAVersion.valueOf(rawCudaVersion);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         return null;
     }
 
