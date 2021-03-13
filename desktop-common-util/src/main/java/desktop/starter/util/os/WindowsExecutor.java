@@ -100,16 +100,18 @@ public class WindowsExecutor implements OSExecutor {
         log.trace("nvcc --version -> {}", res);
         String[] array = res.split(System.lineSeparator());
         if (array.length == 5) {
-            String[] array1 = array[4].split(",");
+            String[] array1 = array[4].trim().split(",");
+            log.trace("array1  {}", String.join(",", array1));
             if (array1.length == 3) {
-                String[] array2 = array1[1].split(" ");
+                String[] array2 = array1[1].trim().split(" ");
+                log.trace("array2  {}", String.join(",", array2));
                 if (array2.length == 2) {
                     String rawCudaVersion = array2[1];
-                    try {
-                        return CUDAVersion.valueOf(rawCudaVersion);
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    }
+                    log.trace("raw cuda version {}", rawCudaVersion);
+                    Optional<CUDAVersion> c = Arrays.stream(CUDAVersion.values()).
+                            filter(e -> e.getValue().equalsIgnoreCase("10.2")).findAny();
+                    if (c.isPresent())
+                        return c.get();
                 }
             }
         }
