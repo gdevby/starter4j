@@ -14,11 +14,10 @@ public interface OSExecutor {
 
     GPUsDescriptionDTO getGPUInfo() throws IOException, InterruptedException;
 
-    CUDAVersion getCUDAVersion() throws IOException;
+    CUDAVersion getCUDAVersion() throws IOException, InterruptedException;
 
     /**
      * @return system switches off power computer after some time
-     * @throws IOException
      */
     int getSystemHibernateDelay();
 
@@ -26,7 +25,6 @@ public interface OSExecutor {
      * should be bind to one thread
      *
      * @param seconds time without any events
-     * @return
      */
     boolean isIdleWithoutInputEventsMoreThan(int seconds);
 
@@ -34,15 +32,11 @@ public interface OSExecutor {
      * should be bind to one thread
      *
      * @param seconds time without any events
-     * @return
      */
     boolean isIdleWithoutExecutionStateMoreThan(int seconds);
 
     /**
      * should be bind to one thread
-     *
-     * @param code
-     * @return
      */
     int setThreadExecutionState(int code);
 
@@ -51,8 +45,6 @@ public interface OSExecutor {
      * @param startUpAppPath ran file
      * @param folder         - app folder to run
      * @param name           - name of the running config
-     * @return
-     * @throws IOException
      */
     void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException;
 
