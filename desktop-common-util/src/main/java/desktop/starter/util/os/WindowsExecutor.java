@@ -155,7 +155,7 @@ public class WindowsExecutor implements OSExecutor {
 
     @Override
     public void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException {
-        ShellLink sl = ShellLink.createLink(startUpAppPath.getFileName().toString())
+        ShellLink sl = ShellLink.createLink(startUpAppPath.toString())
                 .setWorkingDir(folder.toString());
         sl.saveTo(Paths.get(buildStartUpFolder().toString(), name + ".lnk").toString());
         System.out.println(sl.getWorkingDir());
