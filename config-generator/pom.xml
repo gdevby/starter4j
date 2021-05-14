@@ -5,7 +5,7 @@
     <parent>
         <artifactId>starter</artifactId>
         <groupId>desktop.starter</groupId>
-        <version>1.0</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>desktop.starter</groupId>
             <artifactId>starter-core</artifactId>
-            <version>1.0</version>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>
