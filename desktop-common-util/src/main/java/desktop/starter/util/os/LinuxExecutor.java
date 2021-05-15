@@ -5,7 +5,7 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.unix.X11;
-import desktop.starter.util.model.CUDAVersion;
+import desktop.starter.util.model.GPUDriverVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
 import org.apache.commons.io.IOUtils;
@@ -55,11 +55,11 @@ public class LinuxExecutor implements OSExecutor {
     }
 
     @Override
-    public CUDAVersion getCUDAVersion() throws IOException {
+    public GPUDriverVersion getGPUDriverVersion() throws IOException {
         String s = new String(Files.readAllBytes(CUDA_VERSION_PATH));
         String[] res = s.split(" ");
         if (res.length == 3) {
-            Optional<CUDAVersion> op = Arrays.stream(CUDAVersion.values()).
+            Optional<GPUDriverVersion> op = Arrays.stream(GPUDriverVersion.values()).
                     filter(f -> res[2].startsWith(f.getValue())).findFirst();
             if (op.isPresent()) {
                 return op.get();
@@ -92,7 +92,6 @@ public class LinuxExecutor implements OSExecutor {
         return 0;
     }
 
-    @SuppressWarnings("WeakerAccess")
     protected GPUsDescriptionDTO getGPUInfo1(String res, String stringStart) {
         String[] params = res.split(System.lineSeparator());
         List<GPUDescription> gpus = Arrays.stream(params).map(String::toLowerCase).

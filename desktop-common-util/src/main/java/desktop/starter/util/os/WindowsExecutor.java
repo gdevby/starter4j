@@ -2,7 +2,7 @@ package desktop.starter.util.os;
 
 import com.sun.jna.Memory;
 import com.sun.jna.platform.win32.*;
-import desktop.starter.util.model.CUDAVersion;
+import desktop.starter.util.model.GPUDriverVersion;
 import desktop.starter.util.model.GPUDescription;
 import desktop.starter.util.model.GPUsDescriptionDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +95,7 @@ public class WindowsExecutor implements OSExecutor {
     }
 
     @Override
-    public CUDAVersion getCUDAVersion() throws IOException, InterruptedException {
+    public GPUDriverVersion getGPUDriverVersion() throws IOException, InterruptedException {
         String res = execute("nvcc --version", 60);
         log.trace("nvcc --version -> {}", res);
         String[] array = res.split(System.lineSeparator());
@@ -108,7 +108,7 @@ public class WindowsExecutor implements OSExecutor {
                 if (array2.length == 2) {
                     String rawCudaVersion = array2[1];
                     log.trace("raw cuda version {}", rawCudaVersion);
-                    Optional<CUDAVersion> c = Arrays.stream(CUDAVersion.values()).
+                    Optional<GPUDriverVersion> c = Arrays.stream(GPUDriverVersion.values()).
                             filter(e -> e.getValue().equalsIgnoreCase("10.2")).findAny();
                     if (c.isPresent())
                         return c.get();

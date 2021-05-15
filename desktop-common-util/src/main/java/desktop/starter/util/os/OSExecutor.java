@@ -1,6 +1,6 @@
 package desktop.starter.util.os;
 
-import desktop.starter.util.model.CUDAVersion;
+import desktop.starter.util.model.GPUDriverVersion;
 import desktop.starter.util.model.GPUsDescriptionDTO;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public interface OSExecutor {
 
     GPUsDescriptionDTO getGPUInfo() throws IOException, InterruptedException;
 
-    CUDAVersion getCUDAVersion() throws IOException, InterruptedException;
+    GPUDriverVersion getGPUDriverVersion() throws IOException, InterruptedException;
 
     /**
      * @return system switches off power computer after some time
