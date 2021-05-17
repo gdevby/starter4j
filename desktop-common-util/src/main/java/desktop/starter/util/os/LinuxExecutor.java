@@ -56,6 +56,8 @@ public class LinuxExecutor implements OSExecutor {
 
     @Override
     public GPUDriverVersion getGPUDriverVersion() throws IOException {
+    	if(Files.notExists(CUDA_VERSION_PATH))
+    		return null;
         String s = new String(Files.readAllBytes(CUDA_VERSION_PATH));
         String[] res = s.split(" ");
         if (res.length == 3) {
