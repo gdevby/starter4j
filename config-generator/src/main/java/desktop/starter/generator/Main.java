@@ -3,6 +3,8 @@ package desktop.starter.generator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import desktop.starter.generator.model.AppConfigModel;
 import desktop.starter.model.AppConfig;
 
 import java.io.*;

@@ -1,5 +1,6 @@
 package desktop.starter.generator;
 
+import desktop.starter.generator.model.AppConfigModel;
 import desktop.starter.generator.util.Util;
 import desktop.starter.model.AppConfig;
 import desktop.starter.util.DesktopUtil;
