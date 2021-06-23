@@ -1,4 +1,4 @@
-package desktop.starter.generator;
+package desktop.starter.generator.model;
 
 import desktop.starter.util.OSInfo;
 import desktop.starter.util.model.ArgumentType;
@@ -13,7 +13,7 @@ public class AppConfigModel {
     private String appName;
     private String mainClass;
     private Map<ArgumentType,List<String>> arguments;
-    private Map<OSInfo.OSType, Repo> jvms;
+    private String jvms;
     private String resourcesPath;
     //used for -cp
     private String dependenciesPath;

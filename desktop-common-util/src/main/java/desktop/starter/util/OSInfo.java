@@ -2,6 +2,7 @@ package desktop.starter.util;
 
 import java.security.PrivilegedAction;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class OSInfo {
@@ -27,32 +28,38 @@ public class OSInfo {
         LINUX,
         SOLARIS,
         MACOSX,
-        UNKNOWN,
-        ;
+        UNKNOWN
     }
 
+    //todo added maybe raspberry
     public static OSType getOSType() throws SecurityException {
-        String osName = System.getProperty(OS_NAME);
+        String osName = System.getProperty(OS_NAME).toLowerCase(Locale.ROOT);
         if (osName != null) {
-            if (osName.toLowerCase().contains("windows")) {
+            if (osName.contains("windows")) {
                 return OSType.WINDOWS;
             }
 
-            if (osName.toLowerCase().contains("os x") || osName.toLowerCase().contains("mac")) {
+            if (osName.contains("os x") || osName.contains("mac")) {
                 return OSType.MACOSX;
             }
 
-            if (osName.toLowerCase().contains("linux") || osName.toLowerCase().contains("unix")) {
+            if (osName.contains("linux") || osName.contains("unix")) {
                 return OSType.LINUX;
             }
 
-            if (osName.toLowerCase().contains("solaris") || osName.toLowerCase().contains(("sunos"))) {
+            if (osName.contains("solaris") || osName.contains(("sunos"))) {
                 return OSType.SOLARIS;
             }
         }
 
         return OSType.UNKNOWN;
     }
+    public static Arch getJavaBit() {
+		String res = System.getProperty("sun.arch.data.model");
+		if (res != null && res.equalsIgnoreCase("64"))
+			return Arch.x64;
+		return Arch.x32;
+	}
 
     public static PrivilegedAction<OSType> getOSTypeAction() {
         return osTypeAction;
@@ -138,5 +145,8 @@ public class OSInfo {
             return this.major + "." + this.minor;
         }
     }
+	public enum Arch {
+		x32, x64;
+	}
 }
 
