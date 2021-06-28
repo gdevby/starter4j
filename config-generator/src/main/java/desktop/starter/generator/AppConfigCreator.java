@@ -1,41 +1,58 @@
 package desktop.starter.generator;
 
 import desktop.starter.generator.model.AppConfigModel;
+import desktop.starter.generator.model.JVMConfig;
 import desktop.starter.generator.util.Util;
 import desktop.starter.model.AppConfig;
 import desktop.starter.util.DesktopUtil;
+import desktop.starter.util.OSInfo;
+import desktop.starter.util.OSInfo.Arch;
+import desktop.starter.util.OSInfo.OSType;
 import desktop.starter.util.model.download.Metadata;
 import desktop.starter.util.model.download.Repo;
 
+import static desktop.starter.generator.AppConfigCreator.TEMP_APP_CONFIG;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.io.FilenameUtils;
+
+import com.sun.swing.internal.plaf.metal.resources.metal;
 
 public class AppConfigCreator {
 
     public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
-    public static final String FTP_CONFIG = "ftpConfig.json";
+    public static final String DOMAIN_CONFIG = "domainConfig.json";
     public static final String TEMP_APP_CONFIG = "tempAppConfig.json";
     /**
      * Read from local machine
      */
-    private List<FtpInfo> ftpInfos;
+    private List<Domain> domains;
     //todo add sftp and ftp saving of the file
     //todo create config
 
     /**
      * @param configFile contains config app
      * @return generated AppConfig
+     * @throws NoSuchAlgorithmException
      */
 
-    public AppConfig createConfig(AppConfigModel configFile, List<FtpInfo> ftpInfos) throws IOException {
+    public AppConfig createConfig(AppConfigModel configFile, List<Domain> ftpInfos) throws IOException, NoSuchAlgorithmException {
         AppConfig appConfig = new AppConfig();
         appConfig.setAppName(configFile.getAppName());
         appConfig.setArguments(configFile.getArguments());
 //        appConfig.setJvms(configFile.getJvms());
+        test(ftpInfos, configFile);
         appConfig.setMainClass(configFile.getMainClass());
 //        appConfig.setDependencies(createRepo(Paths.get(configFile.getDependenciesPath()), ftpInfos));
 //        appConfig.setResources(createRepo(Paths.get(configFile.getResourcesPath()), ftpInfos));
@@ -173,10 +190,10 @@ public class AppConfigCreator {
                 ftpClients.add(create(s));
             }
         }*/
-    private Repo createRepo(Path folder, List<FtpInfo> ftpInfos) throws IOException {
-        List<String> domains = ftpInfos.stream().map(FtpInfo::getDomain).collect(Collectors.toList());
+    private Repo createRepo(Path jvms, Path folder, List<Domain> ftpInfos) throws IOException {
+        List<String> domains = ftpInfos.stream().map(Domain::getDomain).collect(Collectors.toList());
         List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(Util.wrap(e -> {
-            Path s = e.subpath(1, e.getNameCount());
+            Path s = jvms.relativize(e);
             Metadata m = new Metadata();
             m.setRelativeUrl(s.toString());
             m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
@@ -185,8 +202,50 @@ public class AppConfigCreator {
             return m;
         })).collect(Collectors.toList());
         Repo r = new Repo();
-//        r.setResources(metadataList);
+        r.setResources(metadataList);
         r.setRepositories(domains);
         return r;
+    }
+    public void test(List<Domain> domains, AppConfigModel appConfigModel) throws IOException, NoSuchAlgorithmException {
+    	//create jvm metadata json for every jvm
+    	Path p = Paths.get(appConfigModel.getJvms(),getJVMPath());
+    	Repo windows_x64_jre_default = createRepo(Paths.get(appConfigModel.getJvms()).getParent(),p, domains);
+    	Optional<Path> jvmName = Files.walk(p,1).filter(entry -> !entry.equals(p)).findFirst();
+    	if(jvmName.isPresent()) {
+    		Path jvmConfigFile = Paths.get("jvms",getJVMPath() ,FilenameUtils.getName(jvmName.get().toString())+".json");
+    		if(Files.notExists(jvmConfigFile.getParent()))
+    			Files.createDirectories(jvmConfigFile.getParent());
+
+    		try(OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jvmConfigFile.toFile()),Main.charset)){
+                Main.GSON.toJson(windows_x64_jre_default,out);
+            }
+    		//create full json for all jvm for every machine
+    		JVMConfig j = new JVMConfig();
+        	Map<OSType, Map<Arch, Map<String,Repo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch,Map<String,Repo>>>();
+        	Map<Arch, Map<String,Repo>> m1 = new HashMap<OSInfo.Arch, Map<String,Repo>>();
+        	Map<String,Repo> t = new HashMap<String, Repo>();
+        	Repo r = new Repo();
+        	List<Metadata> m = new ArrayList<>();
+        	Metadata metadata = new Metadata();
+        	metadata.setPath(jvmConfigFile.toString());
+        	metadata.setRelativeUrl(jvmConfigFile.toString());
+        	metadata.setSha1(DesktopUtil.getChecksum(jvmConfigFile.toFile(),"sha-1"));
+        	r.setResources(Arrays.asList(metadata));
+        	r.setRepositories(domains.stream().map(e->e.getDomain()).collect(Collectors.toList()));
+        	t.put("jre_default", r);
+        	m1.put(Arch.x32, t);
+        	jvms.put(OSType.LINUX,m1);
+        	j.setJvms(jvms);
+        	try(OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream("jvms/jvms.json"),Main.charset)){
+                Main.GSON.toJson(j,out);
+            }
+    	}
+
+
+
+    }
+    private String getJVMPath() {
+    	return String.join(File.separator,OSType.LINUX.toString().toLowerCase(Locale.ROOT),
+		Arch.x64.toString().toLowerCase(Locale.ROOT),"jre_default");
     }
 }
