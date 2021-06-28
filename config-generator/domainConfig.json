@@ -1,12 +1,12 @@
 [
   {
-    "domain":"file.repository.com/",
+    "domain":"http://localhost/",
     "address": "3.202.49.1",
     "login": "test",
     "pass": "test"
   },
   {
-    "domain":"file.repository1.com/",
+    "domain":"http://localhost1111/",
     "address": "5.9.78.146",
     "login": "test1",
     "pass": "test1"

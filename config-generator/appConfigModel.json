@@ -4,7 +4,7 @@
   "appName":"starter-app",
   "mainClass":"desktop.starter.app.Main",
   "arguments":{"JVM":[],"APP":[]},
-  "jvms":"./starter-app-folder/jvms",
+  "jvms":"src/test/resources/jvms",
   "resourcesPath": "./starter-app-folder/resources",
   "dependenciesPath":"./starter-app-folder/dep"
 }
