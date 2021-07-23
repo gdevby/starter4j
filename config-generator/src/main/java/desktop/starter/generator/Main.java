@@ -47,7 +47,7 @@ public class Main {
             throw new FileNotFoundException(String.format("can't find file %s in directory %s", DOMAIN_CONFIG, new File(".").getCanonicalPath()));
         }
         log.info("used FTP_CONFIG{}", ftpFile );
-        log.info("uused APP_CONFIG_GENERATOR{}", file );
+        log.info("used APP_CONFIG_GENERATOR{}", file );
         AppConfigModel c = GSON.fromJson(new InputStreamReader(new FileInputStream(file), charset),
                 AppConfigModel.class);
 
