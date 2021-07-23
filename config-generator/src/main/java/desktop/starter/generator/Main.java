@@ -53,7 +53,6 @@ public class Main {
         AppConfigCreator appConfigCreator = new AppConfigCreator();
         //create
         AppConfig appConfig = appConfigCreator.createConfig(c, ftps);
-
         System.out.println("save config before uploading " + new File(TEMP_APP_CONFIG).getAbsolutePath());
         try(OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(TEMP_APP_CONFIG),charset)){
             GSON.toJson(appConfig,out);
