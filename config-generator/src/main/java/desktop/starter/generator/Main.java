@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import desktop.starter.generator.model.AppConfigModel;
 import desktop.starter.model.AppConfig;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -35,6 +36,7 @@ public class Main {
             file = new File(APP_CONFIG_GENERATOR).getCanonicalPath();
         } else {
             throw new FileNotFoundException(String.format("can't find file %s in directory %s", APP_CONFIG_GENERATOR, new File(".").getCanonicalPath()));
+            
         }
         String ftpFile;
         if (length == 2) {
@@ -44,9 +46,8 @@ public class Main {
         } else {
             throw new FileNotFoundException(String.format("can't find file %s in directory %s", DOMAIN_CONFIG, new File(".").getCanonicalPath()));
         }
-        System.out.println("used FTP_CONFIG " + ftpFile);
-        System.out.println("used APP_CONFIG_GENERATOR " + file);
-
+        log.info("used FTP_CONFIG{}", ftpFile );
+        log.info("uused APP_CONFIG_GENERATOR{}", file );
         AppConfigModel c = GSON.fromJson(new InputStreamReader(new FileInputStream(file), charset),
                 AppConfigModel.class);
 
@@ -56,17 +57,15 @@ public class Main {
         AppConfigCreator appConfigCreator = new AppConfigCreator();
         //create
         AppConfig appConfig = appConfigCreator.createConfig(c, ftps);
-        System.out.println("save config before uploading " + new File(TEMP_APP_CONFIG).getAbsolutePath());
+        
+        log.info("save config before uploading{}", new File(TEMP_APP_CONFIG).getAbsolutePath());
+//        System.out.println("save config before uploading " + new File(TEMP_APP_CONFIG).getAbsolutePath());
         try(OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(TEMP_APP_CONFIG),charset)){
             GSON.toJson(appConfig,out);
         }
-
-
-        System.out.println("upload remote servers");
-
-        System.out.println("save");
-        //save on remote server remote servers
-        System.out.println("DONE ");
-
+        
+        log.info("upload remote servers");
+        log.info("save");
+        log.info("DONE");
     }
 }
