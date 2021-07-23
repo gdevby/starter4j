@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import desktop.starter.generator.model.AppConfigModel;
 import desktop.starter.model.AppConfig;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -18,11 +19,13 @@ import java.util.List;
 import static desktop.starter.generator.AppConfigCreator.APP_CONFIG_GENERATOR;
 import static desktop.starter.generator.AppConfigCreator.DOMAIN_CONFIG;
 import static desktop.starter.generator.AppConfigCreator.TEMP_APP_CONFIG;
-
+@Slf4j
 public class Main {
     static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     static Charset charset = StandardCharsets.UTF_8;
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    	log.trace("test logger trace");
+    	log.info("test logger info");
         //todo add special library to process args
         int length = args.length;
         String file;
