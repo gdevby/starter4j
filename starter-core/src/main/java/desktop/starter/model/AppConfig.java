@@ -1,10 +1,8 @@
 package desktop.starter.model;
 
-import desktop.starter.util.OSInfo;
 import desktop.starter.util.model.ArgumentType;
 import desktop.starter.util.model.download.Repo;
 import lombok.Data;
-
 import java.util.List;
 import java.util.Map;
 
@@ -18,13 +16,15 @@ import java.util.Map;
 public class AppConfig {
     private String comment = "Config file for desktop-starter example";
     private String appName;
+    private double appVersion;
     private String mainClass;
     private Map<ArgumentType,List<String>> arguments;
-    private Map<OSInfo.OSType,Repo> jvms;
     /**
      * images and other files are used an app
      */
-    private Repo resources;
+    private Repo appFile;    
+    private Repo appResources;
     //used for -cp
-    private Repo dependencies;
+    private Repo appDependencies;
+    private Repo javaFolder;
 }

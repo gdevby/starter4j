@@ -1,0 +1,6 @@
+/.flattened-pom.xml
+/.classpath
+/.project
+jvms/
+json/
+.settings/
