@@ -17,4 +17,7 @@ public class AppConfigModel {
     //used for -cp
     private String appDependencies;
     private String appFolder;
+    private boolean generetedJava;
+    
+//    public String h
 }

@@ -19,7 +19,7 @@ public class Metadata {
      * Related url, first check urls after relativeUrl
      */
     private String relativeUrl; 
-    //создать метод
+
     public static Metadata getResource (Path config) throws NoSuchAlgorithmException, IOException {
 		Metadata metadata = new Metadata();
 		metadata.setPath(config.toString());
