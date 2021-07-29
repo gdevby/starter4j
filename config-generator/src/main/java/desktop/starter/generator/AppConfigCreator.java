@@ -28,6 +28,7 @@ public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
 	public static final String DOMAIN_CONFIG = "domainConfig.json";
 	public static final String TEMP_APP_CONFIG = "tempAppConfig.json";
+	//todo объеденить папки out и target
 	public static final String OUT_FOLDER = "out";
 	public static final String TARGET_FOLDER = "target";
 	public static final String APP_DEPENDENCISES_CONFIG = "dependencises.json";
@@ -39,6 +40,7 @@ public class AppConfigCreator {
 	 * @return generated AppConfig
 	 * @throws NoSuchAlgorithmException
 	 */
+	//todo rename parameter to domains from ftpInfos
 	public AppConfig createConfig(AppConfigModel configFile, List<Domain> ftpInfos)
 			throws IOException, NoSuchAlgorithmException {
 		AppConfig appConfig = new AppConfig();
@@ -47,6 +49,7 @@ public class AppConfigCreator {
 		appConfig.setArguments(configFile.getArguments());
 		appConfig.setMainClass(configFile.getMainClass());
 		createAppConfig(ftpInfos, configFile);
+		//todo создать переменные конечные в папки
 		FileMapperService.copyFile(Paths.get(configFile.getAppFolder()), Paths.get(TARGET_FOLDER, OUT_FOLDER,
 				configFile.getAppName(), String.valueOf(configFile.getAppVersion())));
 		appConfig.setAppDependencies(createRepo(
@@ -61,6 +64,7 @@ public class AppConfigCreator {
 				Paths.get(TARGET_FOLDER, OUT_FOLDER, configFile.getAppName(),
 						String.valueOf(configFile.getAppVersion()), APP_RESOURCES_CONFIG),
 				ftpInfos, Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString()));
+		//src/test/resources/tempAppConfig.json задавать это из конфига
 		Object app = FileMapperService.read(Paths.get("src/test/resources/tempAppConfig.json"), AppConfig.class);
 		appConfig.setAppFileRepo(createRepo(Paths.get(configFile.getAppFolder()),
 				Paths.get(configFile.getAppFolder(), configFile.getAppFile()), ftpInfos,
@@ -100,17 +104,17 @@ public class AppConfigCreator {
 	 * info.getPass()); logger.debug("ftp reply code  is " +
 	 * ftpClient.getReplyCode()); ftpClient.enterLocalPassiveMode();
 	 * ftpClient.setFileType(FTP.BINARY_FILE_TYPE); return ftpClient; }
-	 * 
+	 *
 	 * public void deleteFile(String path) throws IOException { synchronized (this)
 	 * { if (!init) init(); for (FTPClient client : ftpClients) { if
 	 * (!client.deleteFile(path)) { throw new
 	 * RuntimeException("problem with save of the file: " + path); } } } }
-	 * 
+	 *
 	 * private void ftpCreateDirectoryTree(FTPClient client, String dirTree) throws
 	 * IOException {
-	 * 
+	 *
 	 * boolean dirExists = true;
-	 * 
+	 *
 	 * // tokenize the string and attempt to change into each directory level. If
 	 * you // cannot, then start creating. String[] directories =
 	 * dirTree.substring(0, dirTree.lastIndexOf("/")).split("/"); for (String dir :
@@ -125,12 +129,12 @@ public class AppConfigCreator {
 	 * IOException("Unable to change into newly created remote directory '" + dir +
 	 * "'.  error='" + client.getReplyString() + "'"); } } } }
 	 * client.changeWorkingDirectory("/"); }
-	 * 
+	 *
 	 * @PreDestroy public void close() { for (FTPClient client : ftpClients) { try {
 	 * if (client.isConnected()) { client.logout(); } } catch (IOException ex) {
 	 * logger.debug("", ex); } finally { try { client.disconnect(); } catch
 	 * (IOException e) { logger.error("", e); } } } }
-	 * 
+	 *
 	 * public void storeFile(byte[] array, String path) throws IOException { String
 	 * decode = UriUtils.decode(path, StandardCharsets.ISO_8859_1.toString());
 	 * synchronized (this) { if (!init) init(); try { for (FTPClient client :
@@ -140,11 +144,11 @@ public class AppConfigCreator {
 	 * cleanMetadata(decode); throw new RuntimeException(client.getReplyCode() + " "
 	 * + client.getReplyString() + " " + decode); } logger.debug("saved file " +
 	 * path + " on server " + client.getRemoteAddress()); }
-	 * 
+	 *
 	 * } catch (FTPConnectionClosedException f) { logger.warn("", f); try {
 	 * Thread.sleep(10 * 1000L); } catch (InterruptedException e) { } close();
 	 * init(); storeFile(array, path); } } }
-	 * 
+	 *
 	 * protected void init() throws IOException { init = true; Resource resource =
 	 * new ClassPathResource(defaultConfigFile); String text =
 	 * IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
@@ -161,6 +165,7 @@ public class AppConfigCreator {
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString());
 			m.setSize(e.toFile().length());
+			//todo used Objects.nonNull except !=null
 			if (str != null) {
 				s = Paths.get(str, s.toString());
 			}
@@ -172,7 +177,7 @@ public class AppConfigCreator {
 		r.setRepositories(domains);
 		return r;
 	}
-
+	//todo one line
 	private List<Path> listPath(Path p) throws IOException {
 		List<Path> list = Files.walk(p, 1).filter(entry -> !entry.equals(p)).collect(Collectors.toList());
 		return list;
@@ -206,9 +211,10 @@ public class AppConfigCreator {
 			}
 		}
 		// Create json Config from all json
+		//todo without static, crate object and used from appconfig creator field , set with constructor
 		FileMapperService.write(jvm, Paths.get(TARGET_FOLDER, OUT_FOLDER, JAVA_CONFIG));
 	}
-
+	//todo check double using
 	private void createAppConfig(List<Domain> ftpInfos, AppConfigModel configFile) throws IOException {
 		AppConfig appConfig = new AppConfig();
 		appConfig
