@@ -15,9 +15,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class FileMapperService {
+	//todo used one gson from main
     static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     static Charset charset = StandardCharsets.UTF_8;
-    
+
 	public static void write(Object create, Path config) throws FileNotFoundException, IOException {
 		if (Files.notExists(config.getParent()))
 			Files.createDirectories(config.getParent());
@@ -29,11 +30,11 @@ public class FileMapperService {
 	public static Object read(Path file, Class<?> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile())) ){
 			return GSON.fromJson(read, clas);
-		}		
+		}
 	}
-	
-	public static void copyFile(Path source, Path dest) throws IOException {  
+
+	public static void copyFile(Path source, Path dest) throws IOException {
 	    FileUtils.copyDirectory(source.toFile(), dest.toFile());
 	}
-	
+
 }

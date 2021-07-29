@@ -8,7 +8,7 @@ import java.util.Map;
 @Data
 public class AppConfigModel {
     private String appName;
-    private double appVersion; 
+    private double appVersion;
     private String mainClass;
     private Map<ArgumentType,List<String>> arguments;
     private String appFile;
@@ -18,6 +18,6 @@ public class AppConfigModel {
     private String appDependencies;
     private String appFolder;
     private boolean generetedJava;
-    
+     //todo remove line lower.
 //    public String h
 }
