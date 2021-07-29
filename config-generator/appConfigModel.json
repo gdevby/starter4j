@@ -9,5 +9,6 @@
   "appResources": "src/test/starter-app-folder/resources",
   "appDependencies":"src/test/starter-app-folder/dep",  
   "appFile":"starter-app-1.0.jar",  
-  "appFolder":"src/test/starter-app-folder"
+  "appFolder":"src/test/starter-app-folder", 
+  "generetedJava" : false
 }

@@ -1,9 +1,6 @@
 package desktop.starter.generator;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import desktop.starter.generator.model.AppConfigModel;
 import desktop.starter.generator.model.JVMConfig;
 import desktop.starter.generator.util.Util;
@@ -24,13 +22,14 @@ import desktop.starter.util.OSInfo.Arch;
 import desktop.starter.util.OSInfo.OSType;
 import desktop.starter.util.model.download.Metadata;
 import desktop.starter.util.model.download.Repo;
+import desktop.starter.generator.service.FileMapperService;
 
 public class AppConfigCreator {
-
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
 	public static final String DOMAIN_CONFIG = "domainConfig.json";
 	public static final String TEMP_APP_CONFIG = "tempAppConfig.json";
-	public static final String FOLDER_CONFIG = "json";
+	public static final String OUT_FOLDER = "out";
+	public static final String TARGET_FOLDER = "target";
 	public static final String APP_DEPENDENCISES_CONFIG = "dependencises.json";
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
@@ -47,12 +46,32 @@ public class AppConfigCreator {
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setArguments(configFile.getArguments());
 		appConfig.setMainClass(configFile.getMainClass());
-		createJreConfig(ftpInfos, configFile);
 		createAppConfig(ftpInfos, configFile);
-		appConfig.setAppDependencies(createRepo(Paths.get(FOLDER_CONFIG), Paths.get(FOLDER_CONFIG, APP_DEPENDENCISES_CONFIG), ftpInfos));
-		appConfig.setAppResources(createRepo(Paths.get(FOLDER_CONFIG), Paths.get(FOLDER_CONFIG, APP_RESOURCES_CONFIG), ftpInfos));
-		appConfig.setJavaFolder(createRepo(Paths.get(FOLDER_CONFIG), Paths.get(FOLDER_CONFIG, JAVA_CONFIG), ftpInfos));
-		appConfig.setAppFile(createRepo(Paths.get(configFile.getAppFolder()),Paths.get(configFile.getAppFolder(), configFile.getAppFile()), ftpInfos));
+		FileMapperService.copyFile(Paths.get(configFile.getAppFolder()), Paths.get(TARGET_FOLDER, OUT_FOLDER,
+				configFile.getAppName(), String.valueOf(configFile.getAppVersion())));
+		appConfig.setAppDependencies(createRepo(
+				Paths.get(TARGET_FOLDER, OUT_FOLDER, configFile.getAppName(),
+						String.valueOf(configFile.getAppVersion())),
+				Paths.get(TARGET_FOLDER, OUT_FOLDER, configFile.getAppName(),
+						String.valueOf(configFile.getAppVersion()), APP_DEPENDENCISES_CONFIG),
+				ftpInfos, Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString()));
+		appConfig.setAppResources(createRepo(
+				Paths.get(TARGET_FOLDER, OUT_FOLDER, configFile.getAppName(),
+						String.valueOf(configFile.getAppVersion())),
+				Paths.get(TARGET_FOLDER, OUT_FOLDER, configFile.getAppName(),
+						String.valueOf(configFile.getAppVersion()), APP_RESOURCES_CONFIG),
+				ftpInfos, Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString()));
+		Object app = FileMapperService.read(Paths.get("src/test/resources/tempAppConfig.json"), AppConfig.class);
+		appConfig.setAppFileRepo(createRepo(Paths.get(configFile.getAppFolder()),
+				Paths.get(configFile.getAppFolder(), configFile.getAppFile()), ftpInfos,
+				Paths.get(configFile.getAppName()).toString()));
+		appConfig.setJavaRepo(((AppConfig) app).getJavaRepo());
+		if (configFile.isGeneretedJava()) {
+			createJreConfig(ftpInfos, configFile);
+			appConfig.setJavaRepo(
+					createRepo(Paths.get(TARGET_FOLDER, OUT_FOLDER), Paths.get(TARGET_FOLDER, OUT_FOLDER, JAVA_CONFIG),
+							ftpInfos, Paths.get(configFile.getAppName()).toString()));
+		}
 		return appConfig;
 	}
 
@@ -134,15 +153,18 @@ public class AppConfigCreator {
 	 * (FtpInfo s : servers) { ftpClients.add(create(s)); } }
 	 */
 
-	private Repo createRepo(Path jvms, Path folder, List<Domain> ftpInfos) throws IOException {
+	private Repo createRepo(Path jvms, Path folder, List<Domain> ftpInfos, String str) throws IOException {
 		List<String> domains = ftpInfos.stream().map(Domain::getDomain).collect(Collectors.toList());
 		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(Util.wrap(e -> {
 			Path s = jvms.relativize(e);
 			Metadata m = new Metadata();
-			m.setRelativeUrl(s.toString());
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString());
 			m.setSize(e.toFile().length());
+			if (str != null) {
+				s = Paths.get(str, s.toString());
+			}
+			m.setRelativeUrl(s.toString());
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();
@@ -156,19 +178,11 @@ public class AppConfigCreator {
 		return list;
 	}
 
-	private void write(Object create, Path config) throws FileNotFoundException, IOException {
-		if (Files.notExists(config.getParent()))
-			Files.createDirectories(config.getParent());
-		try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(config.toFile()), Main.charset)) {
-			Main.GSON.toJson(create, out);
-		}
-	}
-
-	private void createJreConfig(List<Domain> domains, AppConfigModel appConfigModel)
+	private void createJreConfig(List<Domain> domains, AppConfigModel configFile)
 			throws IOException, NoSuchAlgorithmException {
 		JVMConfig jvm = new JVMConfig();
 		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>());
-		for (Path pathTypeOS : listPath(Paths.get(appConfigModel.getJavaFolder()))) {
+		for (Path pathTypeOS : listPath(Paths.get(configFile.getJavaFolder()))) {
 			OSType type = OSType.valueOf(pathTypeOS.getFileName().toString().toUpperCase(Locale.ROOT));
 			jvm.getJvms().put(type, new HashMap<OSInfo.Arch, Map<String, Repo>>());
 			for (Path pathArch : listPath(pathTypeOS)) {
@@ -180,10 +194,11 @@ public class AppConfigCreator {
 					jvm.getJvms().get(type).get(arch).put(key, repo);
 					for (Path pathJre : listPath(pathKey)) {
 						// Create json from all jvm
-						Repo createdJson = createRepo(pathKey, pathJre, domains);
+						Repo createdJson = createRepo(pathKey.getParent(), pathJre, domains,
+								Paths.get(configFile.getAppName()).toString());
 						Path jvmConfig = Paths.get("jvms", type.toString().toLowerCase(Locale.ROOT), arch.toString(),
 								key, String.valueOf(pathJre.getFileName().toString()) + ".json");
-						write(createdJson, jvmConfig);
+						FileMapperService.write(createdJson, jvmConfig);
 						repo.setResources(Arrays.asList(Metadata.getResource(jvmConfig)));
 						repo.setRepositories(domains.stream().map(e -> e.getDomain()).collect(Collectors.toList()));
 					}
@@ -191,16 +206,27 @@ public class AppConfigCreator {
 			}
 		}
 		// Create json Config from all json
-		write(jvm, Paths.get(FOLDER_CONFIG, JAVA_CONFIG));
+		FileMapperService.write(jvm, Paths.get(TARGET_FOLDER, OUT_FOLDER, JAVA_CONFIG));
 	}
 
 	private void createAppConfig(List<Domain> ftpInfos, AppConfigModel configFile) throws IOException {
 		AppConfig appConfig = new AppConfig();
-		appConfig.setAppDependencies(createRepo(Paths.get(configFile.getAppDependencies()),
-				Paths.get(configFile.getAppDependencies()), ftpInfos));
-		appConfig.setAppResources(
-				createRepo(Paths.get(configFile.getAppResources()), Paths.get(configFile.getAppResources()), ftpInfos));
-		write(appConfig.getAppResources(), Paths.get(FOLDER_CONFIG, APP_RESOURCES_CONFIG));
-		write(appConfig.getAppDependencies(), Paths.get(FOLDER_CONFIG, APP_DEPENDENCISES_CONFIG));
+		appConfig
+				.setAppDependencies(createRepo(Paths.get(configFile.getAppDependencies()),
+						Paths.get(configFile.getAppDependencies()), ftpInfos, Paths
+								.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion()),
+										Paths.get(configFile.getAppDependencies()).getFileName().toString())
+								.toString()));
+		appConfig
+				.setAppResources(
+						createRepo(Paths.get(configFile.getAppResources()), Paths.get(configFile.getAppResources()),
+								ftpInfos, Paths
+										.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion()),
+												Paths.get(configFile.getAppResources()).getFileName().toString())
+										.toString()));
+		FileMapperService.write(appConfig.getAppDependencies(), Paths.get(TARGET_FOLDER, OUT_FOLDER,
+				configFile.getAppName(), String.valueOf(configFile.getAppVersion()), APP_DEPENDENCISES_CONFIG));
+		FileMapperService.write(appConfig.getAppResources(), Paths.get(TARGET_FOLDER, OUT_FOLDER,
+				configFile.getAppName(), String.valueOf(configFile.getAppVersion()), APP_RESOURCES_CONFIG));
 	}
 }

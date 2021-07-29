@@ -22,9 +22,12 @@ public class AppConfig {
     /**
      * images and other files are used an app
      */
-    private Repo appFile;    
+    //!
+    private Repo appFileRepo;    
     private Repo appResources;
     //used for -cp
     private Repo appDependencies;
-    private Repo javaFolder;
+    //!
+    private Repo javaRepo;
 }
+
