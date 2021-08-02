@@ -19,14 +19,14 @@ import java.util.List;
 import static desktop.starter.generator.AppConfigCreator.APP_CONFIG_GENERATOR;
 import static desktop.starter.generator.AppConfigCreator.DOMAIN_CONFIG;
 import static desktop.starter.generator.AppConfigCreator.TEMP_APP_CONFIG;
-import static desktop.starter.generator.AppConfigCreator.OUT_FOLDER;
-import static desktop.starter.generator.AppConfigCreator.TARGET_FOLDER;
+import static desktop.starter.generator.AppConfigCreator.TARGET_OUT_FOLDER;
 
 @Slf4j
 public class Main {
-	static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	static Charset charset = StandardCharsets.UTF_8;
-
+	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	public static Charset charset = StandardCharsets.UTF_8;
+	public static FileMapperService fms = new FileMapperService();
+	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 		// todo add special library to process args
 		int length = args.length;
@@ -52,15 +52,14 @@ public class Main {
 		log.info("used APP_CONFIG_GENERATOR {}", file);
 		AppConfigModel c = GSON.fromJson(new InputStreamReader(new FileInputStream(file), charset),
 				AppConfigModel.class);
-
 		List<Domain> ftps = GSON.fromJson(new InputStreamReader(new FileInputStream(ftpFile), charset),
 				new TypeToken<List<Domain>>() {
 				}.getType());
 		AppConfigCreator appConfigCreator = new AppConfigCreator();
-		// create
+		// create		
 		AppConfig appConfig = appConfigCreator.createConfig(c, ftps);
-		log.info("save config before uploading {}", new File(TEMP_APP_CONFIG).getAbsolutePath());
-		FileMapperService.write(appConfig, Paths.get(TARGET_FOLDER, OUT_FOLDER, TEMP_APP_CONFIG));
+		log.info("save config before uploading {}", new File(TEMP_APP_CONFIG).getAbsolutePath());	
+		fms.write(appConfig, Paths.get(TARGET_OUT_FOLDER, TEMP_APP_CONFIG));
 		log.info("upload remote servers");
 		log.info("save");
 		log.info("DONE");
