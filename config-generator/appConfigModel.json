@@ -6,6 +6,7 @@
   "mainClass":"desktop.starter.app.Main",
   "arguments":{"JVM":[],"APP":[]},
   "javaFolder":"src/test/resources/jvms",
+  "javaConfig":"src/test/resources",
   "appResources": "src/test/starter-app-folder/resources",
   "appDependencies":"src/test/starter-app-folder/dep",  
   "appFile":"starter-app-1.0.jar",  
