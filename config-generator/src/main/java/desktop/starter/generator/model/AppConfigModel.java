@@ -13,11 +13,10 @@ public class AppConfigModel {
     private Map<ArgumentType,List<String>> arguments;
     private String appFile;
     private String javaFolder;
+    private String javaConfig;
     private String appResources;
     //used for -cp
     private String appDependencies;
     private String appFolder;
     private boolean generetedJava;
-     //todo remove line lower.
-//    public String h
 }
