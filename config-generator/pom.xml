@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>starter</artifactId>
-        <groupId>desktop.starter</groupId>
+        <groupId>by.gdev</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -18,9 +18,14 @@
             <version>3.6</version>
         </dependency>
         <dependency>
-            <groupId>desktop.starter</groupId>
+            <groupId>by.gdev</groupId>
             <artifactId>starter-core</artifactId>
             <version>${revision}</version>
         </dependency>
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.81</version>
+		</dependency>      
     </dependencies>
 </project>
