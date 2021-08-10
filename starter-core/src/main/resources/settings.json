@@ -1,7 +1,7 @@
 {
   "comment": "_comment : Config file for desktop-starter example",
   "appName": "starter",
-  "mainClass": "desktop.starter.app.Main",
+  "mainClass": "by.gdev.app.Main",
   "dependencies": [
     {
       "repo": [

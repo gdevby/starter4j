@@ -3,7 +3,7 @@
   "_comment_jvm":"we need to use folder with jvms windows/x64/jre_default, see resources/jvms",
   "appName":"starter-app",
   "appVersion": 1.0,
-  "mainClass":"desktop.starter.app.Main",
+  "mainClass":"by.gdev.app.Main",
   "arguments":{"JVM":[],"APP":[]},
   "javaFolder":"src/test/resources/jvms",
   "javaConfig":"src/test/resources",
