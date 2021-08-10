@@ -42,30 +42,30 @@ public class AppConfigCreator {
 	public AppConfigCreator(FileMapperService fileMapperService) {
 		this.fileMapperService = fileMapperService;
 	}
-	
+
 	public AppConfig createConfig(AppConfigModel configFile, List<Domain> domains)
 			throws IOException, NoSuchAlgorithmException {
 		AppConfig appConfig = new AppConfig();
-		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();	
+		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();
 		Path appFolder = Paths.get(configFile.getAppFolder());
 		Path dependencies = Paths.get(configFile.getAppDependencies());
 		Path resources = Paths.get(configFile.getAppResources());
 		Path dependenciesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_DEPENDENCISES_CONFIG);
-		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);		
-		fileMapperService.copyFile(appFolder, Paths.get(TARGET_OUT_FOLDER, version));			
+		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
+		fileMapperService.copyFile(appFolder, Paths.get(TARGET_OUT_FOLDER, version));
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setArguments(configFile.getArguments());
-		appConfig.setMainClass(configFile.getMainClass());			
+		appConfig.setMainClass(configFile.getMainClass());
 		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppFile()),
-				domains, configFile.getAppName()));	
+				domains, configFile.getAppName()));
 		fileMapperService.write(createRepo(dependencies, dependencies, domains,
 				Paths.get(version, dependencies.getFileName().toString()).toString()), dependenciesConfig);
 		fileMapperService.write(createRepo(resources, resources, domains,
-				Paths.get(version, resources.getFileName().toString()).toString()), resourcesConfig);			
+				Paths.get(version, resources.getFileName().toString()).toString()), resourcesConfig);
 		appConfig.setAppDependencies(
 				createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, domains, version));
-		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, domains, version));		
+		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, domains, version));
 		if (configFile.isGeneretedJava()) {
 			createJreConfig(domains, configFile);
 			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG),
@@ -179,7 +179,7 @@ public class AppConfigCreator {
 		return Files.walk(p, 1).filter(entry -> !entry.equals(p)).collect(Collectors.toList());
 	}
 
-	private void createJreConfig(List<Domain> domains, AppConfigModel configFile)
+	void createJreConfig(List<Domain> domains, AppConfigModel configFile)
 			throws IOException, NoSuchAlgorithmException {
 		JVMConfig jvm = new JVMConfig();
 		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>());
@@ -202,11 +202,13 @@ public class AppConfigCreator {
 						repo.setResources(Arrays.asList(Metadata.createMetadata(jvmConfig)));
 						repo.setRepositories(domains.stream().map(e -> e.getDomain()).collect(Collectors.toList()));
 					}
+
 					jvm.getJvms().get(type).get(arch).put(key, repo);
 				}
 			}
 		}
+		//todo return jvm and save after
 		// Create json Config from all json
 		fileMapperService.write(jvm, Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG));
-	}	
+	}
 }
