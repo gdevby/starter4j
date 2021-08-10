@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>starter</artifactId>
-        <groupId>desktop.starter</groupId>
+        <groupId>by.gdev</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>desktop.starter</groupId>
+            <groupId>by.gdev</groupId>
             <artifactId>desktop-common-util</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -43,7 +43,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>desktop.desktop.starter.starter.Main</Main-Class>
+                                        <Main-Class>by.by.gdev.gdev.Main</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
