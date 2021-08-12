@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import lombok.Data;
 
 
 
@@ -46,7 +47,7 @@ public class FileMapperService {
 			return GSON.fromJson(read, typ);
 		}		
 	}
-
+	
 	public void copyFile(Path source, Path dest) throws IOException {
 	    FileUtils.copyDirectory(source.toFile(), dest.toFile());
 	}
