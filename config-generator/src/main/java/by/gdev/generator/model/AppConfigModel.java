@@ -19,9 +19,9 @@ public class AppConfigModel{
     private double appVersion;	
 	@Parameter(names = "-class", description = "")
     private String mainClass;   	
-	@Parameter(names = "-A", description = "")
+	@Parameter(names = "-app", description = "")
     private List<String> appArguments; 	
-	@Parameter(names = "-D", description = "")
+	@Parameter(names = "-jvm", description = "")
 	 private List<String> jvmArguments;	
     @Parameter(names = "-file", description = "")
     private String appFile;    
@@ -52,7 +52,7 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("",""),
     			"starter-app-1.0.jar", 
-    			"../../starter-app/starter-app/src/main/resources/jvms",
+    			"../../starter-app/src/main/resources/jvms",
     			"src/test/resources", 
     			"src/test/starter-app-folder/resources", 
     			"src/test/starter-app-folder/dep", 
