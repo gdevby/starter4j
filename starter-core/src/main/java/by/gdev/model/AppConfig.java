@@ -2,9 +2,7 @@ package by.gdev.model;
 
 import lombok.Data;
 import java.util.List;
-import java.util.Map;
 
-import by.gdev.util.model.ArgumentType;
 import by.gdev.util.model.download.Repo;
 
 /**
@@ -18,8 +16,10 @@ public class AppConfig {
     private String comment = "Config file for desktop-starter example";
     private String appName;
     private double appVersion;
-    private String mainClass;
-    private Map<ArgumentType,List<String>> arguments;
+    private String mainClass;   
+//    private Map<ArgumentType,List<String>> arguments;   
+    private List<String> appArguments;
+    private List<String> jvmArguments;   
     /**
      * images and other files are used an app
      */
