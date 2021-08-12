@@ -30,10 +30,9 @@ import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
-@RunWith(JUnit4.class)
 public class AppConfigCreatorTest {
-	@BeforeClass
-//	@Before
+//	@BeforeClass
+	@Before
 	public void init() {
 		log.info("test");
 	}
@@ -52,13 +51,9 @@ public class AppConfigCreatorTest {
 		configFile.setJavaFolder("src/test/resources/jvms2");
 		FileMapperService f = new FileMapperService(new Gson(), StandardCharsets.UTF_8);
 		AppConfigCreator a = new AppConfigCreator(f);
-		a.createJreConfig(domains, configFile);
+//		a.createJreConfig(domains, configFile);
 		JVMConfig jvm = new JVMConfig();
-		Assert.assertEquals(jvmProper,jvm  );
-
-	}
-	@Test
-	public void t1() {
+		Assert.assertEquals(jvmProper,jvm);
 
 	}
 }
