@@ -5,7 +5,7 @@
   "appVersion": 1.0,
   "mainClass":"by.gdev.app.Main",
   "arguments":{"JVM":[],"APP":[]},
-  "javaFolder":"src/test/resources/jvms",
+  "javaFolder":"../../starter-app/starter-app/src/main/resources/jvms",
   "javaConfig":"src/test/resources",
   "appResources": "src/test/starter-app-folder/resources",
   "appDependencies":"src/test/starter-app-folder/dep",  
