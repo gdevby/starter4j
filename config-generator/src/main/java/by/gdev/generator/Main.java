@@ -26,14 +26,12 @@ public class Main {
 	public static FileMapperService fileMapperService = new FileMapperService(GSON, charset);
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-//		 todo add special library to process args
 		AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
 		JCommander jc = JCommander.newBuilder().addObject(acm).build();
 		jc.parse(args);
 		if (acm.help) {
 			jc.usage();
 		}
-		System.out.println(acm);
 		AppConfigCreator appConfigCreator = new AppConfigCreator(fileMapperService);
 		// create	
 		AppConfig appConfig = appConfigCreator.createConfig(acm);

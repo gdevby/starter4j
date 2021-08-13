@@ -19,9 +19,9 @@ public class AppConfigModel{
     private double appVersion;	
 	@Parameter(names = "-class", description = "")
     private String mainClass;   	
-	@Parameter(names = "-A", description = "")
+	@Parameter(names = "-app", description = "")
     private List<String> appArguments; 	
-	@Parameter(names = "-D", description = "")
+	@Parameter(names = "-jvm", description = "")
 	 private List<String> jvmArguments;	
     @Parameter(names = "-file", description = "")
     private String appFile;    
