@@ -57,6 +57,11 @@
             <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+        	<groupId>com.beust</groupId>
+        	<artifactId>jcommander</artifactId>
+        	<version>1.81</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
