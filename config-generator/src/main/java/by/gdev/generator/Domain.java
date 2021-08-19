@@ -6,9 +6,10 @@ import lombok.Data;
 public class Domain {
 //    String address;
 //    String login;
-//    String pass;
-    /**
-     * check exists file or not with this domain name
-     */
-    String domain;
+//    String pass; test github problem
+	/**
+	 * check exists file or not with this domain name
+	 */
+	String domain;
+
 }
