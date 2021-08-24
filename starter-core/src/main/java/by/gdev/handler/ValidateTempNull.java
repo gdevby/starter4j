@@ -1,17 +1,17 @@
 package by.gdev.handler;
 
-import java.nio.file.Paths;
 import java.util.Objects;
 
-public class ValidateTempNull implements ValidateEnvironment {
+public class ValidateTempNull extends AbstractBandle {
 
 	@Override
-	public boolean valite() {
+	public boolean validate() {
 		return Objects.nonNull(System.getProperty("java.io.tmpdir"));
 	}
 
 	@Override
 	public String getExceptionMessage() {
-		return "Доступ к директории /tmp невозможен. Свяжитесь с нами для решения дайнной проблемы";
+		return bundle.getString("validateTempNull");
+				
 	}
 }

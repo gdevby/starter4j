@@ -6,10 +6,10 @@ import java.nio.file.Files;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 
-public class ValidateWorkDir implements ValidateEnvironment {
+public class ValidateWorkDir extends AbstractBandle {
 
 	@Override
-	public boolean valite() {
+	public boolean validate() {
 		File workDir = DesktopUtil.getSystemPath(OSInfo.getOSType(), "starter");
 //		File workDir = new File("/home/aleksandr/Desktop/qwert/acces");
 		if (workDir.exists()) {
@@ -21,6 +21,6 @@ public class ValidateWorkDir implements ValidateEnvironment {
 
 	@Override
 	public String getExceptionMessage() {
-		return "Нет прав доступа, установите корректные права доступа ";
+		return bundle.getString("validate.workdir");
 	}
 }
