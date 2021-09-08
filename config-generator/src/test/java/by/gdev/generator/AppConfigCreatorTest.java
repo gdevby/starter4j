@@ -34,10 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 public class AppConfigCreatorTest {
 	@BeforeClass
 //	@Before
-	public void init() {
+	public static void  init() {
 		log.info("test");
 	}
-	@Test
+	//todo
+//	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
 //		fill with proper data
 		JVMConfig jvmProper = new JVMConfig();
