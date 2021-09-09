@@ -154,16 +154,11 @@ public class WindowsExecutor implements OSExecutor {
     public int setThreadExecutionState(int code) {
         return Kernel32.INSTANCE.SetThreadExecutionState(code);
     }
-    //todo add encoding,
     @Override
     public void startUpAppWithSystem(Path startupAppPath, Path folder, String name) throws IOException {
-    	String javaPath = DesktopUtil.getJavaPathByHome(true);
-    	log.trace("java path {}",javaPath);
-        ShellLink sl = ShellLink.createLink(DesktopUtil.getJavaPathByHome(true) +" \"-Dfile.encoding=UTF-8\" -jar "+startupAppPath.toString())
-                .setWorkingDir(folder.toString());
+        ShellLink sl = ShellLink.createLink(DesktopUtil.getJavaPathByHome(true))
+                .setWorkingDir(folder.toString()).setCMDArgs( "-Dfile.encoding=UTF-8 -jar \""+startupAppPath.toString()+"\"");
         sl.saveTo(Paths.get(buildStartUpFolder().toString(), name + ".lnk").toString());
-        log.trace("working dir {}",sl.getWorkingDir());
-        log.trace("resolve target {}", sl.resolveTarget());
     }
 
     private Path buildStartUpFolder() {
