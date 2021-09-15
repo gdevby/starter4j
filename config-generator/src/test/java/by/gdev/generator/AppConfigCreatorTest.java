@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import by.gdev.generator.model.AppConfigModel;
@@ -23,8 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AppConfigCreatorTest {
+	@BeforeClass
+//	@Before
+	public static void  init() {
+		log.info("test");
+	}
 
-	@Test
+	//todo
+//	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
 		JVMConfig jvmProper = new JVMConfig();
 		Map<OSType, Map<Arch, Map<String, Repo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>();
