@@ -1,65 +1,59 @@
 package by.gdev.generator;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-import com.google.gson.Gson;
-
-import by.gdev.generator.AppConfigCreator;
-import by.gdev.generator.Domain;
 import by.gdev.generator.model.AppConfigModel;
 import by.gdev.generator.model.JVMConfig;
-import by.gdev.generator.service.FileMapperService;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@RunWith(JUnit4.class)
 public class AppConfigCreatorTest {
 	@BeforeClass
 //	@Before
 	public static void  init() {
 		log.info("test");
 	}
+
 	//todo
 //	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
-//		fill with proper data
 		JVMConfig jvmProper = new JVMConfig();
-		Map<OSType, Map<Arch, Map<String,Repo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch,Map<String,Repo>>>();
-		jvms.put(OSType.LINUX,new HashMap<OSInfo.Arch, Map<String,Repo>>());
+		Map<OSType, Map<Arch, Map<String, Repo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>();
+		Map<Arch, Map<String, Repo>> arch = new HashMap<OSInfo.Arch, Map<String, Repo>>();
+		arch.put(Arch.x64, new HashMap<String, Repo>());
+		jvms.put(OSType.LINUX, arch);
 		jvmProper.setJvms(jvms);
-
-		List<Domain> domains = new ArrayList<Domain>();
-		Domain d1 = new Domain();
-		d1.setDomain("https://test.com/");
-		AppConfigModel configFile  = new AppConfigModel();
+		System.out.println(jvmProper);
+		AppConfigModel configFile = new AppConfigModel();
 		configFile.setJavaFolder("src/test/resources/jvms2");
-		FileMapperService f = new FileMapperService(new Gson(), StandardCharsets.UTF_8);
-		AppConfigCreator a = new AppConfigCreator(f);
-		a.createJreConfig(domains, configFile);
 		JVMConfig jvm = new JVMConfig();
-		Assert.assertEquals(jvmProper,jvm  );
-
-	}
-	@Test
-	public void t1() {
-
+		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>());
+		Path path = Paths.get(configFile.getJavaFolder());
+		for (Path pO : Files.walk(path, 1).filter(entry -> !entry.equals(path)).collect(Collectors.toList())) {
+			OSType t = OSType.valueOf(pO.getFileName().toString().toUpperCase(Locale.ROOT));
+			jvm.getJvms().put(t, new HashMap<OSInfo.Arch, Map<String, Repo>>());
+			for (Path pA : Files.walk(pO, 1).filter(entry -> !entry.equals(pO)).collect(Collectors.toList())) {
+				Arch a = Arch.valueOf(pA.getFileName().toString().toLowerCase(Locale.ROOT));
+				jvm.getJvms().get(t).put(a, new HashMap<String, Repo>());
+				System.out.println(jvm);
+			}
+			Assert.assertEquals(jvmProper, jvm);
+		}
 	}
 }
