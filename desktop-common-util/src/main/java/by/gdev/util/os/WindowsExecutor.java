@@ -3,6 +3,7 @@ package by.gdev.util.os;
 import com.sun.jna.Memory;
 import com.sun.jna.platform.win32.*;
 
+import by.gdev.util.DesktopUtil;
 import by.gdev.util.model.GPUDescription;
 import by.gdev.util.model.GPUDriverVersion;
 import by.gdev.util.model.GPUsDescriptionDTO;
@@ -153,14 +154,11 @@ public class WindowsExecutor implements OSExecutor {
     public int setThreadExecutionState(int code) {
         return Kernel32.INSTANCE.SetThreadExecutionState(code);
     }
-
     @Override
-    public void startUpAppWithSystem(Path startUpAppPath, Path folder, String name) throws IOException {
-        ShellLink sl = ShellLink.createLink(startUpAppPath.toString())
-                .setWorkingDir(folder.toString());
+    public void startUpAppWithSystem(Path startupAppPath, Path folder, String name) throws IOException {
+        ShellLink sl = ShellLink.createLink(DesktopUtil.getJavaPathByHome(true))
+                .setWorkingDir(folder.toString()).setCMDArgs( "-Dfile.encoding=UTF-8 -jar \""+startupAppPath.toString()+"\"");
         sl.saveTo(Paths.get(buildStartUpFolder().toString(), name + ".lnk").toString());
-        System.out.println(sl.getWorkingDir());
-        System.out.println(sl.resolveTarget());
     }
 
     private Path buildStartUpFolder() {
