@@ -1,4 +1,4 @@
-package http.head.get.hash.service;
+package by.gdev.http.head.cache.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -17,13 +17,15 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import http.head.get.hash.model.RequestMetadata;
+import by.gdev.http.head.cache.model.RequestMetadata;
+import by.gdev.http.head.cache.service.HttpService;
 
-public class HttpService {
+public class HttpServiceImpl implements HttpService {
 	// Удалять есть существует перезаписью
 	// Выкинуть Exception и проверить как отработает этот метод
 	// Сделать общий метод для извеления методанный этого метода и getMetaByUrl
 
+	@Override
 	public RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpGet httpGet = new HttpGet(url);

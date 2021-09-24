@@ -15,6 +15,7 @@
         <module>examples</module>
         <module>config-generator</module>
         <module>http-head-get-hash</module>
+        <module>http-head-cache</module>
     </modules>
 
     <properties>
