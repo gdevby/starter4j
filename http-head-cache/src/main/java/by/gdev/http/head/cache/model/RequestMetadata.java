@@ -1,4 +1,4 @@
-package http.head.get.hash.model;
+package by.gdev.http.head.cache.model;
 
 import lombok.Data;
 

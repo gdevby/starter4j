@@ -5,8 +5,8 @@
     <artifactId>starter</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>http-head-get-hash</artifactId>
-  <dependencies>
+  <artifactId>http-head-cache</artifactId>
+    <dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

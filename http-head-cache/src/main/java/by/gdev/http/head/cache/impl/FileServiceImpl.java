@@ -1,4 +1,4 @@
-package http.head.get.hash.service;
+package by.gdev.http.head.cache.impl;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,9 +15,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 
 import com.google.gson.Gson;
 
-import http.head.get.hash.model.RequestMetadata;
+import by.gdev.http.head.cache.model.RequestMetadata;
+import by.gdev.http.head.cache.service.FileService;
+import by.gdev.http.head.cache.service.HttpService;
 
-public class FileService {
+public class FileServiceImpl implements FileService {
 	/**
 	 * Saved files and searched files in this directory
 	 */
@@ -26,7 +28,7 @@ public class FileService {
 	private Path directory;
 	private HttpService httpService;
 
-	public FileService(HttpService httpService, Gson gson, Charset charset) {
+	public FileServiceImpl(HttpService httpService, Gson gson, Charset charset) {
 		this.httpService = httpService;
 		this.gson = gson;
 		this.charset = charset;
@@ -40,16 +42,20 @@ public class FileService {
 	 * @return
 	 * @throws IOException
 	 */
+
+	@Override
 	public Path getRawObject(String url, boolean cache) throws IOException {
+		
 		directory = Paths.get("target");
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
 		checkMetadataFile(metaFile, url);
 
 		if (urlPath.toFile().exists()) {
+			HttpServiceImpl httpImpl = new HttpServiceImpl();
 			RequestMetadata localMetadata = (RequestMetadata) read(metaFile, RequestMetadata.class);
-			CloseableHttpResponse headResponse = httpService.getHeadResponse(url);
-			RequestMetadata serverMetadata = httpService.getMetaByUrl(url, headResponse);
+			CloseableHttpResponse headResponse = httpImpl.getHeadResponse(url);
+			RequestMetadata serverMetadata = httpImpl.getMetaByUrl(url, headResponse);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
@@ -73,11 +79,12 @@ public class FileService {
 		 * Если файла нету, то вызываем гет
 		 */
 	}
-
+	
 	private void checkMetadataFile(Path metaFile, String url) throws IOException {
 		if (!metaFile.toFile().exists()) {
-			CloseableHttpResponse headResponse = httpService.getHeadResponse(url);
-			RequestMetadata metadata = httpService.getMetaByUrl(url, headResponse);
+			HttpServiceImpl httpImpl = new HttpServiceImpl();
+			CloseableHttpResponse headResponse = httpImpl.getHeadResponse(url);
+			RequestMetadata metadata = httpImpl.getMetaByUrl(url, headResponse);
 			write(metadata, metaFile);
 		}
 	}
