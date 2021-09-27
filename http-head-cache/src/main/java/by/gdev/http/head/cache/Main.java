@@ -20,10 +20,13 @@ public class Main {
 	public static void main(String[] args) throws JsonSyntaxException, IOException {
 		HttpServiceImpl httpService = new HttpServiceImpl();
 		FileServiceImpl fileService = new FileServiceImpl(httpService, GSON, CHARSET);
-		GsonServiceImpl gsonService = new GsonServiceImpl(GSON, fileService);
-		
+		GsonServiceImpl gsonService = new GsonServiceImpl(GSON, fileService);	
 		String url = "http://localhost:81/t.json";
 		MyTestType myTest = gsonService.getObject(url, MyTestType.class);
 		System.out.println(myTest);
+		
+		
+		
+		
 	}
 }

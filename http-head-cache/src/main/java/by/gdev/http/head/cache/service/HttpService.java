@@ -7,4 +7,5 @@ import by.gdev.http.head.cache.model.RequestMetadata;
 
 public interface HttpService {
 	RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException;
+	RequestMetadata getMetaByUrl(String url) throws IOException;
 }
