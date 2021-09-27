@@ -9,7 +9,8 @@
 
 ##Диаграмма последовательности
 ![UseCaseNumber1](https://user-images.githubusercontent.com/48221408/134877536-9c414467-ca13-4fbb-b2c8-d77aa2fa167c.jpg)
-##Пример 
+
+###Пример 
 ```java
 	static Gson GSON = new Gson();
 	static Charset CHARSET = StandardCharsets.UTF_8;
@@ -23,7 +24,7 @@
 	}
 ```
 
-## Зависимости
+#### Зависимости
 *	Lombok
 *	Gson
 *	Apache Commons IO
