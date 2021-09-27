@@ -11,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-
 import com.google.gson.Gson;
 
 import by.gdev.http.head.cache.model.RequestMetadata;
@@ -45,17 +43,13 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public Path getRawObject(String url, boolean cache) throws IOException {
-		
 		directory = Paths.get("target");
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
 		checkMetadataFile(metaFile, url);
-
 		if (urlPath.toFile().exists()) {
-			HttpServiceImpl httpImpl = new HttpServiceImpl();
-			RequestMetadata localMetadata = (RequestMetadata) read(metaFile, RequestMetadata.class);
-			CloseableHttpResponse headResponse = httpImpl.getHeadResponse(url);
-			RequestMetadata serverMetadata = httpImpl.getMetaByUrl(url, headResponse);
+			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
@@ -70,32 +64,32 @@ public class FileServiceImpl implements FileService {
 			return urlPath;
 		}
 		/**
-		 * делаем замену и у нас новый юрл+ проверяем по этому пути наличие файла в
-		 * папке если файл есть, то считываем метаданные из файла( который лежит рядом
-		 * имя файла.мета делаем запрос хэд и сравниваем метаданные, если они равны,
-		 * тогда возвращаем локальный файл если не равны , тогда делаем запрос гет и
-		 * возвращаем новый файл
+		 * делаем замену и у нас новый юрл+ 
+		 * проверяем по этому пути наличие файла в папке 
+		 * если файл есть, то считываем метаданные из файла( который лежит рядом имя файла.мета 
+		 * 
+		 * делаем запрос хэд и сравниваем метаданные, 
+		 * если они равны, тогда возвращаем локальный файл 
+		 * если не равны , тогда делаем запрос гет и возвращаем новый файл
 		 * 
 		 * Если файла нету, то вызываем гет
 		 */
 	}
-	
-	private void checkMetadataFile(Path metaFile, String url) throws IOException {
-		if (!metaFile.toFile().exists()) {
-			HttpServiceImpl httpImpl = new HttpServiceImpl();
-			CloseableHttpResponse headResponse = httpImpl.getHeadResponse(url);
-			RequestMetadata metadata = httpImpl.getMetaByUrl(url, headResponse);
-			write(metadata, metaFile);
-		}
-	}
-
+	//delete
 	public <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, clas);
 		}
 	}
+	
+	private void checkMetadataFile(Path metaFile, String url) throws IOException {
+		if (!metaFile.toFile().exists()) {
+			RequestMetadata metadata = httpService.getMetaByUrl(url);
+			write(metadata, metaFile);
+		}
+	}
 
-	public void write(Object create, Path config) throws FileNotFoundException, IOException {
+	private void write(Object create, Path config) throws FileNotFoundException, IOException {
 		if (Files.notExists(config.getParent()))
 			Files.createDirectories(config.getParent());
 		try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(config.toFile()), charset)) {
