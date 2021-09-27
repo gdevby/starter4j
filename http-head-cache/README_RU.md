@@ -1,30 +1,22 @@
 # http-head-cache
 
-Сценарии использования:
-	<ol>
-	<li> Данный модуль позволяет кэшировать запросы с сервера и повторном вызове по url, он возращает результат с файла, при этом проверяя актуальность на сервере с помощью http head по e-tag, то есть здесь возвращаются только загаловки без тела ответа.</li>
-	<li> Кэшировать результат ответа ресурса по url на определенное время, при последующем вызове по url , будет возращаться результат из кэша.</li>
+Данный модуль позволяет следующие сценарии использования:
+<ol>
+	<li> Кэшировать запросы с сервера, при повторном вызове по url возращается результат сохраненный в папке кэша, при этом проверяется актуальность файла  с помощью http head по e-tag, то есть проверка происходит по заголовкам http.</li>
+	<li> Кэшировать результат ответа ресурса по url на определенное время, при последующем вызове по url будет возращаться результат из кэша.</li>
 	<li> Возможно возвращать java объект, если на сервере лежит json файл.</li>
 </ol>
 
 ## Диаграмма последовательности
-![UseCaseNumber1](https://user-images.githubusercontent.com/48221408/134877536-9c414467-ca13-4fbb-b2c8-d77aa2fa167c.jpg)
+![2](https://user-images.githubusercontent.com/48221408/134901731-4cd3c891-b172-4f8c-98f5-03db69cb5dad.png)
 
 ## Пример 
-```java
-	static Gson GSON = new Gson();
-	static Charset CHARSET = StandardCharsets.UTF_8;
-	
-	public static void main(String[] args) throws IOException {
-		HttpService httpService = new HttpServiceImpl();
-		FileService fileService = new FileServiceImpl(httpService, GSON, CHARSET);
-		GsonService gsonService = new GsonServiceImpl(GSON, fileService);	
-		String url = "https://gdev.by/repo/test.json";
-		MyTestType myTest = gsonService.getObject(url, MyTestType.class);
-	}
-```
+<a href="https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-head-cache/src/test/java/by/gdev/http/head/cache/MainTest.java">MainTest.java</a>
+
 ## Зависимости
 *	Lombok
 *	Gson
 *	Apache Commons IO
 *	Apache HttpClient
+
+
