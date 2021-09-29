@@ -6,5 +6,5 @@ import java.security.NoSuchAlgorithmException;
 
 public interface GsonService {
 
-	<T> T getObject(String url, Class<T> class1) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+	<T> T getObject(String url, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 }

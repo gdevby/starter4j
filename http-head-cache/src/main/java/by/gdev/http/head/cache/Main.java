@@ -27,7 +27,7 @@ public class Main {
 		FileService fileService = new FileServiceImpl(httpService, GSON, CHARSET);
 		GsonService gsonService = new GsonServiceImpl(GSON, fileService);	
 		String url = "https://gdev.by/repo/test.json";
-		MyTestType myTest = gsonService.getObject(url, MyTestType.class);
+		MyTestType myTest = gsonService.getObject(url, MyTestType.class, true);
 		System.out.println(myTest);
 	}
 }
