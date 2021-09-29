@@ -16,7 +16,7 @@ import by.gdev.http.head.cache.service.FileService;
 import by.gdev.http.head.cache.service.GsonService;
 import by.gdev.http.head.cache.service.HttpService;
 
-
+///removed
 public class Main {
 	
 	static Gson GSON = new Gson();
