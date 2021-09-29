@@ -22,8 +22,8 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
-	public <T> T getObject(String url, Class<T> class1) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		Path pathFile = fileService.getRawObject(url, true);
+	public <T> T getObject(String url, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(url, cache);
 		BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()));
 		return gson.fromJson(read, class1);
 	}
