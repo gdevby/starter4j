@@ -19,10 +19,14 @@ import by.gdev.http.head.cache.service.FileService;
 
 
 public class GsonServiceImplTest1 {
+	Gson gson 
+	@Post
+	public void init() {
+		gson = new Gson();
+	}
 	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
-		Gson gson = new Gson();
-		FileService fileService = new FileServiceImpl(new HttpServiceImpl(), gson, StandardCharsets.UTF_8);
+		
 		Path pathFile = fileService.getRawObject("https://gdev.by/repo/test.json", false);
 		MyTestType type1 =  gson.fromJson(new BufferedReader(new FileReader(pathFile.toFile())), MyTestType.class);
 		MyTestType type2 = new MyTestType();
