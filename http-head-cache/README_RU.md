@@ -10,7 +10,7 @@
 
 ## Диаграмма последовательности
 Для первого сценария:
-![2](https://user-images.githubusercontent.com/48221408/134901731-4cd3c891-b172-4f8c-98f5-03db69cb5dad.png)
+![top](https://user-images.githubusercontent.com/48221408/135266529-7da025a8-9fc7-47ff-8753-5b424182b4bf.png)
 Для второго сценария:
 ![r](https://user-images.githubusercontent.com/48221408/135227297-e5bad530-76ed-498c-ab2b-0fc50a75fc7d.png)
 ## Пример 
