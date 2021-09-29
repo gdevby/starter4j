@@ -7,4 +7,5 @@ public class RequestMetadata {
 	String contentLength;
 	String lastModified;
 	String eTag;
+	String sha1;
 }
