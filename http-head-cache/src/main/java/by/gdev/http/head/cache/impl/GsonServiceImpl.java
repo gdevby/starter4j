@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
@@ -21,8 +22,8 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
-	public <T> T getObject(String url, Class<T> class1) throws FileNotFoundException, IOException {
-		Path pathFile = fileService.getRawObject(url, false);
+	public <T> T getObject(String url, Class<T> class1) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(url, true);
 		BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()));
 		return gson.fromJson(read, class1);
 	}

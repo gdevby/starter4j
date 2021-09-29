@@ -1,6 +1,9 @@
 package by.gdev.http.head.cache.impl;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -10,6 +13,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
@@ -39,17 +44,42 @@ public class FileServiceImpl implements FileService {
 	 *              return content without head.
 	 * @return
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException 
 	 */
 
 	@Override
-	public Path getRawObject(String url, boolean cache) throws IOException {
+	public Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException {
 		directory = Paths.get("target");
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
 		checkMetadataFile(metaFile, url);
+		if (cache == true) {
+			return cacheMetod(url, metaFile, urlPath);
+		} else {
+			return defaultMetod(url, urlPath, metaFile);
+		}
+	}
+	
+	private Path cacheMetod(String url, Path metaFile, Path urlPath) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		long purgeTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+		if (urlPath.toFile().lastModified() < purgeTime)
+			Files.deleteIfExists(urlPath);
+		RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+		String sha = getChecksum(urlPath.toFile(), "SHA-1");
+		if (sha.equals(localMetadata.getSha1())) {
+			return urlPath;
+		} else {
+			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+			createSha(serverMetadata, urlPath, metaFile);
+			return urlPath;
+		}
+	}
+	
+	private Path defaultMetod(String url, Path urlPath, Path metaFile) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
 		if (urlPath.toFile().exists()) {
 			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
+			createSha(serverMetadata, urlPath, metaFile);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
@@ -60,22 +90,12 @@ public class FileServiceImpl implements FileService {
 				return urlPath;
 			}
 		} else {
-			httpService.getResourseByUrlAndSave(url, urlPath);
+			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
-		/**
-		 * делаем замену и у нас новый юрл+ 
-		 * проверяем по этому пути наличие файла в папке 
-		 * если файл есть, то считываем метаданные из файла( который лежит рядом имя файла.мета 
-		 * 
-		 * делаем запрос хэд и сравниваем метаданные, 
-		 * если они равны, тогда возвращаем локальный файл 
-		 * если не равны , тогда делаем запрос гет и возвращаем новый файл
-		 * 
-		 * Если файла нету, то вызываем гет
-		 */
-	}
-	//delete
+	}	
+	
 	public <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, clas);
@@ -94,6 +114,34 @@ public class FileServiceImpl implements FileService {
 			Files.createDirectories(config.getParent());
 		try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(config.toFile()), charset)) {
 			gson.toJson(create, out);
+		}
+	}
+	
+	private void createSha (RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
+		metadata.setSha1(getChecksum(urlPath.toFile(), "SHA-1"));
+		write(metadata, metaFile);
+	}
+	
+	private static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
+		byte[] b = createChecksum(file, algorithm);
+		StringBuilder result = new StringBuilder();
+		for (byte cb : b)
+			result.append(Integer.toString((cb & 0xff) + 0x100, 16).substring(1));
+		return result.toString();
+	}
+
+	private static byte[] createChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
+		try (BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file))) {
+			byte[] buffer = new byte[8192];
+			MessageDigest complete = MessageDigest.getInstance(algorithm);
+			int numRead;
+			do {
+				numRead = fis.read(buffer);
+				if (numRead > 0) {
+					complete.update(buffer, 0, numRead);
+				}
+			} while (numRead != -1);
+			return complete.digest();
 		}
 	}
 }

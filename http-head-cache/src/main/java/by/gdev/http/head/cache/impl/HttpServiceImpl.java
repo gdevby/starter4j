@@ -26,9 +26,6 @@ public class HttpServiceImpl implements HttpService {
 	// Выкинуть Exception и проверить как отработает этот метод
 	// Сделать общий метод для извеления методанный этого метода и getMetaByUrl
 
-	
-	
-	//гет запрос
 	@Override
 	public RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException {
 		RequestMetadata request = new RequestMetadata();
@@ -37,10 +34,6 @@ public class HttpServiceImpl implements HttpService {
 		BufferedOutputStream out = null;
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
 		try {
-//			CloseableHttpClient httpclient = HttpClients.createDefault();
-//			RequestConfig requestConfig = RequestConfig.custom().build();
-//			httpGet.setConfig(requestConfig);
-//			CloseableHttpResponse response = httpclient.execute(httpGet);
 			CloseableHttpResponse response = getGetResponse(url, httpGet);
 			HttpEntity entity = response.getEntity();
 			in = new BufferedInputStream(entity.getContent());
@@ -71,7 +64,6 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	private CloseableHttpResponse getGetResponse(String url, HttpRequestBase http) throws IOException {
-//		HttpGet httpUrl = new HttpGet(url);
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		RequestConfig requestConfig = RequestConfig.custom().build();
 		http.setConfig(requestConfig);
@@ -79,24 +71,9 @@ public class HttpServiceImpl implements HttpService {
 		return response;
 	}
 
-//	public CloseableHttpResponse getHeadResponse(String url) throws IOException {
-//		HttpHead httpUrl = new HttpHead(url);
-//		CloseableHttpClient httpclient = HttpClients.createDefault();
-//		RequestConfig requestConfig = RequestConfig.custom().build();
-//		httpUrl.setConfig(requestConfig);
-//		CloseableHttpResponse response = httpclient.execute(httpUrl);
-//		return response;
-//	}
-
-	
-	//хэд запрос
 	public RequestMetadata getMetaByUrl(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
-//		CloseableHttpClient httpclient = HttpClients.createDefault();
-//		RequestConfig requestConfig = RequestConfig.custom().build();
-//		httpUrl.setConfig(requestConfig);
-//		CloseableHttpResponse response = httpclient.execute(httpUrl);
 		CloseableHttpResponse response = getGetResponse(url, httpUrl);
 		request.setContentLength(response.getFirstHeader("Content-Length").getValue());
 		request.setETag(response.getFirstHeader("ETag").getValue().replaceAll("\"", ""));
