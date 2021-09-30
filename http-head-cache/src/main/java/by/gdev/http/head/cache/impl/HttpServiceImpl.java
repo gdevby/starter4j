@@ -62,7 +62,8 @@ public class HttpServiceImpl implements HttpService {
 		}
 		return request;
 	}
-
+	//proper name of the method
+	//http client should create in one place and got from constructor
 	private CloseableHttpResponse getGetResponse(String url, HttpRequestBase http) throws IOException {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		RequestConfig requestConfig = RequestConfig.custom().build();

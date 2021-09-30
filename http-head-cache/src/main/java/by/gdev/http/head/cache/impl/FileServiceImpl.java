@@ -26,6 +26,7 @@ public class FileServiceImpl implements FileService {
 	/**
 	 * Saved files and searched files in this directory
 	 */
+	//todo private use
 	Gson gson;
 	Charset charset;
 	private Path directory;
@@ -49,11 +50,14 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException {
+		//todo получать по конструктору
 		directory = Paths.get("target");
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
+		//в любом случае обращаемся к серверу?
 		checkMetadataFile(metaFile, url);
 		if (cache == true) {
+			//пишется method
 			return cacheMetod(url, metaFile, urlPath);
 		} else {
 			return defaultMetod(url, urlPath, metaFile);
@@ -61,6 +65,7 @@ public class FileServiceImpl implements FileService {
 	}
 	
 	private Path cacheMetod(String url, Path metaFile, Path urlPath) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		//время указывать через конструктор в секундах будет, название метода странное
 		long purgeTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
 		if (urlPath.toFile().lastModified() < purgeTime)
 			Files.deleteIfExists(urlPath);
@@ -79,6 +84,7 @@ public class FileServiceImpl implements FileService {
 		if (urlPath.toFile().exists()) {
 			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
+			//what is it?
 			createSha(serverMetadata, urlPath, metaFile);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
@@ -95,7 +101,7 @@ public class FileServiceImpl implements FileService {
 			return urlPath;
 		}
 	}	
-	
+	//todo why public
 	public <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, clas);
@@ -121,7 +127,7 @@ public class FileServiceImpl implements FileService {
 		metadata.setSha1(getChecksum(urlPath.toFile(), "SHA-1"));
 		write(metadata, metaFile);
 	}
-	
+	//connect desktop util and use that method
 	private static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
 		byte[] b = createChecksum(file, algorithm);
 		StringBuilder result = new StringBuilder();
