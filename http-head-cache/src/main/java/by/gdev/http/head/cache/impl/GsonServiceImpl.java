@@ -24,8 +24,8 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getObject(String url, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(url, cache);
-		//todo you need to close inputstream of the file because leak of the memory
-		BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()));
-		return gson.fromJson(read, class1);
+		try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
+			return gson.fromJson(read, class1);
+		}
 	}
 }
