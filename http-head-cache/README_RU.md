@@ -15,7 +15,6 @@
 ![r](https://user-images.githubusercontent.com/48221408/135227297-e5bad530-76ed-498c-ab2b-0fc50a75fc7d.png)
 ## Пример 
 <a href="https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-head-cache/src/test/java/by/gdev/http/head/cache/GsonServiceImplTest1.java">GsonServiceImplTest1.java</a><br>
-<a href="https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-head-cache/src/test/java/by/gdev/http/head/cache/GsonServiceImplTest2.java">GsonServiceImplTest2.java</a>
 
 ## Зависимости
 *	Lombok

@@ -16,16 +16,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.HttpService;
 
 public class HttpServiceImpl implements HttpService {
+	CloseableHttpClient httpclient;
+	RequestConfig requestConfig;
 	// Удалять есть существует перезаписью
 	// Выкинуть Exception и проверить как отработает этот метод
 	// Сделать общий метод для извеления методанный этого метода и getMetaByUrl
 
+	public HttpServiceImpl(CloseableHttpClient httpclient,RequestConfig requestConfig) {
+		this.httpclient = httpclient;
+		this.requestConfig = requestConfig;
+	}
+	
 	@Override
 	public RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException {
 		RequestMetadata request = new RequestMetadata();
@@ -34,7 +40,7 @@ public class HttpServiceImpl implements HttpService {
 		BufferedOutputStream out = null;
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
 		try {
-			CloseableHttpResponse response = getGetResponse(url, httpGet);
+			CloseableHttpResponse response = getResponse(httpGet);
 			HttpEntity entity = response.getEntity();
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
@@ -62,20 +68,17 @@ public class HttpServiceImpl implements HttpService {
 		}
 		return request;
 	}
-	//proper name of the method
-	//http client should create in one place and got from constructor
-	private CloseableHttpResponse getGetResponse(String url, HttpRequestBase http) throws IOException {
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		RequestConfig requestConfig = RequestConfig.custom().build();
+	
+
+	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
 		http.setConfig(requestConfig);
-		CloseableHttpResponse response = httpclient.execute(http);
-		return response;
+		return httpclient.execute(http);
 	}
 
 	public RequestMetadata getMetaByUrl(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
-		CloseableHttpResponse response = getGetResponse(url, httpUrl);
+		CloseableHttpResponse response = getResponse(httpUrl);
 		request.setContentLength(response.getFirstHeader("Content-Length").getValue());
 		request.setETag(response.getFirstHeader("ETag").getValue().replaceAll("\"", ""));
 		request.setLastModified(response.getFirstHeader("Last-Modified").getValue());
