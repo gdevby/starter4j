@@ -59,16 +59,23 @@ public class FileServiceImpl implements FileService {
 		}
 	}
 
-	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath) 
+			throws IOException, NoSuchAlgorithmException {
 		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
-		if (urlPath.toFile().lastModified() < purgeTime)
-			Files.deleteIfExists(urlPath);
-		RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
-		String sha = DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1");
-		if (sha.equals(localMetadata.getSha1())) {
-			return urlPath;
+		if (urlPath.toFile().lastModified() < purgeTime) 
+			Files.deleteIfExists(urlPath); 
+		if (urlPath.toFile().exists()) {
+			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+			String sha = DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1");
+			if (sha.equals(localMetadata.getSha1())) {
+				return urlPath;
+			} else {
+				RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+				createSha(serverMetadata, urlPath, metaFile);
+				return urlPath;
+			}
 		} else {
+			checkMetadataFile(metaFile, url);
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
 			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
