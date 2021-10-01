@@ -21,6 +21,7 @@ import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.Args;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -35,11 +36,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GsonServiceImplTest1 {
-	GsonService gsonService;
-	HttpService httpService;
+	static GsonService gsonService;
+	static HttpService httpService;
 	
-	@Before
-	public void init() throws IOException {
+	@BeforeClass
+	public static void init() throws IOException {
 		Path testFolder = Paths.get("target/test_folder");
 		if (testFolder.toFile().exists()) {
 			FileUtils.deleteDirectory(testFolder.toFile());
