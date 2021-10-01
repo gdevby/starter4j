@@ -1,5 +1,7 @@
 package by.gdev.http.head.cache.impl;
 
+//todo description from interface
+//todo and params
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,7 +31,7 @@ public class FileServiceImpl implements FileService {
 	private Path directory;
 	private HttpService httpService;
 	private int timeToLife;
-
+	//todo used lombok to create constructor
 	public FileServiceImpl(HttpService httpService, Gson gson, Charset charset, Path directory, int timeToLife) {
 		this.httpService = httpService;
 		this.gson = gson;
@@ -66,6 +68,7 @@ public class FileServiceImpl implements FileService {
 			Files.deleteIfExists(urlPath); 
 		if (urlPath.toFile().exists()) {
 			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+			//todo enum
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1");
 			if (sha.equals(localMetadata.getSha1())) {
 				return urlPath;
@@ -75,15 +78,16 @@ public class FileServiceImpl implements FileService {
 				return urlPath;
 			}
 		} else {
-			checkMetadataFile(metaFile, url);
+//			checkMetadataFile(metaFile, url);
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
 			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
 	}
-
+	//todo we can without FileNotFoundException
 	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {	
+		//get exist resources
 		checkMetadataFile(metaFile, url);
 		if (urlPath.toFile().exists()) {
 			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
@@ -125,8 +129,7 @@ public class FileServiceImpl implements FileService {
 		}
 	}
 
-	private void createSha(RequestMetadata metadata, Path urlPath, Path metaFile)
-			throws IOException, NoSuchAlgorithmException {
+	private void createSha(RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		write(metadata, metaFile);
 	}

@@ -3,9 +3,9 @@ package by.gdev.http.head.cache.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-
+//every interface should have description.
 public interface GsonService {
-
+//todo you need to define every param of the method.
 	/**
 	 * 
 	 * @param <T>

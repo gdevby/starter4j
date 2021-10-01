@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import by.gdev.http.head.cache.model.RequestMetadata;
-
+//every interface should have description.
 public interface HttpService {
+	//todo you need to define every param of the method.
 	/**
 	 * 
 	 * @param url
