@@ -2,23 +2,24 @@ package by.gdev.http.head.cache;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HeaderElementIterator;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.Args;
-import org.apache.http.util.EntityUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +39,13 @@ public class GsonServiceImplTest1 {
 	HttpService httpService;
 	
 	@Before
-	public void init() {
+	public void init() throws IOException {
+		Path testFolder = Paths.get("target/test_folder");
+		if (testFolder.toFile().exists()) {
+			FileUtils.deleteDirectory(testFolder.toFile());
+		}
+			testFolder.toFile().mkdirs();
+		
 		Gson gson = new Gson();
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setDefaultMaxPerRoute(5);
@@ -55,7 +62,7 @@ public class GsonServiceImplTest1 {
                 }).setConnectionManager(cm).evictIdleConnections(10, TimeUnit.SECONDS).build();
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(604800).setSocketTimeout(604800).build();
 		HttpService httpService = new HttpServiceImpl(builder, requestConfig);
-		FileService fileService = new FileServiceImpl(httpService, gson, StandardCharsets.UTF_8, Paths.get("target"), 604800);
+		FileService fileService = new FileServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 6048000);
 		gsonService = new GsonServiceImpl(gson, fileService);
 	}
 	
@@ -75,16 +82,12 @@ public class GsonServiceImplTest1 {
 		assertEquals(type1, type2);
 	}
 	
-	@Test
-	public void test3() throws IOException {
-		HttpGet http = new HttpGet("https://gdev.by/repo/test.json");
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		RequestConfig requestConfig = RequestConfig.custom().build();
-		http.setConfig(requestConfig);
-		CloseableHttpResponse r = httpclient.execute(http);
-        if (r.getStatusLine().getStatusCode() != 200) {
-            EntityUtils.consume(r.getEntity());
-            throw new IOException(String.valueOf(r.getStatusLine().getStatusCode()));
-        }
+	@Test(expected = NullPointerException.class)
+	public void test3() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
+		gsonService.getObject("https://gdev.by/repo/testnotwxisrt.json", MyTestType.class, true);
+	}
+	@Test(expected = UnknownHostException.class)
+	public void test4() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
+		gsonService.getObject("https://domennotexistgdev.by/repo/testnotwxisrt.json", MyTestType.class, false);
 	}
 }

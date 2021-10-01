@@ -2,6 +2,7 @@ package by.gdev.http.head.cache.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +17,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.HttpService;
@@ -42,6 +44,10 @@ public class HttpServiceImpl implements HttpService {
 		try {
 			CloseableHttpResponse response = getResponse(httpGet);
 			HttpEntity entity = response.getEntity();
+			if (response.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consume(entity);
+                throw new FileNotFoundException(String.valueOf(response.getStatusLine().getStatusCode()));
+            }
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
 			byte[] buffer = new byte[65536];
