@@ -20,25 +20,25 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.HttpService;
-//todo description from interface
-public class HttpServiceImpl implements HttpService {
-	//todo private 
-	CloseableHttpClient httpclient;
-	RequestConfig requestConfig;
-	//todo remove russian
-	// Удалять есть существует перезаписью
-	// Выкинуть Exception и проверить как отработает этот метод
-	// Сделать общий метод для извеления методанный этого метода и getMetaByUrl
+import lombok.AllArgsConstructor;
 
-	public HttpServiceImpl(CloseableHttpClient httpclient,RequestConfig requestConfig) {
-		this.httpclient = httpclient;
-		this.requestConfig = requestConfig;
-	}
+/**
+ * {@inheritDoc}
+ */
+@AllArgsConstructor
+public class HttpServiceImpl implements HttpService {
+	private CloseableHttpClient httpclient;
+	private RequestConfig requestConfig;
+
+	 /**
+	  * {@inheritDoc}
+	  */
 	
 	@Override
-	public RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException {
+	public RequestMetadata getResourseByUrlAndSave(String url, Path path) {
 		RequestMetadata request = new RequestMetadata();
 		HttpGet httpGet = new HttpGet(url);
 		BufferedInputStream in = null;
@@ -47,10 +47,13 @@ public class HttpServiceImpl implements HttpService {
 		try {
 			CloseableHttpResponse response = getResponse(httpGet);
 			HttpEntity entity = response.getEntity();
-			//== 404 and we throw , FileNotFoundException but if we have any other error > 400 we shuld throw IOException
-			if (response.getStatusLine().getStatusCode() != 200) {
+			if (response.getStatusLine().getStatusCode() == 404) {
                 EntityUtils.consume(entity);
-                throw new FileNotFoundException(String.valueOf(response.getStatusLine().getStatusCode()));
+                throw new FileNotFoundException(String.valueOf(response.getStatusLine()));
+            }		
+			if (response.getStatusLine().getStatusCode() > 500) {
+                EntityUtils.consume(entity);
+                throw new IOException(String.valueOf(response.getStatusLine()));
             }
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
@@ -60,43 +63,38 @@ public class HttpServiceImpl implements HttpService {
 				out.write(buffer, 0, curread);
 				curread = in.read(buffer);
 			}
-			//used REPLACE_EXISTING
-			if (path.toFile().exists())
-				Files.delete(path);
-			Files.move(Paths.get(temp.toString()), path);
-			request.setContentLength(response.getFirstHeader("Content-Length").getValue());
-			request.setETag(response.getFirstHeader("ETag").getValue().replaceAll("\"", ""));
-			request.setLastModified(response.getFirstHeader("Last-Modified").getValue());
+			Files.move(Paths.get(temp.toString()), path, StandardCopyOption.REPLACE_EXISTING);
+			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+			request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
+			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue());
 			
-			//ioException can't be thrown
-		} catch (IOException e) {
-			if (temp.toFile().exists())
-				Files.delete(temp);
-			//todo ???
-			else
-				temp.toFile().getParentFile().mkdirs();
-		} finally {
+	    } catch (IOException e) {
+	    	System.out.println("URL error: " + url);
+	    }
+		finally {
 			httpGet.abort();
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
 		return request;
 	}
-	//todo position
 
-	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
-		http.setConfig(requestConfig);
-		return httpclient.execute(http);
-	}
-
+	 /**
+	  * {@inheritDoc}
+	  */
+	
 	public RequestMetadata getMetaByUrl(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
 		CloseableHttpResponse response = getResponse(httpUrl);
-		//create enum with string content ,etag, last....
-		request.setContentLength(response.getFirstHeader("Content-Length").getValue());
-		request.setETag(response.getFirstHeader("ETag").getValue().replaceAll("\"", ""));
-		request.setLastModified(response.getFirstHeader("Last-Modified").getValue());
+		request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+		request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
+		request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue());
 		return request;
+	}
+	
+	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
+		http.setConfig(requestConfig);
+		return httpclient.execute(http);
 	}
 }

@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache;
+package by.gdev.http.head.cache.model;
 
 import lombok.Data;
 
