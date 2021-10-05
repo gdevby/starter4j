@@ -1,7 +1,10 @@
 package by.gdev.http.head.cache.impl;
 
-//todo description from interface
-//todo and params
+
+/**
+ * {@inheritDoc}
+ */
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,39 +19,28 @@ import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
+import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.FileService;
 import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.util.DesktopUtil;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class FileServiceImpl implements FileService {
 	/**
-	 * Saved files and searched files in this directory
+	 * {@inheritDoc}
 	 */
-
+	
+	private HttpService httpService;
 	private Gson gson;
 	private Charset charset;
 	private Path directory;
-	private HttpService httpService;
 	private int timeToLife;
-	//todo used lombok to create constructor
-	public FileServiceImpl(HttpService httpService, Gson gson, Charset charset, Path directory, int timeToLife) {
-		this.httpService = httpService;
-		this.gson = gson;
-		this.charset = charset;
-		this.directory = directory;
-		this.timeToLife = timeToLife;
-	}
 
-	/**
-	 * 
-	 * @param url
-	 * @param cache - If cache = true file exists and hashsum is valid it should
-	 *              return content without head.
-	 * @return
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
-	 */
+	 /**
+	  * {@inheritDoc}
+	  */
 
 	@Override
 	public Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException {
@@ -68,8 +60,7 @@ public class FileServiceImpl implements FileService {
 			Files.deleteIfExists(urlPath); 
 		if (urlPath.toFile().exists()) {
 			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
-			//todo enum
-			String sha = DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1");
+			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
 				return urlPath;
 			} else {
@@ -78,20 +69,19 @@ public class FileServiceImpl implements FileService {
 				return urlPath;
 			}
 		} else {
-//			checkMetadataFile(metaFile, url);
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
 			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
 	}
-	//todo we can without FileNotFoundException
-	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {	
-		//get exist resources
+	
+	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {	
+		boolean fileExists = urlPath.toFile().exists();
+		
 		checkMetadataFile(metaFile, url);
-		if (urlPath.toFile().exists()) {
-			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+		if (fileExists) {
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
+			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
@@ -114,13 +104,6 @@ public class FileServiceImpl implements FileService {
 		}
 	}
 
-	private void checkMetadataFile(Path metaFile, String url) throws IOException {
-		if (!metaFile.toFile().exists()) {
-			RequestMetadata metadata = httpService.getMetaByUrl(url);
-			write(metadata, metaFile);
-		}
-	}
-
 	private void write(Object create, Path config) throws FileNotFoundException, IOException {
 		if (Files.notExists(config.getParent()))
 			Files.createDirectories(config.getParent());
@@ -133,4 +116,12 @@ public class FileServiceImpl implements FileService {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		write(metadata, metaFile);
 	}
+	
+	private void checkMetadataFile(Path metaFile, String url) throws IOException {
+	    if (!metaFile.toFile().exists()) {
+	      RequestMetadata metadata = httpService.getMetaByUrl(url);
+	      write(metadata, metaFile);
+	    }
+	  }
+	
 }

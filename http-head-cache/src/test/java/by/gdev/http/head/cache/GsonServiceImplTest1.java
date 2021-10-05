@@ -20,7 +20,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.Args;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,6 +28,7 @@ import com.google.gson.Gson;
 import by.gdev.http.head.cache.impl.FileServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
+import by.gdev.http.head.cache.model.MyTestType;
 import by.gdev.http.head.cache.service.FileService;
 import by.gdev.http.head.cache.service.GsonService;
 import by.gdev.http.head.cache.service.HttpService;
@@ -83,10 +83,11 @@ public class GsonServiceImplTest1 {
 		assertEquals(type1, type2);
 	}
 	
-	@Test(expected = NullPointerException.class)
+	@Test(expected = FileNotFoundException.class)
 	public void test3() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
 		gsonService.getObject("https://gdev.by/repo/testnotwxisrt.json", MyTestType.class, true);
 	}
+	
 	@Test(expected = UnknownHostException.class)
 	public void test4() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
 		gsonService.getObject("https://domennotexistgdev.by/repo/testnotwxisrt.json", MyTestType.class, false);

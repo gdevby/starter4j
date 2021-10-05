@@ -4,20 +4,24 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import by.gdev.http.head.cache.model.RequestMetadata;
-//every interface should have description.
+/**
+ * 
+ * This service sent http get, http head request and saved response to file
+ *
+ */
 public interface HttpService {
-	//todo you need to define every param of the method.
 	/**
-	 * 
-	 * @param url
-	 * @param path
-	 * @return
+	 * GET request
+	 * @param url - url address 
+	 * @param path - saved content to this path
+	 * @return RequestMetadata metadata about url
 	 * @throws IOException
 	 */
 	RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException;
 	/**
-	 * @param url
-	 * @return
+	 * HEAD request
+	 * @param url - url address 
+	 * @return RequestMetadata metadata about url
 	 * @throws IOException
 	 */
 	RequestMetadata getMetaByUrl(String url) throws IOException;
