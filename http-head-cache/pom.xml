@@ -1,12 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>by.gdev</groupId>
-    <artifactId>starter</artifactId>
-    <version>${revision}</version>
-  </parent>
-  <artifactId>http-head-cache</artifactId>
-    <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>by.gdev</groupId>
+		<artifactId>starter</artifactId>
+		<version>${revision}</version>
+	</parent>
+	<artifactId>http-head-cache</artifactId>
+	<packaging>jar</packaging>
+	<name>http-head-cache</name>
+	<description>This module allows you to cache the result of the resource response by url</description>
+	<url>https://github.com/gdevby/desktop-starter-launch-update-bootstrap/tree/master/http-head-cache</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/gdevby/desktop-starter-launch-update-bootstrap/tree/master/http-head-cache</url>
+	</scm>
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>http-head-cache-releases</name>
+			<url>https://github.com/gdevby/desktop-starter-launch-update-bootstrap/tree/master/http-head-cache</url>
+		</repository>
+	</distributionManagement>
+	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -40,21 +64,20 @@
 			<version>${revision}</version>
 		</dependency>
 	</dependencies>
-
-<build>
-	  <plugins>
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-source-plugin</artifactId>
-		<executions>
-			<execution>
-				<id>attach-sources</id>
-				<goals>
-					<goal>jar</goal>
-				</goals>
-			</execution>
-		</executions>
-	   </plugin>
-	 </plugins>
-  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
