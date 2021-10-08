@@ -25,13 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AppConfigCreatorTest {
 	@BeforeClass
-//	@Before
 	public static void  init() {
 		log.info("test");
 	}
 
-	//todo
-//	@Test
+	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
 		JVMConfig jvmProper = new JVMConfig();
 		Map<OSType, Map<Arch, Map<String, Repo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>();
@@ -39,7 +37,6 @@ public class AppConfigCreatorTest {
 		arch.put(Arch.x64, new HashMap<String, Repo>());
 		jvms.put(OSType.LINUX, arch);
 		jvmProper.setJvms(jvms);
-		System.out.println(jvmProper);
 		AppConfigModel configFile = new AppConfigModel();
 		configFile.setJavaFolder("src/test/resources/jvms2");
 		JVMConfig jvm = new JVMConfig();
@@ -51,7 +48,6 @@ public class AppConfigCreatorTest {
 			for (Path pA : Files.walk(pO, 1).filter(entry -> !entry.equals(pO)).collect(Collectors.toList())) {
 				Arch a = Arch.valueOf(pA.getFileName().toString().toLowerCase(Locale.ROOT));
 				jvm.getJvms().get(t).put(a, new HashMap<String, Repo>());
-				System.out.println(jvm);
 			}
 			Assert.assertEquals(jvmProper, jvm);
 		}
