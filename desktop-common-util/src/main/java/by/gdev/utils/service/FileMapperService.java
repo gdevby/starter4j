@@ -15,12 +15,12 @@ import java.nio.file.Paths;
 import com.google.gson.Gson;
 
 public class FileMapperService {
-	private Gson GSON;
+	private Gson gson;
 	private Charset charset;
 	private String workingDirectory;
 	
-	public FileMapperService(Gson GSON, Charset charset, String workingDirectory) {
-		this.GSON = GSON;
+	public FileMapperService(Gson gson, Charset charset, String workingDirectory) {
+		this.gson = gson;
 		this.charset = charset;
 		this.workingDirectory = workingDirectory;
 	}
@@ -30,19 +30,19 @@ public class FileMapperService {
 		if (Files.notExists(path.getParent()))
 			Files.createDirectories(path.getParent());
 		try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(path.toFile()), charset)) {
-			GSON.toJson(create, out);
+			gson.toJson(create, out);
 		}
 	}
 
 	public <T> T read(String file, Class<T> cl) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(Paths.get(workingDirectory, file).toFile()))){
-			return GSON.fromJson(read, cl);
+			return gson.fromJson(read, cl);
 		}
 	}
 	
 	public Object readToken(Path file, Type typ) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))){
-			return GSON.fromJson(read, typ);
+			return gson.fromJson(read, typ);
 		}		
 	}
 }
