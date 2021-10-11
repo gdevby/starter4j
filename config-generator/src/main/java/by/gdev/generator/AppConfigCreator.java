@@ -12,9 +12,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
+
 import by.gdev.generator.model.AppConfigModel;
 import by.gdev.generator.model.JVMConfig;
-import by.gdev.generator.service.FileMapperService;
 import by.gdev.generator.util.Util;
 import by.gdev.model.AppConfig;
 import by.gdev.util.DesktopUtil;
@@ -23,6 +25,7 @@ import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
+import by.gdev.utils.service.FileMapperService;
 
 public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
@@ -52,7 +55,8 @@ public class AppConfigCreator {
 		Path resources = Paths.get(configFile.getAppResources());
 		Path dependenciesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_DEPENDENCISES_CONFIG);
 		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
-		fileMapperService.copyFile(appFolder, Paths.get(TARGET_OUT_FOLDER, version));
+		//добавить строку из метода 
+		FileUtils.copyDirectory(appFolder.toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
@@ -60,11 +64,11 @@ public class AppConfigCreator {
 		appConfig.setMainClass(configFile.getMainClass());
 		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppFile()),
 				configFile.getAppName()));
-		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG));
+		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG).toString());
 		fileMapperService.write(createRepo(dependencies, dependencies, 
-				Paths.get(version, dependencies.getFileName().toString()).toString()), dependenciesConfig);
+				Paths.get(version, dependencies.getFileName().toString()).toString()), dependenciesConfig.toString());
 		fileMapperService.write(createRepo(resources, resources, 
-				Paths.get(version, resources.getFileName().toString()).toString()), resourcesConfig);
+				Paths.get(version, resources.getFileName().toString()).toString()), resourcesConfig.toString());
 		appConfig.setAppDependencies(
 				createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version));
@@ -73,7 +77,8 @@ public class AppConfigCreator {
 			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG),
 					Paths.get(configFile.getAppName()).toString()));
 		}else {
-			AppConfig app = (AppConfig) fileMapperService.read(Paths.get(configFile.getJavaConfig(), TEMP_APP_CONFIG), AppConfig.class);
+			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), TEMP_APP_CONFIG).toString(), AppConfig.class);
+			System.out.println(app);
 			appConfig.setJavaRepo(app.getJavaRepo());
 		}
 		return appConfig;
@@ -199,7 +204,7 @@ public class AppConfigCreator {
 							configFile.getAppName());
 						Path jvmConfig = Paths.get("jvms", type.toString().toLowerCase(Locale.ROOT), arch.toString(),
 								key, pathJre.getFileName() + ".json");
-						fileMapperService.write(createdJson, jvmConfig);
+						fileMapperService.write(createdJson, jvmConfig.toString());
 						repo.setResources(Arrays.asList(Metadata.createMetadata(jvmConfig)));
 						repo.setRepositories(AppConfigModel.DEFAULT_APP_CONFIG_MODEL.getDomain());
 					}
