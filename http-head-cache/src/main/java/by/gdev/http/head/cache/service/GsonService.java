@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 
 public interface GsonService {
 	/**
-	 * @param T type return object
+	 * @param <T> type return object
 	 * @param url - url address 
 	 * @param class1 java object
 	 * @param cache If cache true file exists and hashsum is valid it should
