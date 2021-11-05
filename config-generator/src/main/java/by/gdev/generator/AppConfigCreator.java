@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 
 import by.gdev.generator.model.AppConfigModel;
-import by.gdev.generator.model.JVMConfig;
 import by.gdev.generator.util.Util;
 import by.gdev.model.AppConfig;
+import by.gdev.model.JVMConfig;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -78,7 +78,6 @@ public class AppConfigCreator {
 					Paths.get(configFile.getAppName()).toString()));
 		}else {
 			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), TEMP_APP_CONFIG).toString(), AppConfig.class);
-			System.out.println(app);
 			appConfig.setJavaRepo(app.getJavaRepo());
 		}
 		return appConfig;

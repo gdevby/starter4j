@@ -21,13 +21,13 @@ import com.google.gson.Gson;
 
 import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.RequestMetadata;
-import by.gdev.http.head.cache.service.FileService;
+import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class FileServiceImpl implements FileService {
+public class FileCacheServiceImpl implements FileCacheService {
 	/**
 	 * {@inheritDoc}
 	 */
@@ -53,8 +53,7 @@ public class FileServiceImpl implements FileService {
 		}
 	}
 
-	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath) 
-			throws IOException, NoSuchAlgorithmException {
+	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath) throws IOException, NoSuchAlgorithmException {
 		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
 		if (urlPath.toFile().lastModified() < purgeTime) 
 			Files.deleteIfExists(urlPath); 
@@ -70,14 +69,14 @@ public class FileServiceImpl implements FileService {
 			}
 		} else {
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
-			createSha(serverMetadata, urlPath, metaFile);
+			checkMetadataFile(metaFile, url);
+//			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
 	}
 	
 	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {	
 		boolean fileExists = urlPath.toFile().exists();
-		
 		checkMetadataFile(metaFile, url);
 		if (fileExists) {
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);

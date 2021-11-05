@@ -57,7 +57,7 @@ public class AppConfigModel{
     			"src/test/starter-app-folder/resources", 
     			"src/test/starter-app-folder/dep", 
     			"src/test/starter-app-folder", 
-    			Arrays.asList("http://localhost/", "http://localhost2/"),
+    			Arrays.asList("http://localhost:81/"),
     			false, 
     			false);
     }
