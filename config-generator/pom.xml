@@ -21,6 +21,7 @@
             <groupId>by.gdev</groupId>
             <artifactId>starter-core</artifactId>
             <version>${revision}</version>
+           
         </dependency>
 		<dependency>
 			<groupId>com.beust</groupId>

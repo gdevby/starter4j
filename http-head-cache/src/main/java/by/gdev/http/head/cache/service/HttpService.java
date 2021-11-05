@@ -25,4 +25,8 @@ public interface HttpService {
 	 * @throws IOException
 	 */
 	RequestMetadata getMetaByUrl(String url) throws IOException;
+	
+	
+	//Дает нам количество загрузок и сокращает время ожидания
+	void init() throws IOException;
 }

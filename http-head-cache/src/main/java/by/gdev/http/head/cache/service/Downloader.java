@@ -3,8 +3,12 @@
  */
 package by.gdev.http.head.cache.service;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 import com.google.common.eventbus.EventBus;
 
+import by.gdev.http.cache.exeption.StatusExeption;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
 
@@ -22,11 +26,11 @@ public interface Downloader {
 	 * download of the file
 	 * 
 	 * @param container
+	 * @throws IOException 
 	 */
-	void addContainer(DownloaderContainer container);
+	void addContainer(DownloaderContainer container) throws IOException;
 
-	void startDownload();
+	void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption;
 
 	void cancelDownload();
-
 }

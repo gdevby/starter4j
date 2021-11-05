@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.service.FileService;
+import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.GsonService;
 import lombok.AllArgsConstructor;
 
@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GsonServiceImpl implements GsonService {
 	private Gson gson;
-	private FileService fileService;
+	private FileCacheService fileService;
 
 	 /**
 	  * {@inheritDoc}

@@ -1,10 +1,8 @@
 package by.gdev.config;
 
-import com.google.gson.*;
-
-import by.gdev.settings.SettingsManager;
-import by.gdev.util.OSInfo;
-import by.gdev.util.model.download.Metadata;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -14,9 +12,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import by.gdev.settings.SettingsManager;
+import by.gdev.util.OSInfo;
+import by.gdev.util.model.download.Metadata;
+
+
 
 public class ConfigManager {
     private static ConfigManager instance;

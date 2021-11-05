@@ -1,35 +1,59 @@
 package by.gdev;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.eventbus.EventBus;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
+import by.gdev.config.HttpConfig;
 import by.gdev.handler.ConsoleSubscriber;
 import by.gdev.handler.Localise;
-import by.gdev.handler.ValidatedPartionSize;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
 import by.gdev.handler.ValidateTempDir;
 import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
+import by.gdev.handler.ValidatedPartionSize;
+import by.gdev.http.head.cache.impl.DownloaderImpl;
+import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
+import by.gdev.http.head.cache.impl.GsonServiceImpl;
+import by.gdev.http.head.cache.impl.HttpServiceImpl;
+import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
+import by.gdev.http.head.cache.service.Downloader;
+import by.gdev.http.head.cache.service.FileCacheService;
+import by.gdev.http.head.cache.service.GsonService;
+import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.model.AppConfig;
+import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.util.OSInfo;
+import by.gdev.util.OSInfo.Arch;
+import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Main  {
+public class Main {
+	public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	public static Charset charset = StandardCharsets.UTF_8;
 
 	/*
 	 * todo reuse args to run and
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	public static void main(String[] args) throws Exception {
 		ConsoleSubscriber listener = new ConsoleSubscriber();
 		StarterAppConfig starterConfig = new StarterAppConfig();
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
@@ -45,14 +69,52 @@ public class Main  {
 		validateEnvironment.add(new ValidateUpdate());
 		for (ValidateEnvironment val : validateEnvironment) {
 			if (!val.validate()) {
-				log.error(bundle.getString("validate.error") +" "+ val.getClass().getName());
+				log.error(bundle.getString("validate.error") + " " + val.getClass().getName());
 				eventBus.post(val.getExceptionMessage());
-			}else {
-				log.debug(bundle.getString("validate.successful") +" "+ val.getClass().getName());
+			} else {
+				log.debug(bundle.getString("validate.successful") + " " + val.getClass().getName());
 			}
 		}
-		try {
+		OSInfo.OSType osType = OSInfo.getOSType();
+		Arch osArc = OSInfo.getJavaBit();
 
+		HttpConfig httpConfig = new HttpConfig();
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), httpConfig.requestConfig(), 4);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, charset, Paths.get("target"), 600000);
+		GsonService gsonService = new GsonServiceImpl(gson, fileService);
+
+		
+		
+		
+		
+		Downloader downloader = new DownloaderImpl("/home/aleksandr/Desktop/qwert/test/");
+		DownloaderContainer container = new DownloaderContainer();
+
+		AppConfig all = gsonService.getObject("http://localhost:81/server/tempAppConfig.json", AppConfig.class, false);
+
+
+		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		
+		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		
+		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+		
+		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
+		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);		
+		Repo java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
+
+		List<Repo> list = new ArrayList<Repo>();
+//		list.add(resources);
+		list.add(dependencis);
+//		list.add(java);
+		for (Repo repo : list) {
+			container.setRepo(repo);
+			downloader.addContainer(container);
+		}
+		downloader.startDownload(true);
+		
+
+		try {
 			// todo add special util args4j and parse args and properties and union them
 //			AppConfig a = g.fromJson(new InputStreamReader(Main.class.getResourceAsStream("/settings.json")),
 //					AppConfig.class);
@@ -92,5 +154,6 @@ public class Main  {
 			t.printStackTrace();
 			System.exit(-1);
 		}
+		
 	}
 }

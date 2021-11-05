@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import by.gdev.generator.model.AppConfigModel;
-import by.gdev.generator.model.JVMConfig;
+import by.gdev.model.JVMConfig;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
