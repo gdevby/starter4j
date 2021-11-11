@@ -1,16 +1,12 @@
 package by.gdev;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
-
-import javax.swing.UnsupportedLookAndFeelException;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.eventbus.EventBus;
@@ -32,6 +28,7 @@ import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
+import by.gdev.http.head.cache.impl.PostHandlerImpl;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.service.Downloader;
 import by.gdev.http.head.cache.service.FileCacheService;
@@ -84,35 +81,28 @@ public class Main {
 		GsonService gsonService = new GsonServiceImpl(gson, fileService);
 
 		
-		
-		
-		
-		Downloader downloader = new DownloaderImpl("/home/aleksandr/Desktop/qwert/test/");
+		Downloader downloader = new DownloaderImpl(eventBus);
 		DownloaderContainer container = new DownloaderContainer();
 
 		AppConfig all = gsonService.getObject("http://localhost:81/server/tempAppConfig.json", AppConfig.class, false);
-
-
 		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		
 		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		
 		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
-		
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);		
 		Repo java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
-
 		List<Repo> list = new ArrayList<Repo>();
-//		list.add(resources);
+		list.add(resources);
 		list.add(dependencis);
-//		list.add(java);
+		list.add(java);
 		for (Repo repo : list) {
+			container.setDestinationRepositories("/home/aleksandr/Desktop/qwert/test/");
+			PostHandlerImpl postHandler = new PostHandlerImpl(container.getDestinationRepositories());
 			container.setRepo(repo);
+			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
 		downloader.startDownload(true);
-		
 
 		try {
 			// todo add special util args4j and parse args and properties and union them

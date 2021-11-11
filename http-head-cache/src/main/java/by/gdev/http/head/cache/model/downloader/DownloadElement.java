@@ -3,6 +3,7 @@
  */
 package by.gdev.http.head.cache.model.downloader;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import by.gdev.http.head.cache.handler.PostHandler;
@@ -23,8 +24,10 @@ public class DownloadElement {
 	/**
 	 * Download part of the file
 	 */
+	private LocalTime start;
+	private LocalTime end;
 	private Repo repo;
-	private volatile Long downloadBytes;
+	private volatile double downloadBytes;
 	private volatile Throwable t;
 
 }
