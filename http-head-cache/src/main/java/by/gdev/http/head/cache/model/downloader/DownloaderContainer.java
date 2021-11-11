@@ -14,6 +14,7 @@ import lombok.Data;
  */
 @Data
 public class DownloaderContainer {
+	private String destinationRepositories;
 	private Repo repo;
 	private List<PostHandler> handlers;
 

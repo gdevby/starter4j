@@ -3,24 +3,22 @@
  */
 package by.gdev.http.head.cache.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
+import com.google.common.eventbus.EventBus;
+
 import by.gdev.http.cache.exeption.StatusExeption;
+import by.gdev.http.head.cache.handler.PostHandler;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
@@ -37,6 +35,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class DownloaderImpl implements Downloader {
 	private String pathToDownload;
+	private EventBus eventBus;
 	/**
 	 * Put new elements to download them.
 	 */
@@ -48,73 +47,41 @@ public class DownloaderImpl implements Downloader {
 
 	private volatile DownloaderStatusEnum status;
 
-	public DownloaderImpl(String pathToDownload) {
-		this.pathToDownload = pathToDownload;
+	public DownloaderImpl(EventBus eventBus) {
+		this.eventBus = eventBus;
 		status = DownloaderStatusEnum.IDLE;
 	}
 
 	@Override
 	public void addContainer(DownloaderContainer container) {
+		pathToDownload = container.getDestinationRepositories();
+//		PostHandlerImpl postHandler = new PostHandlerImpl(pathToDownload);
 		container.getRepo().getResources().forEach(metadata -> {
 			DownloadElement element = new DownloadElement();
+			element.setHandlers(container.getHandlers());
 			element.setMetadata(metadata);
 			element.setRepo(container.getRepo());
 			downloadElements.add(element);
+			
 		});
 	}
 
 	@Override
-	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
+	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
+		DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, pathToDownload, downloadElements, eventBus, processedElements);
 		status = DownloaderStatusEnum.IDLE;
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++) {
-				listThread.add(CompletableFuture.runAsync(() -> {
-					status = DownloaderStatusEnum.WORK;
-					while (status.equals(DownloaderStatusEnum.WORK)) {
-						if (status.equals(DownloaderStatusEnum.CANCEL)) {
-							System.out.println("Загрузка прервана");
-							break;
-						} else {
-							DownloadElement element = downloadElements.poll();
-							processedElements.add(element);
-							if (Objects.nonNull(element)) {
-								try {
-									download(element);
-								} catch (IOException e) {
-									e.printStackTrace();
-								} catch (InterruptedException | ExecutionException e1) {
-									e1.printStackTrace();
-								}
-							} else {
-								break;
-							}
-						}
-					}
-					status = DownloaderStatusEnum.IDLE;
-				}));
-				status = DownloaderStatusEnum.IDLE;
+				listThread.add(CompletableFuture.runAsync(runnable));
 			}
 			if (sync) {
-				CompletableFuture.allOf(listThread.toArray(new CompletableFuture[0])).get();
-			}else {
-				CompletableFuture.runAsync(()->{
-					try {
-						CompletableFuture.allOf(listThread.toArray(new CompletableFuture[0])).get();
-					} catch (InterruptedException | ExecutionException e) {
-						e.printStackTrace();
-					}
-				}).get();
+				synchronous(listThread);
+			} else {
+				asynchronous(listThread);
 			}
-		}else throw new StatusExeption(status.toString());
-		
-		// это для многопоточки
-		// fill downloadElements
-		// check status of the downloading
-		// start new thread
-		// wait 100 ms and check status again and generate every second new stats
-		// before exit send DownloaderStatus with status idle
-		
+		} else
+			throw new StatusExeption(status.toString());
 	}
 
 	@Override
@@ -122,35 +89,53 @@ public class DownloaderImpl implements Downloader {
 		status = DownloaderStatusEnum.CANCEL;
 	}
 
-	private void download(DownloadElement element) throws IOException, InterruptedException, ExecutionException {
-		BufferedInputStream in = null;
-		BufferedOutputStream bout = null;
-		try {
-			URL web = new URL(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
-			File file = new File(pathToDownload + element.getMetadata().getPath());
-			if (!file.exists())
-				file.getParentFile().mkdirs();
-			HttpURLConnection http = (HttpURLConnection) web.openConnection();
-			Long fileSize = http.getContentLengthLong();
-			in = new BufferedInputStream(http.getInputStream());
-			FileOutputStream fos = new FileOutputStream(file);
-			bout = new BufferedOutputStream(fos, 1024);
-			byte[] buffer = new byte[1024];
-			int read = 0;
-			Long download = 0L;
-			while ((read = in.read(buffer, 0, 1024)) >= 0) {
-				if (status.equals(DownloaderStatusEnum.CANCEL)) {
-					System.out.println("Загрузка прервана");
-					break;
-				}else {
-					bout.write(buffer, 0, read);
-					download += read;
-//					System.out.println("download file:" + Paths.get(element.getMetadata().getPath()).getFileName() + ". Uploaded "+ download + " bytes for " + fileSize + " bytes");
-				}
-			}
-		} finally {
-			bout.close();
-			in.close();
+	private double averagSpeed() {
+		double sum = 0;
+		for (DownloadElement d : processedElements) {
+			sum += d.getDownloadBytes();
 		}
+		return sum / processedElements.size();
+	}
+	
+	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
+		LocalTime start = LocalTime.now();
+		boolean workedAnyThread = true;
+		while (workedAnyThread) {
+			workedAnyThread = false;
+			Thread.sleep(50);
+			boolean result = listThread.stream().allMatch(e -> !e.isDone());
+			if (result)
+				workedAnyThread = true;
+			else
+				status = DownloaderStatusEnum.IDLE;
+			LocalTime now = LocalTime.now();
+			if (now.getSecond() == start.getSecond() + 1) {
+				eventBus.post(averagSpeed());
+				start = now;
+			}
+		}
+	}
+	
+	private void asynchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException, ExecutionException {
+		CompletableFuture.runAsync(() -> {
+			try {
+				LocalTime start = LocalTime.now();
+				boolean workedAnyThread = true;
+				while (workedAnyThread) {
+					workedAnyThread = false;
+					Thread.sleep(50);
+					boolean result = listThread.stream().allMatch(e -> !e.isDone());
+					if (result)
+						workedAnyThread = true;
+					LocalTime now = LocalTime.now();
+					if (now.getSecond() == start.getSecond() + 1) {
+						eventBus.post(averagSpeed());
+						start = now;
+					}
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}).get();
 	}
 }
