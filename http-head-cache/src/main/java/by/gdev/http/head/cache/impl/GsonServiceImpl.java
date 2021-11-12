@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
 /**
  * {@inheritDoc}
  */
-
+// TODO: added repository field to download with repo and by link too
 @AllArgsConstructor
 public class GsonServiceImpl implements GsonService {
 	private Gson gson;

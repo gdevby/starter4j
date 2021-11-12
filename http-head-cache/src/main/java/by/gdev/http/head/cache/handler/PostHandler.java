@@ -13,5 +13,6 @@ import by.gdev.http.head.cache.model.downloader.DownloadElement;
  *
  */
 public interface PostHandler {
+	// TODO translate name of the method???
 	void  portProcessDownloadElement(DownloadElement e) throws IOException, NoSuchAlgorithmException;
 }

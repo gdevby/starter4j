@@ -23,7 +23,7 @@ import by.gdev.util.OSInfo;
 import by.gdev.util.model.download.Metadata;
 
 
-
+// TODO what is it?
 public class ConfigManager {
     private static ConfigManager instance;
     private final OSInfo.OSType osType;

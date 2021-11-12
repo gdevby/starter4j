@@ -66,6 +66,7 @@ public class DownloaderImpl implements Downloader {
 		DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, pathToDownload, downloadElements, eventBus,
 				processedElements);
 		status = DownloaderStatusEnum.IDLE;
+		// TODO: it is possibe that the evaluation of the method will be false?
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++) {
@@ -92,13 +93,14 @@ public class DownloaderImpl implements Downloader {
 		}
 		return sum / processedElements.size();
 	}
-
+	// TODO: how to create one methof for synch and asynch and use boolean param for this 
 	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
+			// TODO: can we workedAnyThread = listThread.stream().allMatch(e -> !e.isDone());
 			boolean result = listThread.stream().allMatch(e -> !e.isDone());
 			if (result)
 				workedAnyThread = true;
@@ -126,6 +128,7 @@ public class DownloaderImpl implements Downloader {
 						workedAnyThread = true;
 					LocalTime now = LocalTime.now();
 					if (now.getSecond() == start.getSecond() + 1) {
+						// TODO use DownloaderStatus
 						eventBus.post(averagSpeed());
 						start = now;
 					}

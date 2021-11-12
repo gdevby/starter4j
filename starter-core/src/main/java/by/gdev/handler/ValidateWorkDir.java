@@ -11,6 +11,7 @@ public class ValidateWorkDir extends AbstractBandle {
 	@Override
 	public boolean validate() {
 		File workDir = DesktopUtil.getSystemPath(OSInfo.getOSType(), "starter");
+		//TODO ???
 //		File workDir = new File("/home/aleksandr/Desktop/qwert/acces");
 		if (workDir.exists()) {
 			if (!Files.isWritable(workDir.toPath()) || !Files.isReadable(workDir.toPath()))
