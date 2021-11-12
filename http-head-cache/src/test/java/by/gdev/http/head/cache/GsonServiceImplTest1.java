@@ -51,6 +51,7 @@ public class GsonServiceImplTest1 {
 	@BeforeClass
 	public static void init() throws IOException {
 		Path testFolder = Paths.get("target/test_folder");
+		// TODO warning
 		String proxiUrl = "http://resource.fastrepo.org/file?link=";
 		if (testFolder.toFile().exists()) {
 			FileUtils.deleteDirectory(testFolder.toFile());

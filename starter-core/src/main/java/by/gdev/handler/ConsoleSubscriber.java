@@ -3,7 +3,7 @@ package by.gdev.handler;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.extern.slf4j.Slf4j;
-
+//TODO create package subscriber
 @Slf4j
 public class ConsoleSubscriber {
     @Subscribe

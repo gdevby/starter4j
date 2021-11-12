@@ -9,6 +9,7 @@ import by.gdev.util.model.download.Repo;
  * Updating for every version.
  */
 @Data
+// TODO remove todo if we don't need
 //todo put config file in git and use from git (RAW button) ,parse with gson like one object
 //todo create real example to run test.jar and add new module with test and description
 //todo added this way to config arguments , in this case we can insert in app. -Djava.library.path=${natives_directory}

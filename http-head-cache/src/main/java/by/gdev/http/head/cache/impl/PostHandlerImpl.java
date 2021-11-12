@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {
+	// TODO where do we can extract variable? 
 	private String pathToDownload;
 
 	@Override
@@ -20,7 +21,9 @@ public class PostHandlerImpl implements PostHandler {
 		try {
 			String shaLocalFile = DesktopUtil.getChecksum(new File(pathToDownload + element.getMetadata().getPath()),Headers.SHA1.getValue());
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) {
+				//TODO use logger
 				System.out.println("The hash sum of the file is not equal: " + element.getMetadata().getPath());
+				// TODO set the problem to element.setThrowable...
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
