@@ -95,7 +95,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return urlPath;
 		}
 	}
-
+	// TODO: user library to write read configuration
 	private <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, clas);

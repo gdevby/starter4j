@@ -97,7 +97,7 @@ public class HttpServiceImpl implements HttpService {
 		}
 		return request;
 	}
-		
+	//TODO move method to desktop util and allow to add own link
 	@Override
 	public void init() {
 		try {

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
-
+// TODO NOT USE abstract add method of the validation
 public class ValidatedPartionSize extends AbstractBandle {
 
 	private	File file = new File(new File("").getAbsolutePath());		
