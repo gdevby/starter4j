@@ -1,4 +1,4 @@
-package by.gdev.generator.util;
+package by.gdev.util;
 
 @FunctionalInterface
 public interface CheckedFunction<T,R> {

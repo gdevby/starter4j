@@ -17,7 +17,6 @@ public class AppConfig {
     private String appName;
     private double appVersion;
     private String mainClass;   
-//    private Map<ArgumentType,List<String>> arguments;   
     private List<String> appArguments;
     private List<String> jvmArguments;   
     /**
@@ -31,4 +30,3 @@ public class AppConfig {
     //!
     private Repo javaRepo;
 }
-

@@ -46,18 +46,13 @@ public class GsonServiceImplTest1 {
 	static HttpService httpService;
 	static ClientAndServer mockServer;
 
-	// Сервер смотрит в папку и отдает файл
-
 	@BeforeClass
 	public static void init() throws IOException {
 		Path testFolder = Paths.get("target/test_folder");
-		String proxiUrl = "http://resource.fastrepo.org/file?link=";
 		if (testFolder.toFile().exists()) {
 			FileUtils.deleteDirectory(testFolder.toFile());
 		}
 		testFolder.toFile().mkdirs();
-//		Runtime.getRuntime().exec("ncat -l 12346 -k");
-		
 		mockServer = ClientAndServer.startClientAndServer("127.0.0.1", 12346);
 		mockServer.when( request()
 	              .withMethod("POST")

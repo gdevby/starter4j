@@ -16,7 +16,6 @@ public class Localise {
 			String language = property.getProperty("language");
 			String[] parts = language.split(",");
 			for (String string : parts) {
-				// Поверяет есть ли русский язык
 				if (!string.equals(Locale.getDefault().toString())) {
 					return locale = new Locale.Builder().setLanguage("ru").build();
 				}else {
@@ -24,7 +23,7 @@ public class Localise {
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		return locale;
 	}	
