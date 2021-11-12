@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -156,5 +157,23 @@ public class DesktopUtil {
 		if (OSInfo.getOSType().equals(OSType.WINDOWS))
 			b.append("w.exe");
 		return b.toString();
+	}
+	
+	public static <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
+		return t -> {
+			try {
+				return checkedFunction.apply(t);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		};
+	}
+
+	public static void sleep(int seconds) {
+		try {
+			Thread.sleep(1000 * seconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

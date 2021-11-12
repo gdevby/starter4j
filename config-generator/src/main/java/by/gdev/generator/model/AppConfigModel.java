@@ -52,7 +52,7 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("",""),
     			"starter-app-1.0.jar", 
-    			"../../starter-app/src/main/resources/jvms",
+    			"../starter-app/src/main/resources/jvms",
     			"src/test/resources", 
     			"src/test/starter-app-folder/resources", 
     			"src/test/starter-app-folder/dep", 

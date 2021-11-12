@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
  * Saved files in cache and got from it
  */
 public interface FileCacheService {
-	//переменовать в FileCacheService
 	/**
 	 * @param url - url address
 	 * @param cache - If cache = true file exists and hashsum is valid it should

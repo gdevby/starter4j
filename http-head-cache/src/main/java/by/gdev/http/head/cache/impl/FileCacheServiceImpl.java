@@ -68,9 +68,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 				return urlPath;
 			}
 		} else {
-			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+			httpService.getResourseByUrlAndSave(url, urlPath);
 			checkMetadataFile(metaFile, url);
-//			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
 	}

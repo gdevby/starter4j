@@ -71,7 +71,7 @@ public class HttpServiceImpl implements HttpService {
 		public RequestMetadata getMetaByUrl(String url) throws IOException {
 			for (int attepmts = 1; attepmts < maxAttepmts; attepmts++) {
 				try {
-					return test123(url);
+					return getMetadata(url);
 				} catch (SocketTimeoutException e) {
 					attepmts++;
 					if (attepmts == maxAttepmts)
@@ -80,22 +80,9 @@ public class HttpServiceImpl implements HttpService {
 			}
 
 			return null;
-	
-			
-//			int attepmts = 1;
-//			while (attepmts < maxAttepmts) {
-//				try {
-//					return test123(url);
-//				} catch (SocketTimeoutException e) {
-//					attepmts++;
-//					if (attepmts == maxAttepmts)
-//						throw new SocketTimeoutException();
-//				}
-//			}
-//			return null;
 		}
 		
-	private RequestMetadata test123(String url) throws IOException {
+	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
 		CloseableHttpResponse response = getResponse(httpUrl);

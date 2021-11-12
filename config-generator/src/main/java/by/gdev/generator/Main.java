@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {	
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	//todo correct name of the variable ? and why did you use to this place . try to main class
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static FileMapperService fileMapperService = new FileMapperService(GSON, charset, "");
 	
