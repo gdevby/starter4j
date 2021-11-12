@@ -3,11 +3,8 @@
  */
 package by.gdev.http.head.cache.impl;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -18,7 +15,6 @@ import java.util.concurrent.ExecutionException;
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.http.cache.exeption.StatusExeption;
-import by.gdev.http.head.cache.handler.PostHandler;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
@@ -61,13 +57,14 @@ public class DownloaderImpl implements Downloader {
 			element.setMetadata(metadata);
 			element.setRepo(container.getRepo());
 			downloadElements.add(element);
-			
+
 		});
 	}
 
 	@Override
-	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, pathToDownload, downloadElements, eventBus, processedElements);
+	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
+		DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, pathToDownload, downloadElements, eventBus,
+				processedElements);
 		status = DownloaderStatusEnum.IDLE;
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
@@ -95,7 +92,7 @@ public class DownloaderImpl implements Downloader {
 		}
 		return sum / processedElements.size();
 	}
-	
+
 	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
@@ -114,8 +111,9 @@ public class DownloaderImpl implements Downloader {
 			}
 		}
 	}
-	
-	private void asynchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException, ExecutionException {
+
+	private void asynchronous(List<CompletableFuture<Void>> listThread)
+			throws InterruptedException, ExecutionException {
 		CompletableFuture.runAsync(() -> {
 			try {
 				LocalTime start = LocalTime.now();
