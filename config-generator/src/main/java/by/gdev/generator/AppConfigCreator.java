@@ -55,7 +55,6 @@ public class AppConfigCreator {
 		Path resources = Paths.get(configFile.getAppResources());
 		Path dependenciesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_DEPENDENCISES_CONFIG);
 		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
-		//добавить строку из метода 
 		FileUtils.copyDirectory(appFolder.toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());

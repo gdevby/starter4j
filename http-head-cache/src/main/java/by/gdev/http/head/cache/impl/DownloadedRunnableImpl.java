@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -15,7 +14,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import com.google.common.eventbus.EventBus;
 
@@ -33,7 +31,6 @@ public class DownloadedRunnableImpl implements Runnable {
 
 	@Override
 	public void run() {
-		PostHandlerImpl postHandler = new PostHandlerImpl(pathToDownload);
 		status = DownloaderStatusEnum.WORK;
 		while (status.equals(DownloaderStatusEnum.WORK)) {
 			if (status.equals(DownloaderStatusEnum.CANCEL)) {
@@ -57,8 +54,6 @@ public class DownloadedRunnableImpl implements Runnable {
 		}
 	}
 
-	
-	//Догрузка: получать даннные с сервера
 	private void download(DownloadElement element) throws IOException {
 		BufferedInputStream in = null;
 		BufferedOutputStream bout = null;
@@ -77,7 +72,6 @@ public class DownloadedRunnableImpl implements Runnable {
 			byte[] buffer = new byte[1024];
 			int read;
 			Thread.sleep(100);
-//			Thread.sleep(500);
 			while ((read = in.read(buffer, 0, 1024)) != -1) {
 				if (status.equals(DownloaderStatusEnum.CANCEL)) {
 					eventBus.post("Download interrupted");

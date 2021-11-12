@@ -55,7 +55,6 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void addContainer(DownloaderContainer container) {
 		pathToDownload = container.getDestinationRepositories();
-//		PostHandlerImpl postHandler = new PostHandlerImpl(pathToDownload);
 		container.getRepo().getResources().forEach(metadata -> {
 			DownloadElement element = new DownloadElement();
 			element.setHandlers(container.getHandlers());

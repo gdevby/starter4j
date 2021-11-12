@@ -25,12 +25,23 @@ public interface Downloader {
 	 * Add new type of the download files. You can add additional operation after
 	 * download of the file
 	 * 
-	 * @param container
+	 * @param container - container in which files are stored for download
 	 * @throws IOException 
 	 */
 	void addContainer(DownloaderContainer container) throws IOException;
 
-	void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption;
+	/**
+	 *	Allows you to start downloading. All files in the container are downloaded.
+	 * @param sync file download option
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 * @throws StatusExeption
+	 * @throws IOException
+	 */
+	void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException;
 
+	/**
+	 * Allows you to interrupt the download
+	 */
 	void cancelDownload();
 }
