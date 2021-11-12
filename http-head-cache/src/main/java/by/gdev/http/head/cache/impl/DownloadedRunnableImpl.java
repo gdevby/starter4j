@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -15,7 +14,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import com.google.common.eventbus.EventBus;
 
@@ -34,7 +32,6 @@ public class DownloadedRunnableImpl implements Runnable {
 	@Override
 	public void run() {
 		// TODO: test 
-		PostHandlerImpl postHandler = new PostHandlerImpl(pathToDownload);
 		// TODO:  test ?
 		status = DownloaderStatusEnum.WORK;
 		while (status.equals(DownloaderStatusEnum.WORK)) {
@@ -62,8 +59,6 @@ public class DownloadedRunnableImpl implements Runnable {
 		}
 	}
 
-	
-	//Догрузка: получать даннные с сервера
 	/**
 	 * TODO: It should try 3 times if the net is okay. Test defferent sites for access and regulated param from 3 to one. 
 	 * @param element
@@ -89,7 +84,6 @@ public class DownloadedRunnableImpl implements Runnable {
 			int read;
 			// TODO: WHY sleep?
 			Thread.sleep(100);
-//			Thread.sleep(500);
 			while ((read = in.read(buffer, 0, 1024)) != -1) {
 				if (status.equals(DownloaderStatusEnum.CANCEL)) {
 					eventBus.post("Download interrupted");

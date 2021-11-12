@@ -17,9 +17,12 @@ public class PostHandlerImpl implements PostHandler {
 
 	@Override
 	public void portProcessDownloadElement(DownloadElement element)  {
-//		System.out.println(123);
 		try {
 			String shaLocalFile = DesktopUtil.getChecksum(new File(pathToDownload + element.getMetadata().getPath()),Headers.SHA1.getValue());
+			long sizeLocalFile = new File(pathToDownload + element.getMetadata().getPath()).length();
+			if(sizeLocalFile != element.getMetadata().getSize()) {
+				System.out.println("The size of the file is not equal: " + element.getMetadata().getPath());
+			}
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) {
 				//TODO use logger
 				System.out.println("The hash sum of the file is not equal: " + element.getMetadata().getPath());
