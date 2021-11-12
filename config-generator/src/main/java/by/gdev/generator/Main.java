@@ -22,10 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {	
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	//todo correct name of the variable ? and why did you use to this place . try to main class
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static FileMapperService fileMapperService = new FileMapperService(GSON, charset, "");
 	
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+		log.info("run config generator");
 		AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
 		JCommander jc = JCommander.newBuilder().addObject(acm).build();
 		jc.parse(args);
