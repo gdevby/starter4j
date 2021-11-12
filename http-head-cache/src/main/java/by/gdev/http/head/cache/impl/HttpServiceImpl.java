@@ -80,7 +80,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 
 			return null;
-	
+	// TODO: ???
 			
 //			int attepmts = 1;
 //			while (attepmts < maxAttepmts) {
@@ -94,7 +94,7 @@ public class HttpServiceImpl implements HttpService {
 //			}
 //			return null;
 		}
-		
+		// TODO ????
 	private RequestMetadata test123(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
@@ -110,7 +110,7 @@ public class HttpServiceImpl implements HttpService {
 		}
 		return request;
 	}
-		
+	//TODO move method to desktop util and allow to add own link
 	@Override
 	public void init() {
 		try {

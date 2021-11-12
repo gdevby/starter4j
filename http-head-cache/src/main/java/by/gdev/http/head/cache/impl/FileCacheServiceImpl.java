@@ -68,6 +68,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 				return urlPath;
 			}
 		} else {
+			// TODO: ??
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
 			checkMetadataFile(metaFile, url);
 //			createSha(serverMetadata, urlPath, metaFile);
@@ -96,7 +97,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return urlPath;
 		}
 	}
-
+	// TODO: user library to write read configuration
 	private <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
 		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, clas);
