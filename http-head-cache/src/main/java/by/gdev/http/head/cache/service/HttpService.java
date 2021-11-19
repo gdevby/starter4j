@@ -25,11 +25,4 @@ public interface HttpService {
 	 * @throws IOException
 	 */
 	RequestMetadata getMetaByUrl(String url) throws IOException;
-	
-	
-	/**
-	 * Setting connection attempts
-	 * @throws IOException
-	 */
-	void init() throws IOException;
 }

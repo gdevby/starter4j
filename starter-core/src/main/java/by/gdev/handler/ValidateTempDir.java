@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 import org.openide.filesystems.FileUtil;
 
-public class ValidateTempDir extends AbstractBandle {
+public class ValidateTempDir extends ValisatedEnviromentAbstract {
 
 	@Override
 	public boolean validate() throws IOException {
@@ -21,6 +21,6 @@ public class ValidateTempDir extends AbstractBandle {
 
 	@Override
 	public String getExceptionMessage() {
-		return bundle.getString("validateTempDirs");
+		return localizationBandle.getString("validateTempDirs");
 	}
 }

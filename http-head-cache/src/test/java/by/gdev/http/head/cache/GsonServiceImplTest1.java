@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -130,4 +131,12 @@ public class GsonServiceImplTest1 {
 	public void test6Timeout() throws IOException, NoSuchAlgorithmException {
 		gsonService.getObject("http://127.0.0.1:12346/repo/test77.json", MyTestType.class, false);
 	}
+	
+	@Test
+	public void test7() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
+		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false);
+		System.out.println(test);
+	}
+	
+	
 }

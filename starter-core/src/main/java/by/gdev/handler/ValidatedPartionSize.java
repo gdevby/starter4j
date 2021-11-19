@@ -4,12 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
-// TODO NOT USE abstract add method of the validation
-public class ValidatedPartionSize extends AbstractBandle {
+
+public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
 
 	private	File file = new File(new File("").getAbsolutePath());		
-//	private	long size = new StarterAppConfig().getMinMemorySize();
-//	private	long size = 144350011393L;
 	private long minMemorySize;
 
 	public ValidatedPartionSize(long minMemorySize) {
@@ -28,7 +26,7 @@ public class ValidatedPartionSize extends AbstractBandle {
 
 	@Override
 	public String getExceptionMessage() {
-		return String.format(bundle.getString("validate.size"), file , file.getFreeSpace() / 1024 / 1024, file);
+		return String.format(localizationBandle.getString("validate.size"), file , file.getFreeSpace() / 1024 / 1024, file);
 		
 		
 	}

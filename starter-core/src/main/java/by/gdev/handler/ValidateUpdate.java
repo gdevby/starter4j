@@ -5,7 +5,7 @@ import java.io.IOException;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.os.OSExecutorFactoryMethod;
 
-public class ValidateUpdate extends AbstractBandle {
+public class ValidateUpdate extends ValisatedEnviromentAbstract {
 
 	@Override
 	public boolean validate() throws IOException, InterruptedException {
@@ -22,6 +22,6 @@ public class ValidateUpdate extends AbstractBandle {
 
 	@Override
 	public String getExceptionMessage() {
-		return bundle.getString("validate.update");
+		return localizationBandle.getString("validate.update");
 	}
 }

@@ -17,7 +17,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 
 import by.gdev.config.HttpConfig;
-import by.gdev.handler.ConsoleSubscriber;
 import by.gdev.http.cache.exeption.StatusExeption;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
@@ -28,6 +27,7 @@ import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
 import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.GsonService;
 import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.util.model.download.Repo;
 
 public class DownloadTest {
@@ -48,44 +48,46 @@ public class DownloadTest {
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), httpConfig.requestConfig(), 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
 		gsonService = new GsonServiceImpl(gson, fileService);
-		downloader = new DownloaderImpl(eventBus);
+		downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), httpConfig.requestConfig());
 	}
-//	Repo repo = gsonService.getObject("http://localhost:81/old/test_download.json", Repo.class, false);
 
 	@Test
 	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption{
 		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
-		List<Repo> list = new ArrayList<Repo>();
-		list.add(repo);
 		DownloaderContainer container = new DownloaderContainer();
-		for (Repo r : list) {
-			container.setRepo(r);
-			downloader.addContainer(container);
-		}
+		container.setRepo(repo);
+		downloader.addContainer(container);
+		//download
 		downloader.startDownload(true);
-		Thread.sleep(1000);
-		downloader.cancelDownload();
-		Assert.assertEquals(DownloaderStatusEnum.CANCEL, downloader.getStatus());
+//		Thread.sleep(1000);
+//		downloader.cancelDownload();
+//		Assert.assertEquals(DownloaderStatusEnum.CANCEL, downloader.getStatus());
 	}
 	
-	@Test
-	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
+//	@Test
+//	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
+//		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
+//		DownloaderContainer container = new DownloaderContainer();
+//		container.setRepo(repo);
+//		downloader.addContainer(container);
+//		//download
+//		downloader.startDownload(true);
+//		Thread.sleep(1000);
+//		downloader.cancelDownload();
+//		Thread.sleep(1000);
+//		downloader.startDownload(true);
+//		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
+//	} 
+	
+	@Test (expected = StatusExeption.class)
+	public void test3() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
-		List<Repo> list = new ArrayList<Repo>();
-		list.add(repo);
 		DownloaderContainer container = new DownloaderContainer();
-		for (Repo r : list) {
-			container.setRepo(r);
-			downloader.addContainer(container);
-		}
+		container.setRepo(repo);
+		downloader.addContainer(container);
+		//download
 		downloader.startDownload(true);
-		Thread.sleep(1000);
-		System.out.println("1"+downloader.getStatus());
-		downloader.cancelDownload();
-		Thread.sleep(1000);
-		System.out.println("2"+downloader.getStatus());
 		downloader.startDownload(true);
-		System.out.println("3"+downloader.getStatus());
 		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
 	} 
 }

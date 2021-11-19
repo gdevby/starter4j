@@ -1,14 +1,8 @@
 package by.gdev.http.head.cache.impl;
 
 
-/**
- * {@inheritDoc}
- */
-
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -24,6 +18,7 @@ import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.util.DesktopUtil;
+import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -58,7 +53,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (urlPath.toFile().lastModified() < purgeTime) 
 			Files.deleteIfExists(urlPath); 
 		if (urlPath.toFile().exists()) {
-			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
 				return urlPath;
@@ -79,7 +74,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		checkMetadataFile(metaFile, url);
 		if (fileExists) {
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
-			RequestMetadata localMetadata = read(metaFile, RequestMetadata.class);
+			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(), RequestMetadata.class);
 			if (serverMetadata.getETag().equals(localMetadata.getETag())
 					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
@@ -93,12 +88,6 @@ public class FileCacheServiceImpl implements FileCacheService {
 			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
 			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
-		}
-	}
-	// TODO: user library to write read configuration
-	private <T> T read(Path file, Class<T> clas) throws FileNotFoundException, IOException {
-		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
-			return gson.fromJson(read, clas);
 		}
 	}
 
@@ -121,5 +110,4 @@ public class FileCacheServiceImpl implements FileCacheService {
 	      write(metadata, metaFile);
 	    }
 	  }
-	
 }

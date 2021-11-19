@@ -12,22 +12,19 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {
-	// TODO where do we can extract variable? 
-	private String pathToDownload;
 
 	@Override
-	public void portProcessDownloadElement(DownloadElement element)  {
+	public void postProcessDownloadElement(DownloadElement element)  {
 		try {
-			String shaLocalFile = DesktopUtil.getChecksum(new File(pathToDownload + element.getMetadata().getPath()),Headers.SHA1.getValue());
-			long sizeLocalFile = new File(pathToDownload + element.getMetadata().getPath()).length();
+			String shaLocalFile = DesktopUtil.getChecksum(new File(element.getPathToDownload() + element.getMetadata().getPath()),Headers.SHA1.getValue());
+			long sizeLocalFile = new File(element.getPathToDownload() + element.getMetadata().getPath()).length();
 			if(sizeLocalFile != element.getMetadata().getSize()) {
-				System.out.println("The size of the file is not equal: " + element.getMetadata().getPath());
+				element.setT(new Throwable("The size of the file is not equal: " + element.getMetadata().getPath()));
 			}
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) {
-				//TODO use logger
-				System.out.println("The hash sum of the file is not equal: " + element.getMetadata().getPath());
-				// TODO set the problem to element.setThrowable...
+				element.setT(new Throwable("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
 			}
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}catch (NoSuchAlgorithmException e2) {
