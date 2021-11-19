@@ -3,7 +3,7 @@ package by.gdev.handler;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-public class ValidateFont extends AbstractBandle {
+public class ValidateFont extends ValisatedEnviromentAbstract {
 
 	@Override
 	public boolean validate() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
@@ -13,6 +13,6 @@ public class ValidateFont extends AbstractBandle {
 
 	@Override
 	public String getExceptionMessage() {
-		return bundle.getString("validate.font");
+		return localizationBandle.getString("validate.font");
 	}
 }

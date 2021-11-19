@@ -21,6 +21,7 @@ import lombok.Data;
 public class DownloadElement {
 	private List<PostHandler> handlers;
 	private Metadata metadata;
+	private String pathToDownload;
 	/**
 	 * Download part of the file
 	 */

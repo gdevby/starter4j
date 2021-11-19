@@ -13,32 +13,31 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppConfigModel{
-	@Parameter(names = "-name", description = "")
+	@Parameter(names = "-name", description = "Application Name")
     private String appName;	
-	@Parameter(names = "-version", description = "")
+	@Parameter(names = "-version", description = "Application version")
     private double appVersion;	
-	@Parameter(names = "-class", description = "")
+	@Parameter(names = "-class", description = "The main class for running the application")
     private String mainClass;   	
-	@Parameter(names = "-app", description = "")
+	@Parameter(names = "-app", description = "Application arguments")
     private List<String> appArguments; 	
-	@Parameter(names = "-jvm", description = "")
+	@Parameter(names = "-jvm", description = "Arguments for jvm")
 	 private List<String> jvmArguments;	
-    @Parameter(names = "-file", description = "")
+    @Parameter(names = "-appFile", description = "Jar app file to run the application")
     private String appFile;    
-    @Parameter(names = "-javafolder", description = "")
+    @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java")
     private String javaFolder;   
-    @Parameter(names = "-config", description = "")
+    @Parameter(names = "-config", description = "Saved the result of the jvm configuration")
     private String javaConfig;    
-    @Parameter(names = "-resources", description = "")
+    @Parameter(names = "-resources", description = "Directory with the necessary resources to run the application")
     private String appResources;   
-    //used for -cp
-    @Parameter(names = "-dependencies", description = "")
+    @Parameter(names = "-dependencies", description = "Directory with the necessary dependencies to run the application")
     private String appDependencies;   
-    @Parameter(names = "-appfolder", description = "")
+    @Parameter(names = "-appfolder", description = "Output directory to saved generated configuration for new application")
     private String appFolder;   
-    @Parameter(names = "-domain", description = "")
+    @Parameter(names = "-domain", description = "Domain for which configs will be available for download")
     private List<String> domain;  
-    @Parameter(names = "-flag", description = "")
+    @Parameter(names = "-flag", description = "Flag to skip java generation")
     private boolean generetedJava;   
     @Parameter(names = "-help", help = true)
     public boolean help = false;
@@ -52,7 +51,7 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("",""),
     			"starter-app-1.0.jar", 
-    			"../starter-app/src/main/resources/jvms",
+    			"../../starter-app/src/main/resources/jvms",
     			"src/test/resources", 
     			"src/test/starter-app-folder/resources", 
     			"src/test/starter-app-folder/dep", 

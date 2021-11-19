@@ -2,7 +2,7 @@ package by.gdev.handler;
 
 import java.util.Objects;
 
-public class ValidateTempNull extends AbstractBandle {
+public class ValidateTempNull extends ValisatedEnviromentAbstract {
 
 	@Override
 	public boolean validate() {
@@ -11,7 +11,7 @@ public class ValidateTempNull extends AbstractBandle {
 
 	@Override
 	public String getExceptionMessage() {
-		return bundle.getString("validateTempNull");
+		return localizationBandle.getString("validateTempNull");
 				
 	}
 }

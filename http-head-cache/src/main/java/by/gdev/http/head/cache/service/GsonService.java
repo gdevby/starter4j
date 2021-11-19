@@ -3,6 +3,7 @@ package by.gdev.http.head.cache.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /**
  * Converted json file content of the file to java object
@@ -22,4 +23,20 @@ public interface GsonService {
 	 * @throws NoSuchAlgorithmException
 	 */
 	<T> T getObject(String url, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+	
+	/**
+	 * 
+	 * @param <T>
+	 * @param urls
+	 * @param urn
+	 * @param class1
+	 * @param cache
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
+	
+	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+	
 }

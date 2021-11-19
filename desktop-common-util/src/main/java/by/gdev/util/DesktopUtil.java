@@ -20,6 +20,9 @@ import java.util.function.Function;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
 
@@ -175,5 +178,16 @@ public class DesktopUtil {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static int init(int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
+		try {
+			HttpHead http = new HttpHead("http://www.google.com");
+			http.setConfig(requestConfig);
+			httpclient.execute(http);
+			return maxAttepmts;
+		} catch (IOException e) {
+			return 1;
+	    }
 	}
 }

@@ -27,7 +27,7 @@ public class DownloaderStatus {
 	/**
 	 * Speed in KB
 	 */
-	private Long speed;
+	private double speed;
 	private Integer leftFiles;
 	private Integer allFiles;
 	private List<Throwable> throwables;

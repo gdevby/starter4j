@@ -15,7 +15,6 @@ import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
 import by.gdev.config.HttpConfig;
-import by.gdev.handler.ConsoleSubscriber;
 import by.gdev.handler.Localise;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
@@ -37,6 +36,8 @@ import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.model.AppConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.subscruber.ConsoleSubscriber;
+import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.model.download.Repo;
@@ -74,14 +75,17 @@ public class Main {
 		}
 		OSInfo.OSType osType = OSInfo.getOSType();
 		Arch osArc = OSInfo.getJavaBit();
-
+		
 		HttpConfig httpConfig = new HttpConfig();
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), httpConfig.requestConfig(), 4);
+		
+		
+		int maxAttepmts = DesktopUtil.init(4, httpConfig.requestConfig(), httpConfig.httpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), httpConfig.requestConfig(), maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, charset, Paths.get("target"), 600000);
 		GsonService gsonService = new GsonServiceImpl(gson, fileService);
 
 		
-		Downloader downloader = new DownloaderImpl(eventBus);
+		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), httpConfig.requestConfig());
 		DownloaderContainer container = new DownloaderContainer();
 
 		AppConfig all = gsonService.getObject("http://localhost:81/server/tempAppConfig.json", AppConfig.class, false);
@@ -95,14 +99,16 @@ public class Main {
 		list.add(resources);
 		list.add(dependencis);
 		list.add(java);
+		
+		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
-			container.setDestinationRepositories("/home/aleksandr/Desktop/qwert/test/");
-			PostHandlerImpl postHandler = new PostHandlerImpl(container.getDestinationRepositories());
+			container.setDestinationRepositories("/home/aleksandr/Desktop/qwert/container1/");
 			container.setRepo(repo);
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(true);
+
+		downloader.startDownload(false);
 
 		try {
 			// todo add special util args4j and parse args and properties and union them

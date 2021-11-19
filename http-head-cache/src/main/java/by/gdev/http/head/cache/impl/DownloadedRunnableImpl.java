@@ -5,52 +5,61 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
-import com.google.common.eventbus.EventBus;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 
+import by.gdev.http.head.cache.handler.PostHandler;
+import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public class DownloadedRunnableImpl implements Runnable {
 	private volatile DownloaderStatusEnum status;
-	private String pathToDownload;
 	private Queue<DownloadElement> downloadElements;
-	private EventBus eventBus;
 	private List<DownloadElement> processedElements;
+	private CloseableHttpClient httpclient;
+	private RequestConfig requestConfig;
+	private final int DEFAULT_MAX_ATTEMPTS = 3;
 
 	@Override
 	public void run() {
-		// TODO: test 
-		// TODO:  test ?
-		status = DownloaderStatusEnum.WORK;
 		while (status.equals(DownloaderStatusEnum.WORK)) {
 			if (status.equals(DownloaderStatusEnum.CANCEL)) {
-				// TODO: ?
-				eventBus.post("Download interrupted");
 				break;
 			} else {
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
 					try {
 						download(element);
-						// TODO: when we add aditional handlers do they work or call?
-						element.getHandlers().get(0).portProcessDownloadElement(element);
+						element.getHandlers().forEach(post -> {
+							post.postProcessDownloadElement(element);
+						});
+						if (Objects.nonNull(element.getT()))
+							log.error(element.getT().toString());
 					} catch (IOException e) {
-						e.printStackTrace();
-						// TODO: ?
-					} catch (NoSuchAlgorithmException e1) {
-						e1.printStackTrace();
+						log.error("Exeption", e);
+					} catch (InterruptedException e1) {
+						log.error("Exeption", e1);
 					}
 				} else {
 					break;
@@ -60,60 +69,88 @@ public class DownloadedRunnableImpl implements Runnable {
 	}
 
 	/**
-	 * TODO: It should try 3 times if the net is okay. Test defferent sites for access and regulated param from 3 to one. 
+	 * TODO: It should try 3 times if the net is okay. Test defferent sites for
+	 * access and regulated param from 3 to one.
+	 * 
 	 * @param element
 	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	private void download(DownloadElement element) throws IOException {
-		BufferedInputStream in = null;
-		BufferedOutputStream bout = null;
-		try {
-			LocalTime startTime = LocalTime.now();
-			element.setStart(startTime);
-			// TODO: add test with two repository when first repo is 404 return
-			URL web = new URL(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
-			File file = new File(pathToDownload + element.getMetadata().getPath());
-			if (!file.exists())
-				file.getParentFile().mkdirs();
-			HttpURLConnection http = (HttpURLConnection) web.openConnection();
-			Long fileSize = http.getContentLengthLong();
-			in = new BufferedInputStream(http.getInputStream());
-			FileOutputStream fos = new FileOutputStream(file);
-			bout = new BufferedOutputStream(fos, 1024);
-			byte[] buffer = new byte[1024];
-			int read;
-			// TODO: WHY sleep?
-			Thread.sleep(100);
-			while ((read = in.read(buffer, 0, 1024)) != -1) {
-				if (status.equals(DownloaderStatusEnum.CANCEL)) {
-					eventBus.post("Download interrupted");
-					break;
-				} else {
-					// TODO: how does it work? what is lenght of the read in this case?
-					bout.write(buffer, 0, read);
-					element.setDownloadBytes(element.getDownloadBytes() + read);
-					//use log not system out 
-					System.out.println("download file:" + Paths.get(element.getMetadata().getPath()).getFileName() 
-							+ ". Uploaded "+ Double.valueOf(element.getDownloadBytes()).longValue() 
-							+ " bytes for " + fileSize + " bytes");
+
+	// добавляес количество попыток для докачки
+	// Если не получилось скачать файл при обрыве соединения ждем секунжу и минус 1
+	// попытка
+	// Если на 3 раз получилось подключиться сбрасываем счетчик
+
+	private void download(DownloadElement element) throws IOException, InterruptedException {
+		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
+		if (file.length() != element.getMetadata().getSize()){
+			int attempt = 0;
+			while (attempt < DEFAULT_MAX_ATTEMPTS) {
+				try {
+					BufferedInputStream in = null;
+					BufferedOutputStream out = null;
+					boolean resume = false;
+					try {
+						LocalTime startTime = LocalTime.now();
+						element.setStart(startTime);
+						HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
+						if (!file.exists()) {
+							file.getParentFile().mkdirs();
+						}
+						if (file.exists())
+							if (Objects.nonNull(element.getMetadata().getSha1()))
+								if (file.length() != element.getMetadata().getSize()) {
+									httpGet.addHeader("Range", "bytes= " + file.length() + "-" + element.getMetadata().getSize());
+									resume = true;
+								}
+						httpGet.setConfig(requestConfig);
+						CloseableHttpResponse response = httpclient.execute(httpGet);
+						HttpEntity entity = response.getEntity();
+						in = new BufferedInputStream(entity.getContent());
+						out = new BufferedOutputStream(new FileOutputStream(file, resume));
+						byte[] buffer = new byte[1024];
+//						Thread.sleep(100); //TODO: модет быть виновник всего 
+						int curread = in.read(buffer);
+						while (curread != -1) {
+							if (status.equals(DownloaderStatusEnum.CANCEL)) {
+								break;
+							} else {
+								out.write(buffer, 0, curread);
+								curread = in.read(buffer);
+								element.setDownloadBytes(element.getDownloadBytes() + curread);
+								log.info("download file:" + Paths.get(element.getMetadata().getPath()).getFileName() + ". Uploaded "
+										+ Double.valueOf(element.getDownloadBytes()).longValue() + " bytes for "
+										+ response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue() + " bytes");
+							}
+						}
+						LocalTime endTime = LocalTime.now();
+						element.setEnd(endTime);
+						long thirty = Duration.between(startTime, endTime).getNano();
+						double speed = (element.getDownloadBytes() / 1024) / (thirty / 60000000);
+						element.setDownloadBytes(speed);
+						processedElements.add(element);
+					} finally {
+						out.close();
+						in.close();
+					}
+					attempt = 3; // TODO: подумать стоит ли его использовать
+				}catch (SocketTimeoutException e) {
+					attempt++;
+					if (attempt == DEFAULT_MAX_ATTEMPTS)
+						throw new SocketTimeoutException();
+					else 
+						continue;	
 				}
+//				attempt = 1; // TODO: как сбрасывать счетчик 
 			}
-			LocalTime endTime = LocalTime.now();
-			element.setEnd(endTime);
-			long thirty = Duration.between(startTime, endTime).getNano();
-			double speed = (element.getDownloadBytes() / 1024) / (thirty / 60000000);
-			// TODO: where you should calculate speed?
-			if (speed < 1) {
-				speed = 0.1;
-			}
-			// TODO: why? how does it work with one gb file?
-			element.setDownloadBytes(speed);
-			processedElements.add(element);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}finally {
-			bout.close();
-			in.close();
+			
+			
 		}
+		
+		
+		
+		
+		
 	}
 }

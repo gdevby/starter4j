@@ -25,6 +25,7 @@ import org.apache.http.util.EntityUtils;
 import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 
 /**
@@ -52,10 +53,11 @@ public class HttpServiceImpl implements HttpService {
 					if (Objects.nonNull(proxy)) {
 						return getResourseByUrl(proxy + url, path);
 					} else {
-						throw new SocketTimeoutException();
+						throw e;
 					}
 				}
 			} catch (SocketTimeoutException e1) {
+				attepmts++;
 				if (attepmts == maxAttepmts)
 					throw new SocketTimeoutException();
 			}
@@ -78,7 +80,6 @@ public class HttpServiceImpl implements HttpService {
 						throw new SocketTimeoutException();
 				}
 			}
-
 			return null;
 		}
 		
@@ -96,16 +97,6 @@ public class HttpServiceImpl implements HttpService {
 			request.setLastModified("");
 		}
 		return request;
-	}
-	//TODO move method to desktop util and allow to add own link
-	@Override
-	public void init() {
-		try {
-			HttpHead http = new HttpHead("http://www.google.com");
-			getResponse(http);
-		} catch (IOException e) {
-			maxAttepmts = 1;
-	    }
 	}
 	
 	private RequestMetadata getResourseByUrl(String url, Path path) throws IOException, SocketTimeoutException {
