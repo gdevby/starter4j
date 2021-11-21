@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>by.gdev</groupId>
+		<artifactId>starter</artifactId>
+		<version>${revision}</version>
+	</parent>
+	<description>This module has additional methods to work with OS. 
+					Extended module desktop-common-util. Becase we want to decrease size of the the dependencies 
+						and splited on 2 modules	
+					</description>
+	<artifactId>desktop-common-util-additional</artifactId>
+	<dependencies>
+	   <dependency>
+            <groupId>com.github.vatbub</groupId>
+            <artifactId>mslinks</artifactId>
+            <version>1.0.5.1</version>
+        </dependency>
+		<dependency>
+			<groupId>by.gdev</groupId>
+			<artifactId>desktop-common-util</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna-platform</artifactId>
+			<version>5.6.0</version>
+		</dependency>
+	</dependencies>
+</project>

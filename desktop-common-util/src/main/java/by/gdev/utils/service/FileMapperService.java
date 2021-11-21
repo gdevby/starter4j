@@ -18,13 +18,13 @@ public class FileMapperService {
 	private Gson gson;
 	private Charset charset;
 	private String workingDirectory;
-	
+
 	public FileMapperService(Gson gson, Charset charset, String workingDirectory) {
 		this.gson = gson;
 		this.charset = charset;
 		this.workingDirectory = workingDirectory;
 	}
-	
+
 	public void write(Object create, String config) throws FileNotFoundException, IOException {
 		Path path = Paths.get(workingDirectory, config);
 		if (Files.notExists(path.getParent()))
@@ -35,14 +35,14 @@ public class FileMapperService {
 	}
 
 	public <T> T read(String file, Class<T> cl) throws FileNotFoundException, IOException {
-		try (BufferedReader read = new BufferedReader(new FileReader(Paths.get(workingDirectory, file).toFile()))){
+		try (BufferedReader read = new BufferedReader(new FileReader(Paths.get(workingDirectory, file).toFile()))) {
 			return gson.fromJson(read, cl);
 		}
 	}
-	
+
 	public Object readToken(Path file, Type typ) throws FileNotFoundException, IOException {
-		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))){
+		try (BufferedReader read = new BufferedReader(new FileReader(file.toFile()))) {
 			return gson.fromJson(read, typ);
-		}		
+		}
 	}
 }

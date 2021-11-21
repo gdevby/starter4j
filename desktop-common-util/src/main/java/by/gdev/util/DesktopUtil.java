@@ -1,14 +1,9 @@
 package by.gdev.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,9 +12,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -71,47 +63,6 @@ public class DesktopUtil {
 		return file;
 	}
 
-	public void extractArchive(ArchiveInputStream in, String dir) throws IOException {
-		try {
-			String temp_dir = dir + "_temp";
-			if (Files.exists(Paths.get(temp_dir))) {
-				FileUtils.deleteDirectory(new File(temp_dir));
-				FileUtils.deleteDirectory(new File(dir));
-			}
-			int BUFFER_SIZE = 8092;
-			try (ArchiveInputStream tarIn = in) {
-				ArchiveEntry entry;
-
-				while ((entry = tarIn.getNextEntry()) != null) {
-					// If the entry is a directory, create the directory.
-					if (entry.isDirectory()) {
-						Path p = Paths.get(".", temp_dir, entry.getName());
-						Files.createDirectories(p);
-						if (!Files.exists(p)) {
-							System.err.println("Unable to create directory, during extraction of archive contents. "
-									+ p.toAbsolutePath());
-						}
-					} else {
-						int count;
-						byte[] data = new byte[BUFFER_SIZE];
-						Path entryPath = Paths.get(".", temp_dir, entry.getName());
-						Files.createDirectories(entryPath.getParent());
-						FileOutputStream fos = new FileOutputStream(entryPath.toFile(), false);
-						try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE)) {
-							while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
-								dest.write(data, 0, count);
-							}
-						}
-					}
-				}
-			}
-			Files.move(Paths.get(temp_dir), Paths.get(dir));
-		} catch (IOException e) {
-			FileUtils.deleteDirectory(new File(dir));
-			throw e;
-		}
-	}
-
 	public static <T> T uncheckCall(Callable<T> callable) {
 		try {
 			return callable.call();
@@ -161,7 +112,7 @@ public class DesktopUtil {
 			b.append("w.exe");
 		return b.toString();
 	}
-	
+
 	public static <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
 		return t -> {
 			try {
@@ -179,7 +130,7 @@ public class DesktopUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static int init(int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
 		try {
 			HttpHead http = new HttpHead("http://www.google.com");
@@ -188,6 +139,6 @@ public class DesktopUtil {
 			return maxAttepmts;
 		} catch (IOException e) {
 			return 1;
-	    }
+		}
 	}
 }
