@@ -71,7 +71,7 @@ public class DownloaderImpl implements Downloader {
 
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
-		if (status.equals(DownloaderStatusEnum.IDLE)) {
+		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, downloadElements, processedElements, httpclient, requestConfig);
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
@@ -116,7 +116,7 @@ public class DownloaderImpl implements Downloader {
 			Thread.sleep(50);
 			workedAnyThread = listThread.stream().allMatch(e -> !e.isDone());
 			if (!workedAnyThread)
-				status = DownloaderStatusEnum.IDLE;
+				status = DownloaderStatusEnum.DONE;
 			LocalTime now = LocalTime.now();
 			if (now.getSecond() == start.getSecond() + 1) {
 				eventBus.post(averagSpeed().getSpeed());

@@ -17,7 +17,7 @@ public class AppConfigModel{
     private String appName;	
 	@Parameter(names = "-version", description = "Application version")
     private double appVersion;	
-	@Parameter(names = "-class", description = "The main class for running the application")
+	@Parameter(names = "-mainClass", description = "The main class for running the application")
     private String mainClass;   	
 	@Parameter(names = "-app", description = "Application arguments")
     private List<String> appArguments; 	
@@ -27,7 +27,7 @@ public class AppConfigModel{
     private String appFile;    
     @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java")
     private String javaFolder;   
-    @Parameter(names = "-config", description = "Directory where saved the result of the jvm configuration")
+    @Parameter(names = "-javaConfig", description = "Directory where saved the result of the jvm configuration")
     private String javaConfig;    
     @Parameter(names = "-resources", description = "Directory with the necessary resources to run the application")
     private String appResources;   
@@ -51,11 +51,11 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("",""),
     			"starter-app-1.0.jar", 
-    			"../../starter-app/src/main/resources/jvms",
+    			"../../starter-app/jvms",
     			"src/test/resources", 
     			"../../starter-app/src/main/resources/resources", 
-    			"../../starter-app/src/main/resources/dep", 
-    			"../../starter-app/src/main/resources", 
+    			"../../starter-app/target/dep", 
+    			"../../starter-app/target", 
     			Arrays.asList("http://localhost:81/"),
     			false, 
     			false);
