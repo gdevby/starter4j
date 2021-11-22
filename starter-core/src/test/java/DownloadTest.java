@@ -61,19 +61,17 @@ public class DownloadTest {
 		downloader.startDownload(true);
 		Thread.sleep(1000);
 		downloader.cancelDownload();
-		Thread.sleep(1000);
-		downloader.startDownload(true);
-		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
+		Assert.assertEquals(DownloaderStatusEnum.CANCEL, downloader.getStatus());
 	} 
 	
-//	@Test (expected = StatusExeption.class)
-//	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
-//		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
-//		DownloaderContainer container = new DownloaderContainer();
-//		container.setRepo(repo);
-//		downloader.addContainer(container);
-//		//downloadрое 
-//		downloader.startDownload(true);
-//		downloader.startDownload(true);
-//	} 
+	@Test (expected = StatusExeption.class)
+	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
+		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
+		DownloaderContainer container = new DownloaderContainer();
+		container.setRepo(repo);
+		downloader.addContainer(container);
+		//downloadрое 
+		downloader.startDownload(true);
+		downloader.startDownload(true);
+	} 
 }
