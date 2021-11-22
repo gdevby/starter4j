@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.8</java-version>
         <slf4j.version>1.7.25</slf4j.version>
-        <revision>1.911</revision>
+        <revision>1.912</revision>
     </properties>
     <dependencies>
         <dependency>
