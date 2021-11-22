@@ -57,6 +57,7 @@ public class AppConfigCreator {
 		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
 		FileUtils.copyDirectory(appFolder.toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
 		appConfig.setAppName(configFile.getAppName());
+		
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
 		appConfig.setJvmArguments(configFile.getJvmArguments());	
@@ -67,7 +68,7 @@ public class AppConfigCreator {
 		fileMapperService.write(createRepo(resources, resources, Paths.get(version, resources.getFileName().toString()).toString(), configFile), resourcesConfig.toString());
 		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version, configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version, configFile));
-		if (!configFile.isGeneretedJava()) {
+		if (configFile.isGeneretedJava()) {
 			createJreConfig(configFile);
 			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG),Paths.get(configFile.getAppName()).toString(), configFile));
 		}else {

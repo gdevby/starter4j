@@ -27,13 +27,13 @@ public class AppConfigModel{
     private String appFile;    
     @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java")
     private String javaFolder;   
-    @Parameter(names = "-config", description = "Saved the result of the jvm configuration")
+    @Parameter(names = "-config", description = "Directory where saved the result of the jvm configuration")
     private String javaConfig;    
     @Parameter(names = "-resources", description = "Directory with the necessary resources to run the application")
     private String appResources;   
     @Parameter(names = "-dependencies", description = "Directory with the necessary dependencies to run the application")
     private String appDependencies;   
-    @Parameter(names = "-appfolder", description = "Output directory to saved generated configuration for new application")
+    @Parameter(names = "-appfolder", description = "Input directory to generated configuration for new application")
     private String appFolder;   
     @Parameter(names = "-domain", description = "Domain for which configs will be available for download")
     private List<String> domain;  
@@ -53,9 +53,9 @@ public class AppConfigModel{
     			"starter-app-1.0.jar", 
     			"../../starter-app/src/main/resources/jvms",
     			"src/test/resources", 
-    			"src/test/starter-app-folder/resources", 
-    			"src/test/starter-app-folder/dep", 
-    			"src/test/starter-app-folder", 
+    			"../../starter-app/src/main/resources/resources", 
+    			"../../starter-app/src/main/resources/dep", 
+    			"../../starter-app/src/main/resources", 
     			Arrays.asList("http://localhost:81/"),
     			false, 
     			false);

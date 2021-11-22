@@ -51,43 +51,29 @@ public class DownloadTest {
 		downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), httpConfig.requestConfig());
 	}
 
+	
 	@Test
-	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption{
+	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
 		DownloaderContainer container = new DownloaderContainer();
 		container.setRepo(repo);
 		downloader.addContainer(container);
-		//download
 		downloader.startDownload(true);
-//		Thread.sleep(1000);
-//		downloader.cancelDownload();
-//		Assert.assertEquals(DownloaderStatusEnum.CANCEL, downloader.getStatus());
-	}
+		Thread.sleep(1000);
+		downloader.cancelDownload();
+		Thread.sleep(1000);
+		downloader.startDownload(true);
+		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
+	} 
 	
-//	@Test
+//	@Test (expected = StatusExeption.class)
 //	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 //		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
 //		DownloaderContainer container = new DownloaderContainer();
 //		container.setRepo(repo);
 //		downloader.addContainer(container);
-//		//download
+//		//downloadрое 
 //		downloader.startDownload(true);
-//		Thread.sleep(1000);
-//		downloader.cancelDownload();
-//		Thread.sleep(1000);
 //		downloader.startDownload(true);
-//		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
 //	} 
-	
-	@Test (expected = StatusExeption.class)
-	public void test3() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
-		Repo repo = gsonService.getObject("http://localhost:81/starter-app/1.0/dependencises.json", Repo.class, false);
-		DownloaderContainer container = new DownloaderContainer();
-		container.setRepo(repo);
-		downloader.addContainer(container);
-		//download
-		downloader.startDownload(true);
-		downloader.startDownload(true);
-		Assert.assertEquals(DownloaderStatusEnum.IDLE, downloader.getStatus());
-	} 
 }

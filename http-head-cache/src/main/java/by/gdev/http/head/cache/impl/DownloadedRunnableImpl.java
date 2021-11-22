@@ -77,11 +77,6 @@ public class DownloadedRunnableImpl implements Runnable {
 	 * @throws InterruptedException
 	 */
 
-	// добавляес количество попыток для докачки
-	// Если не получилось скачать файл при обрыве соединения ждем секунжу и минус 1
-	// попытка
-	// Если на 3 раз получилось подключиться сбрасываем счетчик
-
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		if (file.length() != element.getMetadata().getSize()){
@@ -110,7 +105,7 @@ public class DownloadedRunnableImpl implements Runnable {
 						in = new BufferedInputStream(entity.getContent());
 						out = new BufferedOutputStream(new FileOutputStream(file, resume));
 						byte[] buffer = new byte[1024];
-//						Thread.sleep(100); //TODO: модет быть виновник всего 
+//						Thread.sleep(100); 
 						int curread = in.read(buffer);
 						while (curread != -1) {
 							if (status.equals(DownloaderStatusEnum.CANCEL)) {
@@ -134,7 +129,7 @@ public class DownloadedRunnableImpl implements Runnable {
 						out.close();
 						in.close();
 					}
-					attempt = 3; // TODO: подумать стоит ли его использовать
+					attempt = 3;
 				}catch (SocketTimeoutException e) {
 					attempt++;
 					if (attempt == DEFAULT_MAX_ATTEMPTS)
@@ -142,7 +137,6 @@ public class DownloadedRunnableImpl implements Runnable {
 					else 
 						continue;	
 				}
-//				attempt = 1; // TODO: как сбрасывать счетчик 
 			}
 			
 			
