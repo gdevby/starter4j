@@ -54,8 +54,8 @@ public class AppConfigModel{
     			"../../starter-app/jvms",
     			"src/test/resources", 
     			"../../starter-app/src/main/resources/resources", 
-    			"../../starter-app/target/dep", 
-    			"../../starter-app/target", 
+    			"../../starter-app/dep", 
+    			"../../starter-app", 
     			Arrays.asList("http://localhost:81/"),
     			false, 
     			false);
