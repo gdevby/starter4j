@@ -25,7 +25,6 @@ import org.apache.http.util.EntityUtils;
 import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.RequestMetadata;
 import by.gdev.http.head.cache.service.HttpService;
-import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 
 /**
@@ -42,19 +41,17 @@ public class HttpServiceImpl implements HttpService {
 	 /**
 	  * {@inheritDoc}
 	  */
-	
 	@Override
-	public RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException {
+	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
 		for (int attepmts = 1; attepmts < maxAttepmts; attepmts++) {
 			try {
 				try {
 					return getResourseByUrl(url, path);
 				} catch (IOException e) {
-					if (Objects.nonNull(proxy)) {
+					if (Objects.nonNull(proxy))
 						return getResourseByUrl(proxy + url, path);
-					} else {
+					 else 
 						throw e;
-					}
 				}
 			} catch (SocketTimeoutException e1) {
 				attepmts++;
@@ -62,7 +59,7 @@ public class HttpServiceImpl implements HttpService {
 					throw new SocketTimeoutException();
 			}
 		}
-		return null;
+		throw new RuntimeException();
 	}
 
 	 /**
@@ -105,6 +102,8 @@ public class HttpServiceImpl implements HttpService {
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
+		//TODO почитать как выводить сообщение с параметрами, прочитать про уровни какие есть и какие мы можем использовать в нашем приложении
+		//TODO прочитаешь как задавать уровни ниже info  в log 
 			try {
 				CloseableHttpResponse response = getResponse(httpGet);
 				HttpEntity entity = response.getEntity();
@@ -125,7 +124,6 @@ public class HttpServiceImpl implements HttpService {
 					curread = in.read(buffer);
 				}
 				Files.move(Paths.get(temp.toString()), path, StandardCopyOption.REPLACE_EXISTING);
-				
 				try {
 					request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
 					request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));

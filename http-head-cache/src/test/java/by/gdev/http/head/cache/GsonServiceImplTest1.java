@@ -14,24 +14,19 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HeaderElementIterator;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeaderElementIterator;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.Args;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockserver.configuration.ConfigurationProperties;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpResponse;
 
 import com.google.gson.Gson;
 
+import by.gdev.http.head.cache.config.HttpConfig;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
@@ -39,9 +34,7 @@ import by.gdev.http.head.cache.model.MyTestType;
 import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.GsonService;
 import by.gdev.http.head.cache.service.HttpService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class GsonServiceImplTest1 {
 	static GsonService gsonService;
 	static HttpService httpService;
@@ -54,38 +47,23 @@ public class GsonServiceImplTest1 {
 			FileUtils.deleteDirectory(testFolder.toFile());
 		}
 		testFolder.toFile().mkdirs();
-		mockServer = ClientAndServer.startClientAndServer("127.0.0.1", 12346);
+		mockServer = ClientAndServer.startClientAndServer("127.0.0.1",12346);
+		ConfigurationProperties.disableSystemOut(true);
 		mockServer.when( request()
-	              .withMethod("POST")
+	              .withMethod("GET")
 	              .withPath("/validate"))
 	                .respond(
 	                		HttpResponse.response()
-	                    .withStatusCode(401)
+	                    .withStatusCode(201)
 	                    .withHeaders(
 	                      new Header("Content-Type", "application/json; charset=utf-8"),
 	                      new Header("Cache-Control", "public, max-age=86400"))
 	                    .withBody("{ message: 'incorrect username and password combination' }")
-	                    .withDelay(TimeUnit.SECONDS,100));
+	                    .withDelay(TimeUnit.SECONDS,10));
 		Gson gson = new Gson();
-		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-		cm.setDefaultMaxPerRoute(5);
-		cm.setMaxTotal(20);
-		CloseableHttpClient builder = HttpClients.custom().setKeepAliveStrategy((response, context) -> {
-			Args.notNull(response, "HTTP response");
-			final HeaderElementIterator it = new BasicHeaderElementIterator(
-					response.headerIterator(HTTP.CONN_KEEP_ALIVE));
-			if (it.hasNext()) {
-				log.info("used keep alive 5000");
-				return 5000L;
-			}
-			return -1;
-		}).setConnectionManager(cm).evictIdleConnections(10, TimeUnit.SECONDS).build();
+		HttpConfig httpConfig = new HttpConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
-
-		
-		
-		
-		HttpService httpService = new HttpServiceImpl(null ,builder, requestConfig, 3);
+		HttpService httpService = new HttpServiceImpl(null ,httpConfig.httpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
 		gsonService = new GsonServiceImpl(gson, fileService);
 
@@ -137,6 +115,4 @@ public class GsonServiceImplTest1 {
 		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false);
 		System.out.println(test);
 	}
-	
-	
 }

@@ -5,11 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
@@ -17,17 +13,13 @@ import java.util.Objects;
 import java.util.Queue;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import by.gdev.http.head.cache.handler.PostHandler;
-import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
-import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,9 +61,6 @@ public class DownloadedRunnableImpl implements Runnable {
 	}
 
 	/**
-	 * TODO: It should try 3 times if the net is okay. Test defferent sites for
-	 * access and regulated param from 3 to one.
-	 * 
 	 * @param element
 	 * @throws IOException
 	 * @throws InterruptedException
@@ -79,7 +68,7 @@ public class DownloadedRunnableImpl implements Runnable {
 
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
-		if (file.length() != element.getMetadata().getSize()){
+		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
 			int attempt = 0;
 			while (attempt < DEFAULT_MAX_ATTEMPTS) {
 				try {
@@ -105,7 +94,7 @@ public class DownloadedRunnableImpl implements Runnable {
 						in = new BufferedInputStream(entity.getContent());
 						out = new BufferedOutputStream(new FileOutputStream(file, resume));
 						byte[] buffer = new byte[1024];
-//						Thread.sleep(100); 
+						Thread.sleep(100); 
 						int curread = in.read(buffer);
 						while (curread != -1) {
 							if (status.equals(DownloaderStatusEnum.CANCEL)) {
@@ -114,9 +103,6 @@ public class DownloadedRunnableImpl implements Runnable {
 								out.write(buffer, 0, curread);
 								curread = in.read(buffer);
 								element.setDownloadBytes(element.getDownloadBytes() + curread);
-								log.info("download file:" + Paths.get(element.getMetadata().getPath()).getFileName() + ". Uploaded "
-										+ Double.valueOf(element.getDownloadBytes()).longValue() + " bytes for "
-										+ response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue() + " bytes");
 							}
 						}
 						LocalTime endTime = LocalTime.now();
@@ -138,13 +124,6 @@ public class DownloadedRunnableImpl implements Runnable {
 						continue;	
 				}
 			}
-			
-			
 		}
-		
-		
-		
-		
-		
 	}
 }

@@ -8,7 +8,6 @@
 		<version>${revision}</version>
 	</parent>
 	<artifactId>http-head-cache</artifactId>
-	<packaging>jar</packaging>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -20,6 +19,11 @@
 		</repository>
 	</distributionManagement>
 	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -57,27 +61,7 @@
 			<artifactId>nexus-staging-maven-plugin</artifactId>
 			<version>1.6.8</version>
 		</dependency>
-		<dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.2.3</version>
-        </dependency>
+
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
@@ -89,7 +73,7 @@
 			<version>31.0.1-jre</version>
 		</dependency>
 	</dependencies>
-		<profiles>
+	<profiles>
 		<profile>
 			<id>deploy</id>
 			<build>
@@ -146,8 +130,7 @@
 				<version>5.11.2</version>
 				<configuration>
 					<serverPort>1080</serverPort>
-					<logLevel>DEBUG</logLevel>
-					<initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>
+					<logLevel>INFO</logLevel>
 				</configuration>
 				<executions>
 					<execution>
@@ -173,7 +156,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
-					 <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>

@@ -17,7 +17,7 @@ public interface HttpService {
 	 * @return RequestMetadata metadata about url
 	 * @throws IOException
 	 */
-	RequestMetadata getResourseByUrlAndSave(String url, Path path) throws IOException;
+	RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException;
 	/**
 	 * HEAD request
 	 * @param url - url address 
