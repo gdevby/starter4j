@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.cache.exeption.StatusExeption;
+import by.gdev.http.head.cache.exeption.StatusExeption;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
 

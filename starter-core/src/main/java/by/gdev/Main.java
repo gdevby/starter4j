@@ -8,13 +8,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.apache.http.client.config.RequestConfig;
+
 import com.beust.jcommander.JCommander;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
-import by.gdev.config.HttpConfig;
 import by.gdev.handler.Localise;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
@@ -23,6 +24,7 @@ import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
+import by.gdev.http.head.cache.config.HttpConfig;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
@@ -48,9 +50,6 @@ public class Main {
 	public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 
-	/*
-	 * todo reuse args to run and
-	 */
 	public static void main(String[] args) throws Exception {
 		ConsoleSubscriber listener = new ConsoleSubscriber();
 		StarterAppConfig starterConfig = new StarterAppConfig();
@@ -75,19 +74,14 @@ public class Main {
 		}
 		OSInfo.OSType osType = OSInfo.getOSType();
 		Arch osArc = OSInfo.getJavaBit();
-		
 		HttpConfig httpConfig = new HttpConfig();
-		
-		
-		int maxAttepmts = DesktopUtil.init(4, httpConfig.requestConfig(), httpConfig.httpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), httpConfig.requestConfig(), maxAttepmts);
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
+		int maxAttepmts = DesktopUtil.init(4, requestConfig, httpConfig.httpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), requestConfig, maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, charset, Paths.get("target"), 600000);
 		GsonService gsonService = new GsonServiceImpl(gson, fileService);
-
-		
-		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), httpConfig.requestConfig());
+		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-
 		AppConfig all = gsonService.getObject("http://localhost:81/server/tempAppConfig.json", AppConfig.class, false);
 		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
@@ -99,7 +93,6 @@ public class Main {
 		list.add(resources);
 		list.add(dependencis);
 		list.add(java);
-		
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
 			container.setDestinationRepositories("/home/aleksandr/Desktop/qwert/container1/");
@@ -107,8 +100,7 @@ public class Main {
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
-
-		downloader.startDownload(false);
+		downloader.startDownload(true);
 
 		try {
 			// todo add special util args4j and parse args and properties and union them

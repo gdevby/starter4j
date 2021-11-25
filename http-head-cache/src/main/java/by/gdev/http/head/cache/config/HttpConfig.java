@@ -1,9 +1,8 @@
-package by.gdev.config;
+package by.gdev.http.head.cache.config;
 
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HeaderElementIterator;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -32,9 +31,5 @@ public class HttpConfig {
                     return -1;
                 }).setConnectionManager(cm).evictIdleConnections(10, TimeUnit.SECONDS).build();
         return builder;
-	}
-
-	public RequestConfig requestConfig() {
-		return RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
 	}
 }

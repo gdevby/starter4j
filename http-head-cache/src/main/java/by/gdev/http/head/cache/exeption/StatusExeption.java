@@ -1,4 +1,4 @@
-package by.gdev.http.cache.exeption;
+package by.gdev.http.head.cache.exeption;
 
 @SuppressWarnings("serial")
 public class StatusExeption extends Exception{

@@ -58,12 +58,12 @@ public class FileCacheServiceImpl implements FileCacheService {
 			if (sha.equals(localMetadata.getSha1())) {
 				return urlPath;
 			} else {
-				RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+				RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 				createSha(serverMetadata, urlPath, metaFile);
 				return urlPath;
 			}
 		} else {
-			httpService.getResourseByUrlAndSave(url, urlPath);
+			httpService.getRequestByUrlAndSave(url, urlPath);
 			checkMetadataFile(metaFile, url);
 			return urlPath;
 		}
@@ -80,12 +80,12 @@ public class FileCacheServiceImpl implements FileCacheService {
 					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
 				return urlPath;
 			} else {
-				httpService.getResourseByUrlAndSave(url, urlPath);
+				httpService.getRequestByUrlAndSave(url, urlPath);
 				write(serverMetadata, metaFile);
 				return urlPath;
 			}
 		} else {
-			RequestMetadata serverMetadata = httpService.getResourseByUrlAndSave(url, urlPath);
+			RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 			createSha(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}

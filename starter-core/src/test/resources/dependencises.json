@@ -1,0 +1,26 @@
+{
+  "repositories": [
+    "http://localhost:81/"
+  ],
+  "resources": [
+    {
+      "sha1": "7c4f3c474fb2c041d8028740440937705ebb473a",
+      "size": 290339,
+      "path": "logback-classic-1.2.3.jar",
+      "relativeUrl": "starter-app/1.0/dep/logback-classic-1.2.3.jar"
+    },
+    {
+      "sha1": "864344400c3d4d92dfeb0a305dc87d953677c03c",
+      "size": 471901,
+      "path": "logback-core-1.2.3.jar",
+      "relativeUrl": "starter-app/1.0/dep/logback-core-1.2.3.jar"
+    },
+    {
+      "sha1": "da76ca59f6a57ee3102f8f9bd9cee742973efa8a",
+      "size": 41203,
+      "path": "slf4j-api-1.7.25.jar",
+      "relativeUrl": "starter-app/1.0/dep/slf4j-api-1.7.25.jar"
+    }
+  ],
+  "remoteServerSHA1": false
+}
