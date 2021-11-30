@@ -29,9 +29,9 @@ import by.gdev.utils.service.FileMapperService;
 public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
 	public static final String DOMAIN_CONFIG = "domainConfig.json";
-	public static final String TEMP_APP_CONFIG = "tempAppConfig.json";
+	public static final String APP_CONFIG = "appConfig.json";
 	public static final String TARGET_OUT_FOLDER = "target/out";
-	public static final String APP_DEPENDENCISES_CONFIG = "dependencises.json";
+	public static final String APP_DEPENDENCISES_CONFIG = "dependencies.json";
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
 	FileMapperService fileMapperService;
@@ -50,29 +50,30 @@ public class AppConfigCreator {
 		AppConfig appConfig = new AppConfig();
 		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();
 		Path appFolder = Paths.get(configFile.getAppFolder());
-		System.out.println(appFolder.toAbsolutePath());
 		Path dependencies = Paths.get(configFile.getAppDependencies());
 		Path resources = Paths.get(configFile.getAppResources());
 		Path dependenciesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_DEPENDENCISES_CONFIG);
 		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
-		FileUtils.copyDirectory(appFolder.toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
+		FileUtils.copyDirectory(resources.getParent().toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
+		FileUtils.copyDirectory(dependencies.toFile(), Paths.get(TARGET_OUT_FOLDER, version, "dep").toFile());
+		FileUtils.copyFile(Paths.get(appFolder.toString(), configFile.getAppFile().toString()).toFile(), 
+				Paths.get(TARGET_OUT_FOLDER, version, configFile.getAppFile().toString()).toFile());
 		appConfig.setAppName(configFile.getAppName());
-		
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
 		appConfig.setJvmArguments(configFile.getJvmArguments());	
 		appConfig.setMainClass(configFile.getMainClass());
-		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppFile()),configFile.getAppName(), configFile));
-		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG).toString());
+		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppFile()),version, configFile));
+		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG).toString());
 		fileMapperService.write(createRepo(dependencies, dependencies, Paths.get(version, dependencies.getFileName().toString()).toString(), configFile), dependenciesConfig.toString());
 		fileMapperService.write(createRepo(resources, resources, Paths.get(version, resources.getFileName().toString()).toString(), configFile), resourcesConfig.toString());
 		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version, configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version, configFile));
 		if (!configFile.isGeneretedJava()) {
 			createJreConfig(configFile);
-			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, JAVA_CONFIG),Paths.get(configFile.getAppName()).toString(), configFile));
+			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(),JAVA_CONFIG), null, configFile));
 		}else {
-			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), TEMP_APP_CONFIG).toString(), AppConfig.class);
+			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), APP_CONFIG).toString(), AppConfig.class);
 			appConfig.setJavaRepo(app.getJavaRepo());
 		}
 		return appConfig;

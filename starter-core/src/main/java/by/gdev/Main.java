@@ -52,7 +52,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		ConsoleSubscriber listener = new ConsoleSubscriber();
-		StarterAppConfig starterConfig = new StarterAppConfig();
+		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		EventBus eventBus = new EventBus();
 		eventBus.register(listener);
@@ -82,26 +82,27 @@ public class Main {
 		GsonService gsonService = new GsonServiceImpl(gson, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		AppConfig all = gsonService.getObject("http://localhost:81/server/tempAppConfig.json", AppConfig.class, false);
+		AppConfig all = gsonService.getObject(starterConfig.getServerFile(), AppConfig.class, false);
+		Repo fileRepo = all.getAppFileRepo();
 		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
-		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);		
+		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);	
 		Repo java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
+		list.add(fileRepo);
 		list.add(resources);
 		list.add(dependencis);
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
-			container.setDestinationRepositories("/home/aleksandr/Desktop/qwert/container1/");
+			container.setDestinationRepositories(starterConfig.getContainer());
 			container.setRepo(repo);
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(true);
-
+		downloader.startDownload(false);
 		try {
 			// todo add special util args4j and parse args and properties and union them
 //			AppConfig a = g.fromJson(new InputStreamReader(Main.class.getResourceAsStream("/settings.json")),
@@ -112,22 +113,17 @@ public class Main {
 			 */
 //			log.info("working directory: " + DesktopUtil.getSystemPath(OSInfo.getOSType(), a.getAppName()));
 //            new OSExecutorFactoryMethod().createOsExecutor().execute();
-
 			// read settings.json
 //            new SettingsManager();!!!!!!!!!!!
-
 			// load config from web
 //            ConfigManager cfg = new ConfigManager();!!!!!!!!!!!!!!!!!!
 //            cfg.load();!!!!!!!!!!!!!!!!!!
 //            cfg.parse();!!!!!!!!!!!!!!!!!!
-
 			Starter s = new Starter();
 			// union two lines in separated class. This is more common then validate and
 			// prepare resources
 //			s.collectOSInfo();
-
 //			s.checkCommonProblems();
-			//
 //			s.validate();
 //			s.prepareResources();
 			// validate prepared resources
@@ -142,6 +138,5 @@ public class Main {
 			t.printStackTrace();
 			System.exit(-1);
 		}
-		
 	}
 }
