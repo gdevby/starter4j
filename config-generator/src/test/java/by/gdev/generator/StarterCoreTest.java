@@ -73,7 +73,7 @@ public class StarterCoreTest {
 	public void mainTest() throws Exception {
 		String[] configGenerator = {"-name", "test-starter-app", "-version", "0.9", "-domain", "http://127.0.0.1:65079/"};
 		by.gdev.generator.Main.main(configGenerator);
-		String[] starterCoreArg = { "-serverFile","http://127.0.0.1:65079/test-starter-app/0.9/appConfig.json","-output", "/home/aleksandr/Desktop/qwert/testContainer/"};
+		String[] starterCoreArg = { "-serverFile","http://127.0.0.1:65079/test-starter-app/0.9/appConfig.json","-output", "target/test_folder/testContainer/"};
 		by.gdev.Main.main(starterCoreArg);
 	}
 }
