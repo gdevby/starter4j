@@ -65,7 +65,6 @@ public class DownloaderImpl implements Downloader {
 			element.setMetadata(metadata);
 			element.setRepo(container.getRepo());
 			downloadElements.add(element);
-
 		});
 	}
 

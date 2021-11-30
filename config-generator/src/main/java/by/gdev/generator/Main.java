@@ -1,7 +1,7 @@
 package by.gdev.generator;
 
+import static by.gdev.generator.AppConfigCreator.APP_CONFIG;
 import static by.gdev.generator.AppConfigCreator.TARGET_OUT_FOLDER;
-import static by.gdev.generator.AppConfigCreator.TEMP_APP_CONFIG;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +35,8 @@ public class Main {
 		}
 		AppConfigCreator appConfigCreator = new AppConfigCreator(fileMapperService);
 		AppConfig appConfig = appConfigCreator.createConfig(acm);
-		log.info("save config before uploading {}", new File(TARGET_OUT_FOLDER,TEMP_APP_CONFIG).getAbsolutePath());	
-		fileMapperService.write(appConfig, Paths.get(TARGET_OUT_FOLDER, TEMP_APP_CONFIG).toString());
+		log.info("save config before uploading {}", new File(TARGET_OUT_FOLDER,APP_CONFIG).getAbsolutePath());	
+		fileMapperService.write(appConfig, Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), String.valueOf(acm.getAppVersion()), APP_CONFIG).toString());
 		log.info("DONE");
 	}
 }

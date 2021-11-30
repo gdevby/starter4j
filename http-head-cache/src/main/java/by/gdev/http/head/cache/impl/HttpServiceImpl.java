@@ -102,8 +102,6 @@ public class HttpServiceImpl implements HttpService {
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
-		//TODO почитать как выводить сообщение с параметрами, прочитать про уровни какие есть и какие мы можем использовать в нашем приложении
-		//TODO прочитаешь как задавать уровни ниже info  в log 
 			try {
 				CloseableHttpResponse response = getResponse(httpGet);
 				HttpEntity entity = response.getEntity();

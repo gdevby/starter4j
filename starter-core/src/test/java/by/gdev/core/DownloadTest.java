@@ -54,8 +54,7 @@ public class DownloadTest {
 			FileUtils.deleteDirectory(testFolder.toFile());
 		}
 		testFolder.toFile().mkdirs();
-		
-		Repo repo = new FileMapperService(gson, StandardCharsets.UTF_8, "").read("src/test/resources/dependencises.json", Repo.class);
+		Repo repo = new FileMapperService(gson, StandardCharsets.UTF_8, "").read("src/test/resources/dependencies.json", Repo.class);
 		String str = gson.toJson(repo, Repo.class);
 		mockServer = ClientAndServer.startClientAndServer(34631);
 		ConfigurationProperties.disableSystemOut(true);
