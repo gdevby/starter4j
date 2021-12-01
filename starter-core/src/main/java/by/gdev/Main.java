@@ -82,7 +82,7 @@ public class Main {
 		GsonService gsonService = new GsonServiceImpl(gson, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		AppConfig all = gsonService.getObject(starterConfig.getServerFile(), AppConfig.class, false);
+		AppConfig all = gsonService.getObject(starterConfig.controlVersion(starterConfig), AppConfig.class, false);
 		Repo fileRepo = all.getAppFileRepo();
 		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
@@ -103,6 +103,7 @@ public class Main {
 			downloader.addContainer(container);
 		}
 		downloader.startDownload(false);
+		
 		try {
 			// todo add special util args4j and parse args and properties and union them
 //			AppConfig a = g.fromJson(new InputStreamReader(Main.class.getResourceAsStream("/settings.json")),

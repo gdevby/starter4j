@@ -112,7 +112,7 @@ public class GsonServiceImplTest1 {
 	
 	@Test
 	public void test7() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
-		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false);
+		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false); 
 		System.out.println(test);
 	}
 }
