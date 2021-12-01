@@ -17,13 +17,10 @@ import lombok.AllArgsConstructor;
 /**
  * {@inheritDoc}
  */
-// TODO: added repository field to download with repo and by link too
-// 
 @AllArgsConstructor
 public class GsonServiceImpl implements GsonService {
 	private Gson gson;
 	private FileCacheService fileService;
-//	private List<String> urls;
 	
 	 /**
 	  * {@inheritDoc}
@@ -44,14 +41,18 @@ public class GsonServiceImpl implements GsonService {
 
 	@Override
 	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)	throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		//TODO подумать как перебирать все элементы
+		int size = urls.size();
 		Path pathFile = null;
-		try {
-			pathFile = fileService.getRawObject(urls.get(0) + urn, cache);
-		}catch (IOException e) {
-			pathFile = fileService.getRawObject(urls.get(1) + urn, cache);
+		for (int i = 0; i < urls.size(); i++) {
+			try {
+				pathFile = fileService.getRawObject(urls.get(i) + urn, cache);
+			} catch (IOException e) {
+				size--;
+				if (size == 0) {
+					throw new IOException();
+				}
+			}
 		}
-		
 			try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
 				return gson.fromJson(read, class1);
 		}

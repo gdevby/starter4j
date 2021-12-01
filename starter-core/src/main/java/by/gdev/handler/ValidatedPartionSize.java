@@ -19,7 +19,7 @@ public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
 		try {
 			FileStore store = Files.getFileStore(file.toPath().getRoot());
 			long res = store.getUsableSpace();
-			return res > minMemorySize;
+			return res > minMemorySize * 1024 * 1024;
 		} catch (IOException e) {}
 		return true;
 	}
