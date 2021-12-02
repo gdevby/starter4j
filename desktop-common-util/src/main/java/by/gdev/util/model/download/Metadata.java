@@ -10,6 +10,7 @@ import java.util.List;
 import by.gdev.util.DesktopUtil;
 
 @Data
+//TODO  add for every class descriptoin
 public class Metadata {
     private String sha1;
     private long size;

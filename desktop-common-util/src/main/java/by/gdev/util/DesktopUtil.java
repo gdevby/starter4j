@@ -23,6 +23,7 @@ import by.gdev.util.OSInfo.OSType;
  * https://github.com/wille/startuplib/blob/master/src/startuplib/WindowsStartup.java
  * or merge and https://github.com/wille/oslib
  */
+//TODO describe every method of the util
 public class DesktopUtil {
 	@SuppressWarnings("serial")
 	public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {
