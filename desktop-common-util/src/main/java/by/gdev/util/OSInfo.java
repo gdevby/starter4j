@@ -4,7 +4,7 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
+//TODO add what is it?
 public class OSInfo {
     private static final String OS_NAME = "os.name";
     private static final String OS_VERSION = "os.version";
