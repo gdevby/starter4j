@@ -25,7 +25,7 @@ import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
-
+//TODO DESKRIPTION OF THE CLASS
 public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
 	public static final String DOMAIN_CONFIG = "domainConfig.json";
@@ -35,6 +35,7 @@ public class AppConfigCreator {
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
 	FileMapperService fileMapperService;
+	//TODO ???
 	/**
 	 * @param configFile contains config app
 	 * @param fms
