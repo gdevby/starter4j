@@ -42,6 +42,7 @@ import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
+import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +52,8 @@ public class Main {
 	public static Charset charset = StandardCharsets.UTF_8;
 
 	public static void main(String[] args) throws Exception {
+		boolean flag = true;
+		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		ConsoleSubscriber listener = new ConsoleSubscriber();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
@@ -91,9 +94,10 @@ public class Main {
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);	
 		Repo java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
-		list.add(fileRepo);
+		
 		list.add(resources);
 		list.add(dependencis);
+		list.add(fileRepo);
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
@@ -103,6 +107,13 @@ public class Main {
 			downloader.addContainer(container);
 		}
 		downloader.startDownload(false);
+		
+		
+		
+		new DesktopUtil().activeDoublePreparingJVM(starterConfig.getContainer());
+		
+		
+		
 		
 		try {
 			// todo add special util args4j and parse args and properties and union them

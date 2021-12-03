@@ -4,10 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -24,6 +28,8 @@ import by.gdev.util.OSInfo.OSType;
  * or merge and https://github.com/wille/oslib
  */
 public class DesktopUtil {
+	 private static final String PROTECTION = "protection.txt";
+	 private FileLock lock;
 	@SuppressWarnings("serial")
 	public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {
 		{
@@ -62,7 +68,15 @@ public class DesktopUtil {
 		}
 		return file;
 	}
-
+	
+	
+//    public static File getSystemRelatedDirectory(OSInfo.OSType type, String path) {
+//    	if (!type.equals(OSInfo.OSType.MACOSX)|| !type.equals(OSInfo.OSType.UNKNOWN)) {
+//            path = '.' + path;
+//    	}
+//        return getSystemPath(type, path);
+//    }
+	
 	public static <T> T uncheckCall(Callable<T> callable) {
 		try {
 			return callable.call();
@@ -141,4 +155,30 @@ public class DesktopUtil {
 			return 1;
 		}
 	}
+	
+    private static void createFile(File file) throws IOException {
+        if (file.isFile())
+            return;
+        if (file.getParentFile() != null)
+            file.getParentFile().mkdirs();
+    }	
+	
+	public void activeDoublePreparingJVM(String container) throws IOException {
+        File f = new File(container, PROTECTION);
+        createFile(f);
+        if (f.exists()) {
+            FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+            lock = ch.tryLock();
+            if (Objects.isNull(lock)) {
+            	//TODO отключение ведение журнала sl4g?
+//                LogManager.shutdown();
+                System.exit(4);
+            }
+        }
+    }
+
+    private void diactivateDoublePreparingJVM() throws IOException {
+        if (Objects.nonNull(lock))
+            lock.release();
+    }
 }

@@ -49,7 +49,7 @@ public class AppConfigModel{
     			1.0, 
     			"by.gdev.app.Main", 
     			Arrays.asList("",""),
-    			Arrays.asList("",""),
+    			Arrays.asList("-Xmx512m","-Dfile.encoding=UTF8"),
     			"starter-app-1.0.jar", 
     			"../../starter-app/jvms",
     			"src/test/resources", 
