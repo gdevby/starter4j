@@ -94,7 +94,6 @@ public class DownloadedRunnableImpl implements Runnable {
 						in = new BufferedInputStream(entity.getContent());
 						out = new BufferedOutputStream(new FileOutputStream(file, resume));
 						byte[] buffer = new byte[1024];
-//						Thread.sleep(100); 
 						int curread = in.read(buffer);
 						while (curread != -1) {
 							if (status.equals(DownloaderStatusEnum.CANCEL)) {
