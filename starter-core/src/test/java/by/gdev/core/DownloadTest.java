@@ -27,11 +27,11 @@ import com.google.gson.Gson;
 
 import by.gdev.http.head.cache.config.HttpConfig;
 import by.gdev.http.head.cache.exeption.StatusExeption;
+import by.gdev.http.head.cache.handler.PostHandlerImpl;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
-import by.gdev.http.head.cache.impl.PostHandlerImpl;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
 import by.gdev.http.head.cache.service.FileCacheService;

@@ -13,7 +13,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.google.gson.Gson;
-//TODO same
+//TODO same(ready)
+/**
+ * This class is intended for reading and writing json files.
+ */
 public class FileMapperService {
 	private Gson gson;
 	private Charset charset;

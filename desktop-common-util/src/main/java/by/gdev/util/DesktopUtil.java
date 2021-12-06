@@ -6,11 +6,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -70,13 +73,6 @@ public class DesktopUtil {
 		return file;
 	}
 	
-	
-//    public static File getSystemRelatedDirectory(OSInfo.OSType type, String path) {
-//    	if (!type.equals(OSInfo.OSType.MACOSX)|| !type.equals(OSInfo.OSType.UNKNOWN)) {
-//            path = '.' + path;
-//    	}
-//        return getSystemPath(type, path);
-//    }
 	
 	public static <T> T uncheckCall(Callable<T> callable) {
 		try {
@@ -157,6 +153,7 @@ public class DesktopUtil {
 		}
 	}
 	
+	//TODO new function
     private static void createFile(File file) throws IOException {
         if (file.isFile())
             return;
@@ -171,15 +168,49 @@ public class DesktopUtil {
             FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
             lock = ch.tryLock();
             if (Objects.isNull(lock)) {
-            	//TODO отключение ведение журнала sl4g?
 //                LogManager.shutdown();
                 System.exit(4);
             }
         }
     }
 
-    private void diactivateDoublePreparingJVM() throws IOException {
+	public void diactivateDoublePreparingJVM() throws IOException {
         if (Objects.nonNull(lock))
             lock.release();
     }
+	
+    public static String convertListToString(String c, List<Path> l) {
+        StringBuilder b = new StringBuilder();
+        for (Path string : l) {
+            b.append(string).append(c);
+        }
+        return b.toString();
+    }
+    
+    
+    
+    
+    
+    
+	public static Path getAbsolutePathToJava(OSInfo.OSType type, String path) {
+		StringBuilder b = new StringBuilder();
+		//for Linux x64
+		if (type == OSInfo.OSType.LINUX && OSInfo.getJavaBit() ==  OSInfo.Arch.x64) 
+			b.append("jre_default").append(File.separatorChar).append("jre-8u281-linux-x64").append(File.separatorChar);
+		//for Linux x32
+		if (type == OSInfo.OSType.LINUX && OSInfo.getJavaBit() ==  OSInfo.Arch.x32) 
+			b.append("jre_default").append(File.separatorChar).append("jre-8u281-linux-i586").append(File.separatorChar);
+		//for Windows x64
+		if (type == OSInfo.OSType.WINDOWS && OSInfo.getJavaBit() ==  OSInfo.Arch.x64) 
+			b.append("jre_default").append(File.separatorChar).append("jre-8u281-windows-x64").append(File.separatorChar);
+		//for Windows x32
+		if (type == OSInfo.OSType.WINDOWS && OSInfo.getJavaBit() ==  OSInfo.Arch.x32) 
+			b.append("jre_default").append(File.separatorChar).append("jre-8u111-windows-i586").append(File.separatorChar);
+		//for MACOSX x32
+		if (type == OSInfo.OSType.MACOSX  && !path.toLowerCase().endsWith("jre") && !path.toLowerCase().endsWith("home"))
+			b.append("jre_default").append(File.separatorChar).append("jdk1.8.0_202.jdk").append(File.separatorChar)
+			.append("Contents").append(File.separatorChar).append("Home").append(File.separatorChar).append("jre").append(File.separatorChar);
+		
+		return Paths.get(appendToJVM(String.valueOf(new File(path, b.toString())))).toAbsolutePath();
+	}
 }

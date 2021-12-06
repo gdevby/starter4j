@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import com.google.common.eventbus.EventBus;
 
-//TODO ProcessMonitor
 public class ProcessMonitor extends Thread {
 	 private final JavaProcess process;
 	 private EventBus listener;
@@ -25,27 +24,24 @@ public class ProcessMonitor extends Thread {
 	        InputStreamReader reader = new InputStreamReader(raw.getInputStream());
 	        BufferedReader buf = new BufferedReader(reader);
 	        String line;
-
 	        while (this.process.isRunning()) {
 	            try {
 	                while ((line = buf.readLine()) != null) {
-	                    if (listener != null)
-	                    	System.out.println();
-	                    //TODO ??? eventBus
-//	                    	listener.post(process, line);
-//	                        listener.onJavaProcessLog(process, line);
+	                    if (listener != null) {
+	                    	listener.post(line);
+	                    	listener.post(process);
+	                    }
 	                }
 	            } catch (Throwable ex) {
 	            } finally {
 	                try {
 	                    buf.close();
 	                } catch (IOException ex) {
-	                    Logger.getLogger(ProcessMonitor.class.getName()).log(
-	                            Level.SEVERE, null, ex);
+	                    Logger.getLogger(ProcessMonitor.class.getName()).log(Level.SEVERE, null, ex);
 	                }
 	            }
 	        }
 	        if (Objects.nonNull(listener))
-	        	listener.post(this.process);
+	            listener.post(this.process);
 	    }
 }
