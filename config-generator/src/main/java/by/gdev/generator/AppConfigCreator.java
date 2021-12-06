@@ -25,7 +25,11 @@ import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
-//TODO DESKRIPTION OF THE CLASS
+/**
+  * This class is designed to convert files required for configuration into json format.
+ * Input parameters directory with files to convert.
+ * At the output, we receive a json file with a description of the metadata of each file in the input directory
+ */
 public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
 	public static final String DOMAIN_CONFIG = "domainConfig.json";
@@ -35,13 +39,7 @@ public class AppConfigCreator {
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
 	FileMapperService fileMapperService;
-	//TODO ???
-	/**
-	 * @param configFile contains config app
-	 * @param fms
-	 * @return generated AppConfig
-	 * @throws NoSuchAlgorithmException
-	 */
+
 	public AppConfigCreator(FileMapperService fileMapperService) {
 		this.fileMapperService = fileMapperService;
 	}
@@ -55,19 +53,19 @@ public class AppConfigCreator {
 		Path resources = Paths.get(configFile.getAppResources());
 		Path dependenciesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_DEPENDENCISES_CONFIG);
 		Path resourcesConfig = Paths.get(TARGET_OUT_FOLDER, version, APP_RESOURCES_CONFIG);
-		FileUtils.copyDirectory(resources.getParent().toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
-		FileUtils.copyDirectory(dependencies.toFile(), Paths.get(TARGET_OUT_FOLDER, version, "dep").toFile());
-		FileUtils.copyFile(Paths.get(appFolder.toString(), configFile.getAppFile().toString()).toFile(), 
-				Paths.get(TARGET_OUT_FOLDER, version, configFile.getAppFile().toString()).toFile());
+		FileUtils.copyDirectory(resources.toFile(), Paths.get(TARGET_OUT_FOLDER, version).toFile());
+		FileUtils.copyDirectory(dependencies.toFile(), Paths.get(TARGET_OUT_FOLDER, version, "dependencies").toFile());
+		FileUtils.copyFile(Paths.get(appFolder.toString(), configFile.getAppJar().toString()).toFile(), 
+				Paths.get(TARGET_OUT_FOLDER, version, configFile.getAppJar().toString()).toFile());
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
 		appConfig.setJvmArguments(configFile.getJvmArguments());	
 		appConfig.setMainClass(configFile.getMainClass());
-		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppFile()),version, configFile));
+		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppJar()),version, configFile));
 		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG).toString());
-		fileMapperService.write(createRepo(dependencies, dependencies, Paths.get(version, dependencies.getFileName().toString()).toString(), configFile), dependenciesConfig.toString());
-		fileMapperService.write(createRepo(resources, resources, Paths.get(version, resources.getFileName().toString()).toString(), configFile), resourcesConfig.toString());
+		fileMapperService.write(createRepo(dependencies.getParent(), dependencies, Paths.get(version).toString(), configFile), dependenciesConfig.toString());
+		fileMapperService.write(createRepo(resources, resources, Paths.get(version).toString(), configFile), resourcesConfig.toString());
 		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version, configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version, configFile));
 		if (!configFile.isGeneretedJava()) {
@@ -84,18 +82,19 @@ public class AppConfigCreator {
 		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(DesktopUtil.wrap(e -> {
 			Path s = jvms.relativize(e);
 			Metadata m = new Metadata();
+			if (s.endsWith("java")) 
+				m.setExecutable(true);
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString());
 			m.setSize(e.toFile().length());
-			if (Objects.nonNull(str)) {
+			if (Objects.nonNull(str))
 				s = Paths.get(str, s.toString());
-			}
 			m.setRelativeUrl(s.toString());
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();
 		r.setResources(metadataList);
-		r.setRepositories(configFile.getDomain());
+		r.setRepositories(configFile.getUrl());
 		return r;
 	}
 
@@ -124,7 +123,7 @@ public class AppConfigCreator {
 								key, pathJre.getFileName() + ".json");
 						fileMapperService.write(createdJson, jvmConfig.toString());
 						repo.setResources(Arrays.asList(Metadata.createMetadata(jvmConfig)));
-						repo.setRepositories(configFile.getDomain());
+						repo.setRepositories(configFile.getUrl());
 					}
 					jvm.getJvms().get(type).get(arch).put(key, repo);
 				}

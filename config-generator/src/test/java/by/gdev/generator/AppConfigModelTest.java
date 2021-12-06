@@ -13,7 +13,7 @@ public class AppConfigModelTest {
 	@Test
 	public void test() {
 		AppConfigModel acm = new AppConfigModel();
-		String[] argv = { "-name", "new-name", "-version", "1.1", "-jvm", "first", "-jvm","second", "-flag"};
+		String[] argv = { "-name", "new-name", "-version", "1.1", "-jvmArguments", "first", "-jvmArguments","second", "-flag"};
 		JCommander.newBuilder().addObject(acm).build().parse(argv);
 		Assert.assertEquals(acm.getAppName(), "new-name");
 		Assert.assertEquals(acm.getAppVersion(), 1.1, 0.0);

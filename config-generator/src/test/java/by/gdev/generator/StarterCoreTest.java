@@ -71,7 +71,7 @@ public class StarterCoreTest {
 	
 	@Test
 	public void mainTest() throws Exception {
-		String[] configGenerator = {"-name", "test-starter-app", "-version", "0.9", "-domain", "http://127.0.0.1:65079/"};
+		String[] configGenerator = {"-name", "test-starter-app", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass" , "desktop.starter.app.Main"};
 		by.gdev.generator.Main.main(configGenerator);
 		String[] starterCoreArg = { "-mainAppConfig","http://127.0.0.1:65079/test-starter-app/0.9"};
 		by.gdev.Main.main(starterCoreArg);

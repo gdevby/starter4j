@@ -1,5 +1,6 @@
 package by.gdev;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -25,11 +26,12 @@ import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
 import by.gdev.http.head.cache.config.HttpConfig;
+import by.gdev.http.head.cache.handler.AccesHandler;
+import by.gdev.http.head.cache.handler.PostHandlerImpl;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
-import by.gdev.http.head.cache.impl.PostHandlerImpl;
 import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
 import by.gdev.http.head.cache.service.Downloader;
 import by.gdev.http.head.cache.service.FileCacheService;
@@ -38,11 +40,11 @@ import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.model.AppConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.process.JavaProcessHelper;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
-import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +57,7 @@ public class Main {
 		boolean flag = true;
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		ConsoleSubscriber listener = new ConsoleSubscriber();
+		DesktopUtil desktopUtil = new DesktopUtil();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		EventBus eventBus = new EventBus();
@@ -94,26 +97,27 @@ public class Main {
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);	
 		Repo java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
-		
 		list.add(resources);
 		list.add(dependencis);
 		list.add(fileRepo);
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
+		AccesHandler accesHandler = new AccesHandler();
 		for (Repo repo : list) {
 			container.setDestinationRepositories(starterConfig.getContainer());
 			container.setRepo(repo);
-			container.setHandlers(Arrays.asList(postHandler));
+			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(false);
-		
-		
-		
-		new DesktopUtil().activeDoublePreparingJVM(starterConfig.getContainer());
-		
-		
-		
+		desktopUtil.activeDoublePreparingJVM(starterConfig.getContainer());
+//		downloader.startDownload(false);
+		desktopUtil.diactivateDoublePreparingJVM();
+		String jre = String.valueOf(DesktopUtil.getAbsolutePathToJava(osType, starterConfig.getContainer()));
+		JavaProcessHelper javaProcess = new JavaProcessHelper(jre, new File(starterConfig.getContainer()), eventBus);
+		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getContainer())));
+		javaProcess.addCommand("-cp", classPath);
+		javaProcess.addCommand(all.getMainClass());
+		javaProcess.start();
 		
 		try {
 			// todo add special util args4j and parse args and properties and union them

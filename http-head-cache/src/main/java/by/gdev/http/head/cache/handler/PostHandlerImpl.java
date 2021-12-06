@@ -1,10 +1,9 @@
-package by.gdev.http.head.cache.impl;
+package by.gdev.http.head.cache.handler;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import by.gdev.http.head.cache.handler.PostHandler;
 import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
@@ -24,7 +23,6 @@ public class PostHandlerImpl implements PostHandler {
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) {
 				element.setT(new Throwable("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
 			}
-			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}catch (NoSuchAlgorithmException e2) {

@@ -19,16 +19,12 @@ public class AppConfigModel{
     private double appVersion;	
 	@Parameter(names = "-mainClass", description = "The main class for running the application")
     private String mainClass;  
-	//TODO PARAM TRY TO IMPROVE NAME
-	@Parameter(names = "-app", description = "Application arguments")
+	@Parameter(names = "-appArguments", description = "Application arguments")
     private List<String> appArguments;
-	//TODO TOO
-	@Parameter(names = "-jvm", description = "Arguments for jvm")
+	@Parameter(names = "-jvmArguments", description = "Arguments for jvm")
 	 private List<String> jvmArguments;
-	//TODO appJar 
-    @Parameter(names = "-appFile", description = "Jar app file to run the application")
-    private String appFile;    
-    //TODO ADDED EXPLANATION WHY IT SHOULD SKIP
+    @Parameter(names = "-appJar", description = "Jar app file to run the application")
+    private String appJar;    
     @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java, lets you skip java generation if the argument is -flag=true")
     private String javaFolder;   
     @Parameter(names = "-javaConfig", description = "Directory where saved the result of the jvm configuration. We can create once the config and using all times.")
@@ -37,13 +33,11 @@ public class AppConfigModel{
     private String appResources;   
     @Parameter(names = "-dependencies", description = "Directory with the necessary dependencies to run the application")
     private String appDependencies;   
-    //TODO EXPLAIN
-    @Parameter(names = "-appfolder", description = "Input directory to generated configuration for new application")
+    @Parameter(names = "-appFolder", description = "Direcotory with your desktop app. It tries to find in target/appName-version.jar")
     private String appFolder;   
-    //TODO IMPROVE 
-    @Parameter(names = "-domain", description = "Domain for which configs will be available for download")
-    private List<String> domain;  
-    @Parameter(names = "-flag", description = "Flag to skip java generation")
+    @Parameter(names = "-url", description = "used url(example.com) to generate configurations for all resources to download from this in future")
+    private List<String> url;  
+    @Parameter(names = "-flag", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs")
     private boolean generetedJava;   
     @Parameter(names = "-help", help = true)
     public boolean help = false;
@@ -57,11 +51,11 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("-Xmx512m","-Dfile.encoding=UTF8"),
     			"starter-app-1.0.jar", 
-    			"../../starter-app/jvms",
+    			"../../starter-app/example-compiled-app/jvms",
     			"src/test/resources", 
-    			"../../starter-app/src/main/resources/resources", 
-    			"../../starter-app/dep", 
-    			"../../starter-app", 
+    			"../../starter-app/src/main/resources", 
+    			"../../starter-app/example-compiled-app/target/dependencies", 
+    			"../../starter-app/example-compiled-app/target", 
     			Arrays.asList("http://localhost:81/"),
     			false, 
     			false);

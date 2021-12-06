@@ -33,7 +33,7 @@ public class StarterAppConfig{
 	public static final StarterAppConfig DEFAULT_CONFIG;
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500, 
-				"http://localhost:81/app",
+				"http://localhost:81/starter-app/1.0",
 				"target/test_folder/testContainer/",
 				null);
 	}
