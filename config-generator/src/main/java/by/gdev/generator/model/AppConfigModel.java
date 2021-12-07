@@ -25,7 +25,7 @@ public class AppConfigModel{
 	 private List<String> jvmArguments;
     @Parameter(names = "-appJar", description = "Jar app file to run the application")
     private String appJar;    
-    @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java, lets you skip java generation if the argument is -flag=true")
+    @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java, lets you skip java generation if the argument is -skinJVMGeneration=true")
     private String javaFolder;   
     @Parameter(names = "-javaConfig", description = "Directory where saved the result of the jvm configuration. We can create once the config and using all times.")
     private String javaConfig;    
@@ -37,7 +37,7 @@ public class AppConfigModel{
     private String appFolder;   
     @Parameter(names = "-url", description = "used url(example.com) to generate configurations for all resources to download from this in future")
     private List<String> url;  
-    @Parameter(names = "-flag", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs")
+    @Parameter(names = "-skinJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs")
     private boolean generetedJava;   
     @Parameter(names = "-help", help = true)
     public boolean help = false;
