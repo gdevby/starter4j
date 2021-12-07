@@ -3,17 +3,16 @@ package by.gdev.component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * I want to see all possible implementations and idea.
  * So we can implement upper abstraction with system.out messages!
  */
-public class Starter {
+@Slf4j
+public class Bootstrapper {
 
-    private Logger log;
-
-    public Starter() {
-        log = LoggerFactory.getLogger(getClass());
-    }
 
     /**
      * Get information about current OS
@@ -33,8 +32,7 @@ public class Starter {
      */
     public Object validate() {
         log.info("call method {}", "validate");
-        return null;
-    }
+        return null;    }
 
     /**
      * Download resources(java,files,.jar) and and prepare them to use,

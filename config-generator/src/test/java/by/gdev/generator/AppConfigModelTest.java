@@ -13,11 +13,11 @@ public class AppConfigModelTest {
 	@Test
 	public void test() {
 		AppConfigModel acm = new AppConfigModel();
-		String[] argv = { "-name", "new-name", "-version", "1.1", "-jvmArguments", "first", "-jvmArguments","second", "-flag"};
+		String[] argv = { "-name", "new-name", "-version", "1.1", "-jvmArguments", "first", "-jvmArguments","second", "-skinJVMGeneration"};
 		JCommander.newBuilder().addObject(acm).build().parse(argv);
 		Assert.assertEquals(acm.getAppName(), "new-name");
 		Assert.assertEquals(acm.getAppVersion(), 1.1, 0.0);
 		Assert.assertEquals(acm.getJvmArguments(), Arrays.asList("first", "second"));
-		Assert.assertTrue(acm.isGeneretedJava());
+		Assert.assertTrue(acm.isSkinJVMGeneration());
 	}
 }

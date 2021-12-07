@@ -14,22 +14,22 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttpConfig {
-
-	
+	//TODO check how it works
+	//В результате мы должны убедиться что это работает и не создает новые соединения 
 	public CloseableHttpClient httpClient() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setDefaultMaxPerRoute(5);
-        cm.setMaxTotal(20);
-        CloseableHttpClient builder = HttpClients.custom().setKeepAliveStrategy((response, context) -> {
-                    Args.notNull(response, "HTTP response");
-                    final HeaderElementIterator it = new BasicHeaderElementIterator(
-                            response.headerIterator(HTTP.CONN_KEEP_ALIVE));
-                    if (it.hasNext()) {
-                        log.info("used keep alive 5000");
-                        return 5000L;
-                    }
-                    return -1;
-                }).setConnectionManager(cm).evictIdleConnections(10, TimeUnit.SECONDS).build();
-        return builder;
+		cm.setDefaultMaxPerRoute(1);
+		cm.setMaxTotal(20);
+		CloseableHttpClient builder = HttpClients.custom().setKeepAliveStrategy((response, context) -> {
+			Args.notNull(response, "HTTP response");
+			final HeaderElementIterator it = new BasicHeaderElementIterator(
+					response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+			if (it.hasNext()) {
+				log.info("used keep alive 5000");
+				return 5000L;
+			}
+			return -1;
+		}).setConnectionManager(cm).evictIdleConnections(10, TimeUnit.SECONDS).build();
+		return builder;
 	}
 }

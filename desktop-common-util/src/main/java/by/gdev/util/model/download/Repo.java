@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 /**
- * We can config direct link and part path.
+ * Used several repositories(URLs) to download files
  *
  */
 @Data
@@ -18,6 +18,7 @@ public class Repo {
 	/**
 	 * Saves sha1 on the server allow to add more flexibility todo implement low
 	 * priority
+	 * NOt implemented
 	 */
 	private boolean remoteServerSHA1;
 }

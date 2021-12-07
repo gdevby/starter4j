@@ -4,6 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 public class MacExecutorAdditional extends LinuxExecutorAdditional implements OSExecutorAdditional {
+	//Not correct work
 	@Override
 	public boolean isIdleWithoutInputEventsMoreThan(int seconds) {
 		double idleTimeSeconds = ApplicationServices.INSTANCE.CGEventSourceSecondsSinceLastEventType(

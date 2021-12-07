@@ -17,9 +17,7 @@ import by.gdev.util.model.GPUDescription;
 import by.gdev.util.model.GPUDriverVersion;
 import by.gdev.util.model.GPUsDescriptionDTO;
 
-//todo create new module to separate osExecutor from  unique api like isIdleWithoutInputEventsMoreThan 
-//todo использовать логгер джава по умолчанию с фасадом, определить логбэк как будет работать при провдед
-//использовать стандартный логгер
+
 public class LinuxExecutor implements OSExecutor {
 
 	private static final Path CUDA_VERSION_PATH = Paths.get("/usr/local/cuda/version.txt");
