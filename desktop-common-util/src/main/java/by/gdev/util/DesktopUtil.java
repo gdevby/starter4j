@@ -24,13 +24,15 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * add
- * https://github.com/wille/startuplib/blob/master/src/startuplib/WindowsStartup.java
+ * Class utilities. Chagned mode fo the file for linux and mac {@link DesktopUtil#PERMISSIONS}
+ * 
  * or merge and https://github.com/wille/oslib
  */
 //TODO describe every method of the util
+@Slf4j
 public class DesktopUtil {
 	 private static final String PROTECTION = "protection.txt";
 	 private FileLock lock;
@@ -50,7 +52,15 @@ public class DesktopUtil {
 			add(PosixFilePermission.GROUP_EXECUTE);
 		}
 	};
-
+	/**
+	 * Defined default working directory + path.
+	 * Examples for WINDOWS C:\\Users\\user\\AppData\\Roaming\\MyAppName 
+	 * LINUX /home/user/MyAppName
+	 * 
+	 * @param type {@link OSType}
+	 * @param path is MyAppName in description
+	 * @return
+	 */
 	public static File getSystemPath(OSInfo.OSType type, String path) {
 		String userHome = System.getProperty("user.home", ".");
 		File file;
@@ -74,14 +84,7 @@ public class DesktopUtil {
 	}
 	
 	
-	public static <T> T uncheckCall(Callable<T> callable) {
-		try {
-			return callable.call();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
+	
 	public static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
 		byte[] b = createChecksum(file, algorithm);
 		StringBuilder result = new StringBuilder();
@@ -123,7 +126,23 @@ public class DesktopUtil {
 			b.append("w.exe");
 		return b.toString();
 	}
-
+	/**
+	 * Used to call without checked exception.
+	 * 
+	 * @param <T>
+	 * @param callable
+	 * @return
+	 */
+	public static <T> T uncheckCall(Callable<T> callable) {
+		try {
+			return callable.call();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	/**
+	 * {@inheritDoc CheckedFunction}
+	 */
 	public static <T, R> Function<T, R> wrap(CheckedFunction<T, R> checkedFunction) {
 		return t -> {
 			try {
@@ -141,7 +160,8 @@ public class DesktopUtil {
 			e.printStackTrace();
 		}
 	}
-
+	//todo removed google and create without exactly url and we can use several url
+	//name of the method
 	public static int init(int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
 		try {
 			HttpHead http = new HttpHead("http://www.google.com");
@@ -154,26 +174,27 @@ public class DesktopUtil {
 	}
 	
 	//TODO new function
-    private static void createFile(File file) throws IOException {
+    private static void createDirectory(File file) throws IOException {
         if (file.isFile())
             return;
         if (file.getParentFile() != null)
             file.getParentFile().mkdirs();
     }	
 	
-	public void activeDoublePreparingJVM(String container) throws IOException {
+	public void activeDoubleDownloadingResourcesLock(String container) throws IOException {
         File f = new File(container, PROTECTION);
-        createFile(f);
+        createDirectory(f);
         if (f.exists()) {
             FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
             lock = ch.tryLock();
             if (Objects.isNull(lock)) {
-//                LogManager.shutdown();
+            	//TODO ?
+            	log.warn("");
                 System.exit(4);
             }
         }
     }
-
+	//TODO name of the method
 	public void diactivateDoublePreparingJVM() throws IOException {
         if (Objects.nonNull(lock))
             lock.release();
@@ -186,11 +207,7 @@ public class DesktopUtil {
         }
         return b.toString();
     }
-    
-    
-    
-    
-    
+    //TODO removed
     
 	public static Path getAbsolutePathToJava(OSInfo.OSType type, String path) {
 		StringBuilder b = new StringBuilder();

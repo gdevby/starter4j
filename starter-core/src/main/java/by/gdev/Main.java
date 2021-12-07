@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.config.RequestConfig;
 
 import com.beust.jcommander.JCommander;
@@ -16,7 +17,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import by.gdev.component.Starter;
+import by.gdev.component.Bootstrapper;
 import by.gdev.handler.Localise;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
@@ -52,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 	public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
-
+	//TODO split to starter
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
@@ -104,17 +105,17 @@ public class Main {
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		AccesHandler accesHandler = new AccesHandler();
 		for (Repo repo : list) {
-			container.setDestinationRepositories(starterConfig.getContainer());
+			container.setDestinationRepositories(starterConfig.getWorkDirectory());
 			container.setRepo(repo);
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-		desktopUtil.activeDoublePreparingJVM(starterConfig.getContainer());
+		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 //		downloader.startDownload(false);
 		desktopUtil.diactivateDoublePreparingJVM();
-		String jre = String.valueOf(DesktopUtil.getAbsolutePathToJava(osType, starterConfig.getContainer()));
-		JavaProcessHelper javaProcess = new JavaProcessHelper(jre, new File(starterConfig.getContainer()), eventBus);
-		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getContainer())));
+		String jre = String.valueOf(DesktopUtil.getAbsolutePathToJava(osType, starterConfig.getWorkDirectory()));
+		JavaProcessHelper javaProcess = new JavaProcessHelper(jre, new File(starterConfig.getWorkDirectory()), eventBus);
+		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getWorkDirectory())));
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
 		javaProcess.start();
@@ -135,7 +136,7 @@ public class Main {
 //            ConfigManager cfg = new ConfigManager();!!!!!!!!!!!!!!!!!!
 //            cfg.load();!!!!!!!!!!!!!!!!!!
 //            cfg.parse();!!!!!!!!!!!!!!!!!!
-			Starter s = new Starter();
+			Bootstrapper s = new Bootstrapper();
 			// union two lines in separated class. This is more common then validate and
 			// prepare resources
 //			s.collectOSInfo();

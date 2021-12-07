@@ -13,6 +13,7 @@ import by.gdev.util.DesktopUtil;
 //TODO  add for every class descriptoin (ready)
 /**
  * This class is intended to describe information about the file that will be used in the configuration. The file information includes the following data:
+ * TODO
  * sha1 - hash sum of the file, using the SHA-1 hashing algorithm.
  * size - file size.
  * path - the path to the file.
@@ -20,6 +21,9 @@ import by.gdev.util.DesktopUtil;
  *
  */
 public class Metadata {
+	/**
+	 * TODO ???
+	 */
     private String sha1;
     private long size;
     private String path;

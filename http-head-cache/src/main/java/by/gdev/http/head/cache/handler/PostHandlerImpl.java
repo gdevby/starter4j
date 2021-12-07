@@ -18,12 +18,14 @@ public class PostHandlerImpl implements PostHandler {
 			String shaLocalFile = DesktopUtil.getChecksum(new File(element.getPathToDownload() + element.getMetadata().getPath()),Headers.SHA1.getValue());
 			long sizeLocalFile = new File(element.getPathToDownload() + element.getMetadata().getPath()).length();
 			if(sizeLocalFile != element.getMetadata().getSize()) {
+				//todo 
 				element.setT(new Throwable("The size of the file is not equal: " + element.getMetadata().getPath()));
 			}
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) {
 				element.setT(new Throwable("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
 			}
 		} catch (IOException e1) {
+			//TODO 
 			e1.printStackTrace();
 		}catch (NoSuchAlgorithmException e2) {
 			e2.printStackTrace();

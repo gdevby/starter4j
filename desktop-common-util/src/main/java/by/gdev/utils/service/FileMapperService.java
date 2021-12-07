@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import com.google.gson.Gson;
 //TODO same(ready)
 /**
- * This class is intended for reading and writing json files.
+ * This class is intended for reading json to get object and writing json files to working directory.
  */
 public class FileMapperService {
 	private Gson gson;

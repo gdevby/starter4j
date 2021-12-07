@@ -33,7 +33,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
+//TODO ???
 public class DownloaderImpl implements Downloader {
+	//TODO???
 	private String pathToDownload;
 	private EventBus eventBus;
 	private CloseableHttpClient httpclient;
@@ -74,9 +76,8 @@ public class DownloaderImpl implements Downloader {
 			status = DownloaderStatusEnum.WORK;
 			DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, downloadElements, processedElements, httpclient, requestConfig);
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 3; i++) 
 				listThread.add(CompletableFuture.runAsync(runnable));
-			}
 			if (sync) {
 				synchronous(listThread);
 			} else {
@@ -84,6 +85,7 @@ public class DownloaderImpl implements Downloader {
 					try {
 						synchronous(listThread);
 					} catch (InterruptedException e) {
+						//TODO
 						e.printStackTrace();
 					}
 				}).get();
@@ -96,7 +98,7 @@ public class DownloaderImpl implements Downloader {
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
 	}
-
+	//TODO ???name
 	private DownloaderStatus averagSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
@@ -106,7 +108,7 @@ public class DownloaderImpl implements Downloader {
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}
-	
+	//TODO? ??? name
 	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
@@ -118,6 +120,7 @@ public class DownloaderImpl implements Downloader {
 				status = DownloaderStatusEnum.DONE;
 			LocalTime now = LocalTime.now();
 			if (now.getSecond() == start.getSecond() + 1) {
+				//TODO
 				eventBus.post(averagSpeed().getSpeed());
 				start = now;
 			}

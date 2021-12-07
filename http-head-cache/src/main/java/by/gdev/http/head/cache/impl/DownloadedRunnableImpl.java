@@ -25,7 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
+//TODO????
 public class DownloadedRunnableImpl implements Runnable {
+	//TODO ???
+	//TODO error with status. will be same
 	private volatile DownloaderStatusEnum status;
 	private Queue<DownloadElement> downloadElements;
 	private List<DownloadElement> processedElements;
@@ -43,12 +46,12 @@ public class DownloadedRunnableImpl implements Runnable {
 				if (Objects.nonNull(element)) {
 					try {
 						download(element);
-						element.getHandlers().forEach(post -> {
-							post.postProcessDownloadElement(element);
-						});
+						element.getHandlers().forEach(post ->post.postProcessDownloadElement(element));
+						//TODO in handlers
 						if (Objects.nonNull(element.getT()))
 							log.error(element.getT().toString());
 					} catch (IOException e) {
+						//TODO
 						log.error("Exeption", e);
 					} catch (InterruptedException e1) {
 						log.error("Exeption", e1);
@@ -70,18 +73,21 @@ public class DownloadedRunnableImpl implements Runnable {
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
 			int attempt = 0;
+			//TODO try with for
 			while (attempt < DEFAULT_MAX_ATTEMPTS) {
 				try {
 					BufferedInputStream in = null;
 					BufferedOutputStream out = null;
 					boolean resume = false;
+					LocalTime startTime = LocalTime.now();
+					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
 					try {
-						LocalTime startTime = LocalTime.now();
 						element.setStart(startTime);
-						HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
+						//TODO
 						if (!file.exists()) {
 							file.getParentFile().mkdirs();
 						}
+						//TODO IMPROVE
 						if (file.exists())
 							if (Objects.nonNull(element.getMetadata().getSha1()))
 								if (file.length() != element.getMetadata().getSize()) {
@@ -111,10 +117,11 @@ public class DownloadedRunnableImpl implements Runnable {
 						element.setDownloadBytes(speed);
 						processedElements.add(element);
 					} finally {
+						httpGet.abort();
 						out.close();
 						in.close();
 					}
-					attempt = 3;
+					break;
 				}catch (SocketTimeoutException e) {
 					attempt++;
 					if (attempt == DEFAULT_MAX_ATTEMPTS)
