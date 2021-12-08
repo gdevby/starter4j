@@ -24,8 +24,11 @@ public enum DownloaderStatusEnum {
 	 */
 	WORK,
 	/**
-	 * Tried to cancel downloading
+	 * Sent this events when {@link Downloader} finished job.
 	 */
 	DONE,
+	/**
+	 * Tried to cancel downloading
+	 */
 	CANCEL
 }
