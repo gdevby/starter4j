@@ -82,7 +82,7 @@ public class AppConfigCreator {
 		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(DesktopUtil.wrap(e -> {
 			Path s = jvms.relativize(e);
 			Metadata m = new Metadata();
-			if (s.endsWith("java")) 
+			if (s.endsWith("java") | s.endsWith("java.exe")) 
 				m.setExecutable(true);
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString());

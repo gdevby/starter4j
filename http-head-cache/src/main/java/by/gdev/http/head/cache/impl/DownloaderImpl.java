@@ -40,10 +40,6 @@ public class DownloaderImpl implements Downloader {
 	 * Path to download file
 	 */
 	private String pathToDownload;
-	//TODO ??? What is it?
-	/**
-	 * {@link EventBus}
-	 */
 	private EventBus eventBus;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
@@ -55,9 +51,8 @@ public class DownloaderImpl implements Downloader {
 	 * Put processed elements after process to get info about status
 	 */
 	private List<DownloadElement> processedElements = Collections.synchronizedList(new ArrayList<DownloadElement>());
-	//TODO used past time Shown status of the downloading
 	/**
-	 * Downloads status
+	 * Shown status of the downloading
 	 */
 	private volatile DownloaderStatusEnum status;
 
@@ -84,7 +79,7 @@ public class DownloaderImpl implements Downloader {
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
-			DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(status, downloadElements, processedElements, httpclient, requestConfig);
+			DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(this,downloadElements, processedElements, httpclient, requestConfig);
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++) 
 				listThread.add(CompletableFuture.runAsync(runnable));

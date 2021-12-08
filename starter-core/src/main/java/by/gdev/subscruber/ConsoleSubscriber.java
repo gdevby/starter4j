@@ -12,11 +12,10 @@ public class ConsoleSubscriber {
     public void message(String s) {
     	log.info(s);
     }
-    //TODO sout?
+
     @Subscribe
     public void messageToSpeed(DownloaderStatus status) {
-    	
-    	System.out.println("download speed: " + String.format("%.2f", status.getSpeed()) + "KB/m");
+    	log.info("download speed: " + String.format("%.2f", status.getSpeed()) + "KB/m");
     }
     
     @Subscribe

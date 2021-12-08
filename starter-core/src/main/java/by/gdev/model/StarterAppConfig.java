@@ -12,7 +12,6 @@ import com.beust.jcommander.Parameter;
 
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
-import io.swagger.v3.oas.annotations.links.LinkParameter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,11 +46,6 @@ public class StarterAppConfig{
 				null);
 	}
 	
-	/**
-	 * 
-	 * @param config
-	 * @return
-	 */
 	public String getServerFileConifg(StarterAppConfig config) {
 		if (Objects.isNull(config.getVersion()))
 			return config.getServerFile() + APP_CONFIG;
