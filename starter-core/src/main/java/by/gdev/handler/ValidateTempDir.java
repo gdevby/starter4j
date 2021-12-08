@@ -21,6 +21,6 @@ public class ValidateTempDir extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validateTempDirs");
+		return localizationBandle.getString("validate.tempdir");
 	}
 }

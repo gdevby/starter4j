@@ -8,7 +8,9 @@ import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.OSType;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AccesHandler implements PostHandler{
 
 	@Override
@@ -18,11 +20,9 @@ public class AccesHandler implements PostHandler{
 			     try {
 					Files.setPosixFilePermissions(Paths.get(e.getPathToDownload() + e.getMetadata().getPath()), DesktopUtil.PERMISSIONS);
 				} catch (IOException e1) {
-					//todo ???
-					e1.printStackTrace();
+					log.error("Error", e1);
 				}
 			}
-		
 	}
 
 }

@@ -18,12 +18,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.model.download.Metadata;
+import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * or merge and https://github.com/wille/oslib
  */
-//TODO describe every method of the util
+
 @Slf4j
 public class DesktopUtil {
 	 private static final String PROTECTION = "protection.txt";
@@ -160,20 +163,22 @@ public class DesktopUtil {
 			e.printStackTrace();
 		}
 	}
-	//todo removed google and create without exactly url and we can use several url
-	//name of the method
-	public static int init(int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
-		try {
-			HttpHead http = new HttpHead("http://www.google.com");
-			http.setConfig(requestConfig);
-			httpclient.execute(http);
-			return maxAttepmts;
-		} catch (IOException e) {
-			return 1;
+	public static int numberOfAttempts(List <String>list, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
+		for (int i = 0; i < list.size();) {
+			try {
+				HttpHead http = new HttpHead(list.get(i));
+				http.setConfig(requestConfig);
+				httpclient.execute(http);
+				return maxAttepmts;
+			} catch (IOException e) {
+				 i++;
+				 if (i == list.size())
+					 return 1;
+			}
 		}
+		return 0;
 	}
 	
-	//TODO new function
     private static void createDirectory(File file) throws IOException {
         if (file.isFile())
             return;
@@ -194,40 +199,36 @@ public class DesktopUtil {
             }
         }
     }
-	//TODO name of the method
-	public void diactivateDoublePreparingJVM() throws IOException {
+	
+	public void diactivateDoubleDownloadingResourcesLock() throws IOException {
         if (Objects.nonNull(lock))
             lock.release();
     }
 	
-    public static String convertListToString(String c, List<Path> l) {
+	/**
+	 * Converts an array to a string separating each element with the specified delimiter
+	 * @param del separator
+	 * @param list an array whose elements need to be converted to a single string
+	 * @return A string of the list array, each element of which is delimited by the specified delimiter
+	 */
+    public static String convertListToString(String del, List<Path> list) {
         StringBuilder b = new StringBuilder();
-        for (Path string : l) {
-            b.append(string).append(c);
+        for (Path string : list) {
+            b.append(string).append(del);
         }
         return b.toString();
     }
-    //TODO removed
-    
-	public static Path getAbsolutePathToJava(OSInfo.OSType type, String path) {
-		StringBuilder b = new StringBuilder();
-		//for Linux x64
-		if (type == OSInfo.OSType.LINUX && OSInfo.getJavaBit() ==  OSInfo.Arch.x64) 
-			b.append("jre_default").append(File.separatorChar).append("jre-8u281-linux-x64").append(File.separatorChar);
-		//for Linux x32
-		if (type == OSInfo.OSType.LINUX && OSInfo.getJavaBit() ==  OSInfo.Arch.x32) 
-			b.append("jre_default").append(File.separatorChar).append("jre-8u281-linux-i586").append(File.separatorChar);
-		//for Windows x64
-		if (type == OSInfo.OSType.WINDOWS && OSInfo.getJavaBit() ==  OSInfo.Arch.x64) 
-			b.append("jre_default").append(File.separatorChar).append("jre-8u281-windows-x64").append(File.separatorChar);
-		//for Windows x32
-		if (type == OSInfo.OSType.WINDOWS && OSInfo.getJavaBit() ==  OSInfo.Arch.x32) 
-			b.append("jre_default").append(File.separatorChar).append("jre-8u111-windows-i586").append(File.separatorChar);
-		//for MACOSX x32
-		if (type == OSInfo.OSType.MACOSX  && !path.toLowerCase().endsWith("jre") && !path.toLowerCase().endsWith("home"))
-			b.append("jre_default").append(File.separatorChar).append("jdk1.8.0_202.jdk").append(File.separatorChar)
-			.append("Contents").append(File.separatorChar).append("Home").append(File.separatorChar).append("jre").append(File.separatorChar);
-		
-		return Paths.get(appendToJVM(String.valueOf(new File(path, b.toString())))).toAbsolutePath();
+    /**
+     * Allows to get the path to the executable file
+     * @param java 
+     * @return
+     */
+	public static String getJavaRun(Repo java) {
+		String javaRun = null;
+		 for (Metadata s : java.getResources()) {
+			 if (s.isExecutable())
+				 javaRun = s.getPath();
+		 }
+		return javaRun;
 	}
 }

@@ -25,7 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
-//TODO????
+/**
+ * This class implements the launch of file downloads by URI
+ */
+
 public class DownloadedRunnableImpl implements Runnable {
 	//TODO ???
 	//TODO error with status. will be same
@@ -38,23 +41,22 @@ public class DownloadedRunnableImpl implements Runnable {
 
 	@Override
 	public void run() {
+		
 		while (status.equals(DownloaderStatusEnum.WORK)) {
 			if (status.equals(DownloaderStatusEnum.CANCEL)) {
 				break;
 			} else {
+				System.out.println(status);
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
 					try {
 						download(element);
-						element.getHandlers().forEach(post ->post.postProcessDownloadElement(element));
+						element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
 						//TODO in handlers
-						if (Objects.nonNull(element.getT()))
-							log.error(element.getT().toString());
-					} catch (IOException e) {
-						//TODO
-						log.error("Exeption", e);
-					} catch (InterruptedException e1) {
-						log.error("Exeption", e1);
+//						if (Objects.nonNull(element.getError()))
+//							log.error(element.getError().toString());
+					} catch (InterruptedException | IOException e) {
+						log.error("Error", e);
 					}
 				} else {
 					break;
@@ -64,36 +66,33 @@ public class DownloadedRunnableImpl implements Runnable {
 	}
 
 	/**
-	 * @param element
+	 * A method that allows a byte-by-byte download of a file at the specified URI
+	 * @param element item received from the download queue
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
-			int attempt = 0;
-			//TODO try with for
-			while (attempt < DEFAULT_MAX_ATTEMPTS) {
+			for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
 				try {
 					BufferedInputStream in = null;
 					BufferedOutputStream out = null;
 					boolean resume = false;
 					LocalTime startTime = LocalTime.now();
-					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
+					HttpGet httpGet = new HttpGet(
+							element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
 					try {
 						element.setStart(startTime);
-						//TODO
-						if (!file.exists()) {
+						if (!file.getParentFile().exists())
 							file.getParentFile().mkdirs();
+
+						if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
+								&& file.length() != element.getMetadata().getSize()) {
+							httpGet.addHeader("Range",
+									"bytes= " + file.length() + "-" + element.getMetadata().getSize());
+							resume = true;
 						}
-						//TODO IMPROVE
-						if (file.exists())
-							if (Objects.nonNull(element.getMetadata().getSha1()))
-								if (file.length() != element.getMetadata().getSize()) {
-									httpGet.addHeader("Range", "bytes= " + file.length() + "-" + element.getMetadata().getSize());
-									resume = true;
-								}
 						httpGet.setConfig(requestConfig);
 						CloseableHttpResponse response = httpclient.execute(httpGet);
 						HttpEntity entity = response.getEntity();
@@ -121,15 +120,12 @@ public class DownloadedRunnableImpl implements Runnable {
 						out.close();
 						in.close();
 					}
-					break;
-				}catch (SocketTimeoutException e) {
+				} catch (SocketTimeoutException e) {
 					attempt++;
 					if (attempt == DEFAULT_MAX_ATTEMPTS)
 						throw new SocketTimeoutException();
-					else 
-						continue;	
 				}
-			}
+			}	
 		}
 	}
 }
