@@ -79,7 +79,7 @@ public class HttpServiceImpl implements HttpService {
 			}
 			return null;
 		}
-		
+		//TODO without null pointer exception
 	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
