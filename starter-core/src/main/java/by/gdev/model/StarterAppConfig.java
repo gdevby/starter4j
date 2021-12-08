@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//TODO STARTER AND APP CONFIG
 public class StarterAppConfig{
 	private static final String APP_CONFIG = "/appConfig.json";
 	

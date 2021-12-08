@@ -14,18 +14,18 @@ import by.gdev.subscruber.ConsoleSubscriber;
 
 public class Main {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	//Can get encoding from args and it is too java.net.preferIPv4Stack
 	public static Charset charset = StandardCharsets.UTF_8;
 
 	public static void main(String[] args) throws Exception {
-		//тут можно инициализировать нашу созданную ошибку и вывожить в кэтче
 		boolean flag = true;
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
-		ConsoleSubscriber listener = new ConsoleSubscriber();
+		
+		EventBus eventBus = new EventBus();
+		eventBus.register(new ConsoleSubscriber());
+		
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
-		EventBus eventBus = new EventBus();
-		eventBus.register(listener);
-		
 		try {
 			Bootstrapper s = new Bootstrapper(eventBus, starterConfig);
 			s.collectOSInfo();
@@ -33,6 +33,7 @@ public class Main {
 			s.prepareResources();
 			s.runApp();
 		} catch (Throwable t) {
+			//TODO log?
 			t.printStackTrace();
 			System.exit(-1);
 		}

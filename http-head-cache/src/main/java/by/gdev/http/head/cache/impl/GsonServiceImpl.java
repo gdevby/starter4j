@@ -41,6 +41,7 @@ public class GsonServiceImpl implements GsonService {
 
 	@Override
 	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)	throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		//TODO improve
 		int size = urls.size();
 		Path pathFile = null;
 		for (int i = 0; i < urls.size(); i++) {
@@ -49,6 +50,7 @@ public class GsonServiceImpl implements GsonService {
 			} catch (IOException e) {
 				size--;
 				if (size == 0) {
+					//TODO ???
 					throw new IOException();
 				}
 			}

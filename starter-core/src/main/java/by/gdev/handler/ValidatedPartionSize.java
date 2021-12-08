@@ -6,7 +6,7 @@ import java.nio.file.FileStore;
 import java.nio.file.Files;
 
 public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
-
+	//TODO USED WORK DIR
 	private	File file = new File(new File("").getAbsolutePath());		
 	private long minMemorySize;
 
@@ -20,6 +20,7 @@ public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
 			FileStore store = Files.getFileStore(file.toPath().getRoot());
 			long res = store.getUsableSpace();
 			return res > minMemorySize * 1024 * 1024;
+			//TODO ???
 		} catch (IOException e) {}
 		return true;
 	}

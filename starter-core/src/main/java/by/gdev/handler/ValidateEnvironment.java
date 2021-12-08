@@ -16,7 +16,7 @@ public interface ValidateEnvironment {
 	 * @throws InstantiationException 
 	 * @throws ClassNotFoundException 
 	 */
-	
+	//TODO SOW MUCH AND IT SHOULD THROW ERROR? UP
 	boolean validate() throws IOException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException;
 	/**
 	 * возвращает сообщение для показа и после будет генерирывать события для busevent

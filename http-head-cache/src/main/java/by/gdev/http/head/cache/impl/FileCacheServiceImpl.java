@@ -20,16 +20,17 @@ import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
-
 @AllArgsConstructor
 public class FileCacheServiceImpl implements FileCacheService {
+	//TODO remove
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	private HttpService httpService;
 	private Gson gson;
+	
 	private Charset charset;
+	//TODO TODO describe some variables
 	private Path directory;
 	private int timeToLife;
 
