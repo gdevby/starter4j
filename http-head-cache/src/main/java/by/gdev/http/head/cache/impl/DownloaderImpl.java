@@ -40,6 +40,7 @@ public class DownloaderImpl implements Downloader {
 	 * Path to download file
 	 */
 	private String pathToDownload;
+	//TODO ??? What is it?
 	/**
 	 * {@link EventBus}
 	 */
@@ -54,7 +55,7 @@ public class DownloaderImpl implements Downloader {
 	 * Put processed elements after process to get info about status
 	 */
 	private List<DownloadElement> processedElements = Collections.synchronizedList(new ArrayList<DownloadElement>());
-
+	//TODO used past time Shown status of the downloading
 	/**
 	 * Downloads status
 	 */
