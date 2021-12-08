@@ -11,7 +11,7 @@ public class ValidateTempNull extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validateTempNull");
+		return localizationBandle.getString("validate.tempnull");
 				
 	}
 }

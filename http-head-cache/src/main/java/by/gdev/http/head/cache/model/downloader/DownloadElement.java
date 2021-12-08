@@ -6,6 +6,7 @@ package by.gdev.http.head.cache.model.downloader;
 import java.time.LocalTime;
 import java.util.List;
 
+import by.gdev.http.head.cache.exeption.ThrowableExeption;
 import by.gdev.http.head.cache.handler.PostHandler;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
@@ -29,6 +30,6 @@ public class DownloadElement {
 	private LocalTime end;
 	private Repo repo;
 	private volatile double downloadBytes;
-	private volatile Throwable t;
+	private volatile Throwable error;
 
 }

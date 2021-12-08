@@ -2,17 +2,19 @@ package by.gdev.handler;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import by.gdev.util.DesktopUtil;
-import by.gdev.util.OSInfo;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class ValidateWorkDir extends ValisatedEnviromentAbstract {
-	//TODO add dir from user configuration from user file which located stater/...properties transfer argument like param
+	String workDir;
+	
+	
 	@Override
 	public boolean validate() {
-		File workDir = DesktopUtil.getSystemPath(OSInfo.getOSType(), "starter");
-		if (workDir.exists()) {
-			if (!Files.isWritable(workDir.toPath()) || !Files.isReadable(workDir.toPath()))
+		if (new File(workDir).exists()) {
+			if (!Files.isWritable(Paths.get(workDir)) || !Files.isReadable(Paths.get(workDir)))
 				return false;
 		}
 		return true;

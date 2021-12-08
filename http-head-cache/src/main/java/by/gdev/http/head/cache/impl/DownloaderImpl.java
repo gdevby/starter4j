@@ -25,18 +25,24 @@ import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
 import by.gdev.http.head.cache.service.Downloader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Robert Makrytski
- *
+ *	This class is responsible for the state of the file upload
  */
 
+@Slf4j
 @Data
 @AllArgsConstructor
-//TODO ???
 public class DownloaderImpl implements Downloader {
-	//TODO???
+	/**
+	 * Path to download file
+	 */
 	private String pathToDownload;
+	/**
+	 * {@link EventBus}
+	 */
 	private EventBus eventBus;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
@@ -49,6 +55,9 @@ public class DownloaderImpl implements Downloader {
 	 */
 	private List<DownloadElement> processedElements = Collections.synchronizedList(new ArrayList<DownloadElement>());
 
+	/**
+	 * Downloads status
+	 */
 	private volatile DownloaderStatusEnum status;
 
 	public DownloaderImpl(EventBus eventBus,CloseableHttpClient httpclient ,RequestConfig requestConfig) {
@@ -85,8 +94,7 @@ public class DownloaderImpl implements Downloader {
 					try {
 						synchronous(listThread);
 					} catch (InterruptedException e) {
-						//TODO
-						e.printStackTrace();
+						log.error("Error", e);
 					}
 				}).get();
 			}
@@ -98,8 +106,8 @@ public class DownloaderImpl implements Downloader {
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
 	}
-	//TODO ???name
-	private DownloaderStatus averagSpeed() {
+
+	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
 		for (DownloadElement d : processedElements) {
@@ -108,6 +116,7 @@ public class DownloaderImpl implements Downloader {
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}
+	
 	//TODO? ??? name
 	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
@@ -120,8 +129,7 @@ public class DownloaderImpl implements Downloader {
 				status = DownloaderStatusEnum.DONE;
 			LocalTime now = LocalTime.now();
 			if (now.getSecond() == start.getSecond() + 1) {
-				//TODO
-				eventBus.post(averagSpeed().getSpeed());
+				eventBus.post(averageSpeed());
 				start = now;
 			}
 		}

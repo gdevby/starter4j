@@ -43,7 +43,7 @@ public class HttpServiceImpl implements HttpService {
 	  */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
-		for (int attepmts = 1; attepmts < maxAttepmts; attepmts++) {
+		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
 				try {
 					return getResourseByUrl(url, path);
@@ -68,7 +68,7 @@ public class HttpServiceImpl implements HttpService {
 	  */
 		@Override
 		public RequestMetadata getMetaByUrl(String url) throws IOException {
-			for (int attepmts = 1; attepmts < maxAttepmts; attepmts++) {
+			for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 				try {
 					return getMetadata(url);
 				} catch (SocketTimeoutException e) {

@@ -3,7 +3,9 @@ package by.gdev.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,5 +33,5 @@ public class Localise {
 			log.error(e.getMessage(), e);
 		}
 		return locale;
-	}	
+	}
 }
