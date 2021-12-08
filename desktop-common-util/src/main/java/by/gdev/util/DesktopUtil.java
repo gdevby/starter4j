@@ -164,6 +164,7 @@ public class DesktopUtil {
 		}
 	}
 	public static int numberOfAttempts(List <String>list, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
+		//TODO can we use for(String url:list)
 		for (int i = 0; i < list.size();) {
 			try {
 				HttpHead http = new HttpHead(list.get(i));
@@ -218,6 +219,7 @@ public class DesktopUtil {
         }
         return b.toString();
     }
+    //TODO How does it work with more than one executable file?
     /**
      * Allows to get the path to the executable file
      * @param java 

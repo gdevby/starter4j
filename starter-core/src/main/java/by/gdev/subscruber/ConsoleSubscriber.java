@@ -12,7 +12,7 @@ public class ConsoleSubscriber {
     public void message(String s) {
     	log.info(s);
     }
-    
+    //TODO sout?
     @Subscribe
     public void messageToSpeed(DownloaderStatus status) {
     	

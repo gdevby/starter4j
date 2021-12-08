@@ -11,10 +11,11 @@ import by.gdev.util.DesktopUtil;
 
 
 /**
- * This class is intended to describe information about the file that will be used in the configuration. The file information includes the following data:
+ * This class is intended to describe information about the file that will be used in the configuration.
  */
 @Data
 public class Metadata {
+	//TODO with Upper character you should start. First character of the sentence.
 	/**
 	 * hash sum of the file, using the SHA-1 hashing algorithm
 	 */
@@ -27,6 +28,7 @@ public class Metadata {
      * the path to the file
      */
     private String path;
+    //TODO ?
     private List<String> urls ;
     /**
      * relative path to the file, first check urls after relativeUrl
