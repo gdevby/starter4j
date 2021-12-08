@@ -7,6 +7,7 @@ import com.google.common.eventbus.EventBus;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
+//TODO REVIEW IN FUTURE
 public class JavaProcess {
 	private final List<String> commands;
     private final Process process;

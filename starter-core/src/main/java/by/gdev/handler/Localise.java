@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Localise {
 	
 	static Locale locale;
-	
+	//TODO CAN RETURN NULL?
 	public Locale getLocal(){
 		try {
 			Properties property = new Properties();

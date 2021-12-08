@@ -8,7 +8,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.eventbus.EventBus;
-
+/**
+ * TODO 
+ * 
+ * @author Robert Makrytski
+ *
+ */
 public class ProcessMonitor extends Thread {
 	 private final JavaProcess process;
 	 private EventBus listener;
@@ -37,10 +42,12 @@ public class ProcessMonitor extends Thread {
 	                try {
 	                    buf.close();
 	                } catch (IOException ex) {
+	                	//???
 	                    Logger.getLogger(ProcessMonitor.class.getName()).log(Level.SEVERE, null, ex);
 	                }
 	            }
 	        }
+	        //TODO ???
 	        if (Objects.nonNull(listener))
 	            listener.post(this.process);
 	    }

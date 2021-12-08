@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
-			<version>5.11.2</version>
+			<version>5.11.2</version> is done
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -132,6 +132,7 @@
 					<serverPort>1080</serverPort>
 					<logLevel>INFO</logLevel>
 				</configuration>
+				<!-- TODO SWITCH OFF -->
 				<executions>
 					<execution>
 						<id>process-test-classes</id>
