@@ -15,27 +15,28 @@ import by.gdev.util.DesktopUtil;
  */
 @Data
 public class Metadata {
-	//TODO with Upper character you should start. First character of the sentence.
 	/**
-	 * hash sum of the file, using the SHA-1 hashing algorithm
+	 * Hash sum of the file, using the SHA-1 hashing algorithm
 	 */
     private String sha1;
 	/**
-	 * file size
+	 * File size
 	 */
     private long size;
     /**
-     * the path to the file
+     * The path to the file
      */
     private String path;
-    //TODO ?
+    /**
+     * List of URLs for which the file is available
+     */
     private List<String> urls ;
     /**
-     * relative path to the file, first check urls after relativeUrl
+     * Relative path to the file, first check urls after relativeUrl
      */
     private String relativeUrl; 
     /**
-     * If executable=true?, this file is executable/
+     * If executable=true, this file is executable.
      */
     private boolean executable;
 

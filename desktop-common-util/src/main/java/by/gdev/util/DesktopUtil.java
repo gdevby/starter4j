@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
@@ -18,7 +17,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
@@ -164,20 +162,20 @@ public class DesktopUtil {
 		}
 	}
 	public static int numberOfAttempts(List <String>list, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
-		//TODO can we use for(String url:list)
-		for (int i = 0; i < list.size();) {
+		int attempt = 1;
+		for (int i = 0; i < list.size(); i++) {
 			try {
 				HttpHead http = new HttpHead(list.get(i));
 				http.setConfig(requestConfig);
 				httpclient.execute(http);
-				return maxAttepmts;
+				attempt =  maxAttepmts;
 			} catch (IOException e) {
 				 i++;
 				 if (i == list.size())
-					 return 1;
+					 attempt = 1;
 			}
 		}
-		return 0;
+		return attempt;
 	}
 	
     private static void createDirectory(File file) throws IOException {

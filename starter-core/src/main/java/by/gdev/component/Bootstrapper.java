@@ -126,9 +126,9 @@ public class Bootstrapper {
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(resources);
-//		list.add(dependencis);
-//		list.add(fileRepo);
-//		list.add(java);
+		list.add(dependencis);
+		list.add(fileRepo);
+		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		AccesHandler accesHandler = new AccesHandler();
 		for (Repo repo : list) {
@@ -137,7 +137,7 @@ public class Bootstrapper {
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-//		downloader.startDownload(true);
+		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
     }
 

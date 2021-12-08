@@ -32,7 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DownloadedRunnableImpl implements Runnable {
 	//TODO ???
 	//TODO error with status. will be same
-	private volatile DownloaderStatusEnum status;
+	private DownloaderImpl impl;
+//	private volatile DownloaderStatusEnum status;
 	private Queue<DownloadElement> downloadElements;
 	private List<DownloadElement> processedElements;
 	private CloseableHttpClient httpclient;
@@ -41,12 +42,11 @@ public class DownloadedRunnableImpl implements Runnable {
 
 	@Override
 	public void run() {
-		
-		while (status.equals(DownloaderStatusEnum.WORK)) {
-			if (status.equals(DownloaderStatusEnum.CANCEL)) {
+		System.out.println(impl.getStatus());
+		while (impl.getStatus().equals(DownloaderStatusEnum.WORK)) {
+			if (impl.getStatus().equals(DownloaderStatusEnum.CANCEL)) {
 				break;
 			} else {
-				System.out.println(status);
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
 					try {
@@ -101,7 +101,7 @@ public class DownloadedRunnableImpl implements Runnable {
 						byte[] buffer = new byte[1024];
 						int curread = in.read(buffer);
 						while (curread != -1) {
-							if (status.equals(DownloaderStatusEnum.CANCEL)) {
+							if (impl.getStatus().equals(DownloaderStatusEnum.CANCEL)) {
 								break;
 							} else {
 								out.write(buffer, 0, curread);
