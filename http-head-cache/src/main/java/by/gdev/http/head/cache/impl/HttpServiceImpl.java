@@ -79,20 +79,20 @@ public class HttpServiceImpl implements HttpService {
 			}
 			return null;
 		}
-		//TODO without null pointer exception
+	
 	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
 		CloseableHttpResponse response = getResponse(httpUrl);
-		try {
-			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+		if (response.containsHeader(Headers.ETAG.getValue()))
 			request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
-			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue());
-		}catch (NullPointerException e) {
-			request.setContentLength("");
+		else
 			request.setETag("");
+		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
+			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
+		else
 			request.setLastModified("");
-		}
+			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
 		return request;
 	}
 	

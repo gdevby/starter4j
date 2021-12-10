@@ -77,7 +77,7 @@ public class DownloadTest {
           .withHeaders(
             new Header("Content-Type", "application/json; charset=utf-8"),
             new Header("Cache-Control", "public, max-age=86400"))
-          .withDelay(TimeUnit.SECONDS,2));
+          .withDelay(TimeUnit.SECONDS,1));
 		
 		
 		HttpConfig httpConfig = new HttpConfig();

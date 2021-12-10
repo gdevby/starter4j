@@ -161,19 +161,17 @@ public class DesktopUtil {
 			e.printStackTrace();
 		}
 	}
-	public static int numberOfAttempts(List <String>list, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
+	public static int numberOfAttempts(List <String>urls, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
 		int attempt = 1;
-		for (int i = 0; i < list.size(); i++) {
+		
+		for (String url : urls) {
 			try {
-				HttpHead http = new HttpHead(list.get(i));
+				HttpHead http = new HttpHead(url);
 				http.setConfig(requestConfig);
 				httpclient.execute(http);
-				attempt =  maxAttepmts;
-			} catch (IOException e) {
-				 i++;
-				 if (i == list.size())
-					 attempt = 1;
-			}
+				return  maxAttepmts;
+				
+			} catch (IOException e) {}
 		}
 		return attempt;
 	}
@@ -192,8 +190,7 @@ public class DesktopUtil {
             FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
             lock = ch.tryLock();
             if (Objects.isNull(lock)) {
-            	//TODO ?
-            	log.warn("");
+            	log.warn("Lock could not be acquired ");
                 System.exit(4);
             }
         }
@@ -217,7 +214,7 @@ public class DesktopUtil {
         }
         return b.toString();
     }
-    //TODO How does it work with more than one executable file?
+
     /**
      * Allows to get the path to the executable file
      * @param java 
@@ -226,9 +223,18 @@ public class DesktopUtil {
 	public static String getJavaRun(Repo java) {
 		String javaRun = null;
 		 for (Metadata s : java.getResources()) {
-			 if (s.isExecutable())
+			 if (s.isExecutable() && s.getPath().endsWith(appendBootstrapperJvm2(s.getPath())))
 				 javaRun = s.getPath();
 		 }
 		return javaRun;
+	}
+	
+	
+	private static String appendBootstrapperJvm2(String path) {
+		StringBuilder b = new StringBuilder();
+		if (OSInfo.getOSType() == OSInfo.OSType.MACOSX) {
+			b.append("Contents").append(File.separatorChar).append("Home").append(File.separatorChar);
+		}
+		return appendToJVM(new File(b.toString()).getPath());
 	}
 }

@@ -55,12 +55,15 @@ public class DownloaderImpl implements Downloader {
 	 * Shown status of the downloading
 	 */
 	private volatile DownloaderStatusEnum status;
-
+	private DownloadRunnableImpl runnable;
+	
+	
 	public DownloaderImpl(EventBus eventBus,CloseableHttpClient httpclient ,RequestConfig requestConfig) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
+		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig);
 	}
 
 	@Override
@@ -79,21 +82,21 @@ public class DownloaderImpl implements Downloader {
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
-			DownloadedRunnableImpl runnable = new DownloadedRunnableImpl(this,downloadElements, processedElements, httpclient, requestConfig);
+			runnable.setStatus(status);
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++) 
 				listThread.add(CompletableFuture.runAsync(runnable));
 			if (sync) {
-				synchronous(listThread);
+				waitThreadDone(listThread);
 			} else {
 				CompletableFuture.runAsync(() -> {
 					try {
-						synchronous(listThread);
+						waitThreadDone(listThread);
 					} catch (InterruptedException e) {
 						log.error("Error", e);
 					}
 				}).get();
-			}
+			}	
 		} else
 			throw new StatusExeption(status.toString());
 	}
@@ -101,8 +104,9 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
+		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
-
+	
 	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
@@ -113,8 +117,7 @@ public class DownloaderImpl implements Downloader {
 		return statusDownload;
 	}
 	
-	//TODO? ??? name
-	private void synchronous(List<CompletableFuture<Void>> listThread) throws InterruptedException {
+	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {

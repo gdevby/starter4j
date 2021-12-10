@@ -13,10 +13,12 @@ import com.google.gson.Gson;
 import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.GsonService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@inheritDoc}
  */
+@Slf4j
 @AllArgsConstructor
 public class GsonServiceImpl implements GsonService {
 	private Gson gson;
@@ -38,21 +40,14 @@ public class GsonServiceImpl implements GsonService {
 	  * {@inheritDoc}
 	  */
 	
-
 	@Override
 	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)	throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		//TODO improve
-		int size = urls.size();
 		Path pathFile = null;
-		for (int i = 0; i < urls.size(); i++) {
+		for (String url : urls) {
 			try {
-				pathFile = fileService.getRawObject(urls.get(i) + urn, cache);
+				pathFile = fileService.getRawObject(url + urn, cache);
 			} catch (IOException e) {
-				size--;
-				if (size == 0) {
-					//TODO ???
-					throw new IOException();
-				}
+				log.error("Error" , e);
 			}
 		}
 			try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {

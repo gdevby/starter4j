@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import by.gdev.http.head.cache.exeption.ThrowableExeption;
 import by.gdev.http.head.cache.model.Headers;
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
@@ -22,10 +21,10 @@ public class PostHandlerImpl implements PostHandler {
 			long sizeLocalFile = new File(element.getPathToDownload() + element.getMetadata().getPath()).length();
 			
 			if(sizeLocalFile != element.getMetadata().getSize()) 
-				element.setError(new ThrowableExeption("The size of the file is not equal: " + element.getMetadata().getPath()));
+				element.setError(new Throwable("The size of the file is not equal: " + element.getMetadata().getPath()));
 			
 			if (!shaLocalFile.equals(element.getMetadata().getSha1())) 
-				element.setError(new ThrowableExeption("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
+				element.setError(new Throwable("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
 		} catch (IOException | NoSuchAlgorithmException e) {
 			log.error("Erorr", e);
 		}

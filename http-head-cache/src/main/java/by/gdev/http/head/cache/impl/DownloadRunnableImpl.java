@@ -20,31 +20,33 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.http.head.cache.model.downloader.DownloadElement;
 import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@AllArgsConstructor
+@Data
 /**
  * This class implements the launch of file downloads by URI
  */
-
-public class DownloadedRunnableImpl implements Runnable {
-	//TODO ???
-	//TODO error with status. will be same
-	private DownloaderImpl impl;
-//	private volatile DownloaderStatusEnum status;
+public class DownloadRunnableImpl implements Runnable {
+	private volatile DownloaderStatusEnum status;
 	private Queue<DownloadElement> downloadElements;
 	private List<DownloadElement> processedElements;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 	private final int DEFAULT_MAX_ATTEMPTS = 3;
 
+	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements, CloseableHttpClient httpclient, RequestConfig requestConfig) {
+		this.downloadElements = downloadElements;
+		this.processedElements = processedElements;
+		this.httpclient = httpclient;
+		this.requestConfig = requestConfig;
+	}
+	
 	@Override
 	public void run() {
-		System.out.println(impl.getStatus());
-		while (impl.getStatus().equals(DownloaderStatusEnum.WORK)) {
-			if (impl.getStatus().equals(DownloaderStatusEnum.CANCEL)) {
+		while (status.equals(DownloaderStatusEnum.WORK)) {
+			if (status.equals(DownloaderStatusEnum.CANCEL)) {
 				break;
 			} else {
 				DownloadElement element = downloadElements.poll();
@@ -52,9 +54,6 @@ public class DownloadedRunnableImpl implements Runnable {
 					try {
 						download(element);
 						element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
-						//TODO in handlers
-//						if (Objects.nonNull(element.getError()))
-//							log.error(element.getError().toString());
 					} catch (InterruptedException | IOException e) {
 						log.error("Error", e);
 					}
@@ -101,7 +100,7 @@ public class DownloadedRunnableImpl implements Runnable {
 						byte[] buffer = new byte[1024];
 						int curread = in.read(buffer);
 						while (curread != -1) {
-							if (impl.getStatus().equals(DownloaderStatusEnum.CANCEL)) {
+							if (status.equals(DownloaderStatusEnum.CANCEL)) {
 								break;
 							} else {
 								out.write(buffer, 0, curread);

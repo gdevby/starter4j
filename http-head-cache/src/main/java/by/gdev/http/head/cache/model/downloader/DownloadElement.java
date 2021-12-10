@@ -6,7 +6,6 @@ package by.gdev.http.head.cache.model.downloader;
 import java.time.LocalTime;
 import java.util.List;
 
-import by.gdev.http.head.cache.exeption.ThrowableExeption;
 import by.gdev.http.head.cache.handler.PostHandler;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;

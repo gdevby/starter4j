@@ -5,7 +5,9 @@ import java.util.List;
 import com.google.common.eventbus.EventBus;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@Data
 @AllArgsConstructor
 //TODO REVIEW IN FUTURE
 public class JavaProcess {
