@@ -1,8 +1,10 @@
 package by.gdev.model;
 
-
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -19,7 +21,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//TODO STARTER AND APP CONFIG
 public class StarterAppConfig{
 	private static final String APP_CONFIG = "/appConfig.json";
 	
@@ -59,11 +60,14 @@ public class StarterAppConfig{
 	}
 	
 	public String workDir(String workDirectory) throws IOException {
-		Properties property = new Properties();
-		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		 InputStream inputStream = classloader.getResourceAsStream("installer.properties");
-		 property.load(inputStream);
-		 String dir = property.getProperty("work.dir");
+		Path installer = Paths.get("installer.properties");
+		String dir = "";
+		if (new File(installer.toAbsolutePath().toString()).exists()) {
+			Properties property = new Properties();
+			 FileInputStream fis = new FileInputStream(String.valueOf(installer.toAbsolutePath()));
+			 property.load(fis);
+			 dir = property.getProperty("work.dir");
+		}
 		 if (!workDirectory.equals(""))
 			 return workDirectory;
 		 else if (!dir.equals(""))

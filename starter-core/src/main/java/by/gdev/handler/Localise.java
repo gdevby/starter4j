@@ -3,9 +3,7 @@ package by.gdev.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Properties;
-
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Localise {
 	
 	static Locale locale;
-	//TODO CAN RETURN NULL?
+
 	public Locale getLocal(){
 		try {
 			Properties property = new Properties();
@@ -24,13 +22,13 @@ public class Localise {
 			String[] parts = language.split(",");
 			for (String string : parts) {
 				if (string.equals(Locale.getDefault().toString())) {
-					return locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
+					locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
 				}else {
-					return locale = new Locale.Builder().setLanguage("en").build();
+					locale = new Locale.Builder().setLanguage("en").build();
 				}
 			}
 		} catch (IOException e) {
-			log.error(e.getMessage(), e);
+			log.error("Error", e);
 		}
 		return locale;
 	}

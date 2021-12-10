@@ -22,16 +22,16 @@ import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FileCacheServiceImpl implements FileCacheService {
-	//TODO remove
-	/**
-	 * {@inheritDoc}
-	 */
 	private HttpService httpService;
 	private Gson gson;
-	
 	private Charset charset;
-	//TODO TODO describe some variables
+	/**
+	 * Directory for storing files and metadata files downloaded from the server
+	 */
 	private Path directory;
+	/**
+	 * The time that the file is up-to-date
+	 */
 	private int timeToLife;
 
 	 /**

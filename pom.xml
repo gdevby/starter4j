@@ -12,7 +12,6 @@
     <modules>
         <module>starter-core</module>
         <module>desktop-common-util</module>
-        <module>examples</module>
         <module>config-generator</module>
         <module>http-head-cache</module>
         <module>desktop-common-util-additional</module>

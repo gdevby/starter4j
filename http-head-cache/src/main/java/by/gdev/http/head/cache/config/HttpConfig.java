@@ -10,11 +10,9 @@ import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.Args;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Data
 public class HttpConfig {
 	//TODO check how it works
 	//В результате мы должны убедиться что это работает и не создает новые соединения 

@@ -3,7 +3,7 @@ package by.gdev.subscruber;
 import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
-import by.gdev.process.JavaProcess;
+import by.gdev.model.StatusModel;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,7 +19,10 @@ public class ConsoleSubscriber {
     }
     
     @Subscribe
-    private void onJavaProcessEnded(JavaProcess process) {
-    	log.info(String.valueOf(process));
+    private void test(StatusModel status) {
+    	if (status.getLine().equals("starter can be closed"))
+    		System.exit(0);
+    	else
+			log.info(String.valueOf(status.getProcess()));
 	}
 }

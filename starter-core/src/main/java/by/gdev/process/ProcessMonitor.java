@@ -4,16 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.google.common.eventbus.EventBus;
+
+import by.gdev.model.StatusModel;
+import lombok.extern.slf4j.Slf4j;
 /**
- * TODO 
- * 
+ * This class allows you to monitor the state of the application.
  * @author Robert Makrytski
  *
  */
+@Slf4j
 public class ProcessMonitor extends Thread {
 	 private final JavaProcess process;
 	 private EventBus listener;
@@ -29,26 +30,29 @@ public class ProcessMonitor extends Thread {
 	        InputStreamReader reader = new InputStreamReader(raw.getInputStream());
 	        BufferedReader buf = new BufferedReader(reader);
 	        String line;
+	        StatusModel status = new StatusModel();
 	        while (this.process.isRunning()) {
 	            try {
-	                while ((line = buf.readLine()) != null) {
-	                    if (listener != null) {
-	                    	listener.post(line);
-	                    	listener.post(process);
-	                    }
+	                while (Objects.nonNull(line = buf.readLine())) {
+//	                    	listener.post(line);
+//	                    	listener.post(process);
+	                	status.setLine(line);
+	                	status.setProcess(process);
+	                	listener.post(status);
 	                }
-	            } catch (Throwable ex) {
+	            } catch (IOException t) {
+	            	log.error("Error Stream", t);
 	            } finally {
 	                try {
 	                    buf.close();
-	                } catch (IOException ex) {
-	                	//???
-	                    Logger.getLogger(ProcessMonitor.class.getName()).log(Level.SEVERE, null, ex);
+	                } catch (IOException e) {
+	                    log.error("Error", e);
 	                }
 	            }
 	        }
-	        //TODO ???
-	        if (Objects.nonNull(listener))
-	            listener.post(this.process);
+	        
+	        listener.post(status);
+	        
+	        
 	    }
 }

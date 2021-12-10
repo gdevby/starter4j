@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
  * So we can implement upper abstraction with system.out messages!
  */
 @Slf4j
-public class Bootstrapper {
+public class Starter {
 	private EventBus eventBus;
 	private StarterAppConfig starterConfig;
 	private OSType osType;
@@ -57,7 +57,7 @@ public class Bootstrapper {
 	private AppConfig all;
 	private Repo java;
 	
-    public Bootstrapper(EventBus eventBus, StarterAppConfig starterConfig) {
+    public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
 		this.starterConfig = starterConfig;
 	}
@@ -68,7 +68,6 @@ public class Bootstrapper {
     public void collectOSInfo() {
     	osType = OSInfo.getOSType();
     	osArc = OSInfo.getJavaBit();
-//        log.info("call method {}", "collectOSInfo");
     }
 
     //TODO aleksandr to delete
@@ -82,7 +81,7 @@ public class Bootstrapper {
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize()));
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(), new File(starterConfig.workDir(starterConfig.getWorkDirectory()))));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory())));
 		validateEnvironment.add(new ValidateTempNull());
 		validateEnvironment.add(new ValidateTempDir());
@@ -137,8 +136,10 @@ public class Bootstrapper {
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(true);
+//		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
+		
+		
     }
 
     /**

@@ -5,14 +5,7 @@
         <encoder>
             <pattern>%d{HH:mm:ss} %logger{15} %-5level - %msg%n</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>TRACE</level>
-            <onMatch>DENY</onMatch>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>DEBUG</level>
-            <onMatch>DENY</onMatch>
-        </filter>
+      
     </appender>
     <appender name="FILE_TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
