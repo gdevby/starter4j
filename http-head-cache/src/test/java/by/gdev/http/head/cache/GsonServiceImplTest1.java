@@ -26,7 +26,7 @@ import org.mockserver.model.HttpResponse;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.config.HttpConfig;
+import by.gdev.http.head.cache.config.HttpClientConfig;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
 import by.gdev.http.head.cache.impl.HttpServiceImpl;
@@ -34,9 +34,7 @@ import by.gdev.http.head.cache.model.MyTestType;
 import by.gdev.http.head.cache.service.FileCacheService;
 import by.gdev.http.head.cache.service.GsonService;
 import by.gdev.http.head.cache.service.HttpService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class GsonServiceImplTest1 {
 	static GsonService gsonService;
 	static HttpService httpService;
@@ -63,12 +61,11 @@ public class GsonServiceImplTest1 {
 	                    .withBody("{ message: 'incorrect username and password combination' }")
 	                    .withDelay(TimeUnit.SECONDS,10));
 		Gson gson = new Gson();
-		HttpConfig httpConfig = new HttpConfig();
+		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
-		HttpService httpService = new HttpServiceImpl(null ,httpConfig.httpClient(), requestConfig, 3);
+		HttpService httpService = new HttpServiceImpl(null ,httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
 		gsonService = new GsonServiceImpl(gson, fileService);
-
 	}
 
 	@After

@@ -2,6 +2,7 @@ package by.gdev.component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
-import by.gdev.http.head.cache.config.HttpConfig;
+import by.gdev.http.head.cache.config.HttpClientConfig;
 import by.gdev.http.head.cache.handler.AccesHandler;
 import by.gdev.http.head.cache.handler.PostHandlerImpl;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
@@ -104,16 +105,13 @@ public class Starter {
     public void prepareResources() throws Exception {
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
-		HttpConfig httpConfig = new HttpConfig();
+		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
-		List <String> uriForConnect = new ArrayList<String>();
-		uriForConnect.add("http://www.google.com");
-		uriForConnect.add("http://www.baidu.com");
-		int maxAttepmts = DesktopUtil.numberOfAttempts(uriForConnect, 4, requestConfig, httpConfig.httpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), requestConfig, maxAttepmts);
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, Paths.get("target"), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
-		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), requestConfig);
+		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
 		Repo fileRepo = all.getAppFileRepo();
@@ -136,10 +134,8 @@ public class Starter {
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-//		downloader.startDownload(true);
+		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
-		
-		
     }
 
     /**
@@ -151,9 +147,10 @@ public class Starter {
 		String jre = DesktopUtil.getJavaRun(java);
 		JavaProcessHelper javaProcess = new JavaProcessHelper(jre, new File(starterConfig.getWorkDirectory()), eventBus);
 		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getWorkDirectory())));
+		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
-//		javaProcess.start();
+		javaProcess.start();
     }
 
 }

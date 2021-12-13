@@ -123,6 +123,7 @@
 		</profile>
 	</profiles>
 	<build>
+	 <pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.mock-server</groupId>
@@ -132,7 +133,6 @@
 					<serverPort>1080</serverPort>
 					<logLevel>INFO</logLevel>
 				</configuration>
-				<!-- TODO SWITCH OFF -->
 				<executions>
 					<execution>
 						<id>process-test-classes</id>
@@ -162,5 +162,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		 </pluginManagement>
 	</build>
 </project>
