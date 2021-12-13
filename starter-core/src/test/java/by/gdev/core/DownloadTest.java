@@ -25,7 +25,7 @@ import org.mockserver.model.HttpResponse;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.config.HttpConfig;
+import by.gdev.http.head.cache.config.HttpClientConfig;
 import by.gdev.http.head.cache.exeption.StatusExeption;
 import by.gdev.http.head.cache.handler.PostHandlerImpl;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
@@ -80,14 +80,14 @@ public class DownloadTest {
           .withDelay(TimeUnit.SECONDS,1));
 		
 		
-		HttpConfig httpConfig = new HttpConfig();
+		HttpClientConfig httpConfig = new HttpClientConfig();
 		EventBus eventBus = new EventBus();
 		eventBus.register(new ConsoleSubscriber());
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.httpClient(), requestConfig, 3);
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
 		gsonService = new GsonServiceImpl(gson, fileService);
-		downloader = new DownloaderImpl(eventBus, httpConfig.httpClient(), requestConfig);
+		downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 	}
 
 	@AfterClass

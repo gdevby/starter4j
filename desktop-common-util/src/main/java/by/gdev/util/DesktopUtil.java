@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
@@ -166,7 +166,7 @@ public class DesktopUtil {
 		
 		for (String url : urls) {
 			try {
-				HttpHead http = new HttpHead(url);
+				HttpGet http = new HttpGet(url);
 				http.setConfig(requestConfig);
 				httpclient.execute(http);
 				return  maxAttepmts;

@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -40,13 +42,17 @@ public class StarterAppConfig{
 			+ "This way we can install old versions of the application. For this you need set exactly version.")
 	private Double version;
 	
+	@Parameter(names = "-urlConnection", description = "List of sites for checking Internet connection access")
+	private List <String> urlConnection;
+	
 	public static final StarterAppConfig DEFAULT_CONFIG;
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500, 
 				"http://localhost:81/starter-app/1.0",
 				"target/test_folder/testContainer/",
-				null);
+				null, Arrays.asList("http://www.google.com","http://www.baidu.com"));
 	}
+	
 	
 	public String getServerFileConifg(StarterAppConfig config) {
 		if (Objects.isNull(config.getVersion()))
