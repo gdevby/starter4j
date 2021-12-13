@@ -7,9 +7,9 @@ import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-public class HttpConfig {
+public class HttpClientConfig {
 
-	public CloseableHttpClient httpClient() {
+	public CloseableHttpClient getInstanceHttpClient() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setDefaultMaxPerRoute(1);
 		cm.setMaxTotal(20);
