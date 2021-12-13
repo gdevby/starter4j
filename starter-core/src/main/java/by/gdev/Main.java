@@ -16,11 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	//Can get encoding from args and it is too java.net.preferIPv4Stack
+	
+	//TODO used default encoding
 	public static Charset charset = StandardCharsets.UTF_8;
 
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
+		//TODO Can get encoding from args and it is too java.net.preferIPv4Stack
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		eventBus.register(new ConsoleSubscriber());
