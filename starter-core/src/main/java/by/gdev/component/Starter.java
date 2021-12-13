@@ -136,10 +136,8 @@ public class Starter {
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-//		downloader.startDownload(true);
+		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
-		
-		
     }
 
     /**
@@ -153,7 +151,7 @@ public class Starter {
 		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getWorkDirectory())));
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
-//		javaProcess.start();
+		javaProcess.start();
     }
 
 }
