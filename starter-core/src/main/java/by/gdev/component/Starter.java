@@ -107,6 +107,7 @@ public class Starter {
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
 		List <String> uriForConnect = new ArrayList<String>();
+		//TODO get from arguemnts
 		uriForConnect.add("http://www.google.com");
 		uriForConnect.add("http://www.baidu.com");
 		int maxAttepmts = DesktopUtil.numberOfAttempts(uriForConnect, 4, requestConfig, httpConfig.getInstanceHttpClient());
