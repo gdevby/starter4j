@@ -121,7 +121,6 @@ public class HttpServiceImpl implements HttpService {
 					out.write(buffer, 0, curread);
 					curread = in.read(buffer);
 				}
-				Files.move(Paths.get(temp.toString()), path, StandardCopyOption.REPLACE_EXISTING);
 				try {
 					request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
 					request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
@@ -136,6 +135,7 @@ public class HttpServiceImpl implements HttpService {
 				IOUtils.closeQuietly(in);
 				IOUtils.closeQuietly(out);
 			}
+			Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
 			return request;
 	}
 	
