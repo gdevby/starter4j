@@ -34,8 +34,6 @@ public class ProcessMonitor extends Thread {
 	        while (this.process.isRunning()) {
 	            try {
 	                while (Objects.nonNull(line = buf.readLine())) {
-//	                    	listener.post(line);
-//	                    	listener.post(process);
 	                	status.setLine(line);
 	                	status.setProcess(process);
 	                	listener.post(status);
@@ -50,9 +48,5 @@ public class ProcessMonitor extends Thread {
 	                }
 	            }
 	        }
-	        
-	        listener.post(status);
-	        
-	        
 	    }
 }

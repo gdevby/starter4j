@@ -47,7 +47,7 @@ public class AppConfigModel{
     	DEFAULT_APP_CONFIG_MODEL = new AppConfigModel(
     			"starter-app",
     			1.0, 
-    			"by.gdev.app.Main", 
+    			"desktop.starter.app.Main", 
     			Arrays.asList("",""),
     			Arrays.asList("-Xmx512m","-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true"),
     			"starter-app-1.0.jar", 
@@ -56,7 +56,7 @@ public class AppConfigModel{
     			"../../starter-app/src/main/resources", 
     			"../../starter-app/example-compiled-app/target/dependencies", 
     			"../../starter-app/example-compiled-app/target", 
-    			Arrays.asList("http://localhost:81/"),
+    			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
     			false, 
     			false);
     }

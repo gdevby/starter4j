@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -111,7 +112,10 @@ public class DownloaderImpl implements Downloader {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
 		for (DownloadElement d : processedElements) {
-			sum += d.getDownloadBytes();
+			double speed = d.getDownloadBytes();
+			if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
+				speed = 5.0;
+			sum += speed;
 		}
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
@@ -124,8 +128,6 @@ public class DownloaderImpl implements Downloader {
 			workedAnyThread = false;
 			Thread.sleep(50);
 			workedAnyThread = listThread.stream().allMatch(e -> !e.isDone());
-			if (!workedAnyThread)
-				status = DownloaderStatusEnum.DONE;
 			LocalTime now = LocalTime.now();
 			if (now.getSecond() == start.getSecond() + 1) {
 				eventBus.post(averageSpeed());

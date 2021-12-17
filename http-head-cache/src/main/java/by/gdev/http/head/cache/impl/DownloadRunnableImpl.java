@@ -79,8 +79,7 @@ public class DownloadRunnableImpl implements Runnable {
 					BufferedOutputStream out = null;
 					boolean resume = false;
 					LocalTime startTime = LocalTime.now();
-					HttpGet httpGet = new HttpGet(
-							element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
+					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
 					try {
 						element.setStart(startTime);
 						if (!file.getParentFile().exists())

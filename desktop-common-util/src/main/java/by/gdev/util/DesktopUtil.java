@@ -223,8 +223,10 @@ public class DesktopUtil {
 	public static String getJavaRun(Repo java) {
 		String javaRun = null;
 		 for (Metadata s : java.getResources()) {
-			 if (s.isExecutable() && s.getPath().endsWith(appendBootstrapperJvm2(s.getPath())))
+//			 if (s.isExecutable() && s.getPath().endsWith(appendBootstrapperJvm2(s.getPath()))) {
+			 if (s.isExecutable()) {
 				 javaRun = s.getPath();
+			 }
 		 }
 		return javaRun;
 	}
