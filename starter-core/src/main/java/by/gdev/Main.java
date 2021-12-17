@@ -20,7 +20,6 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
-		//TODO Can get encoding from args and it is too java.net.preferIPv4Stack
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		eventBus.register(new ConsoleSubscriber());

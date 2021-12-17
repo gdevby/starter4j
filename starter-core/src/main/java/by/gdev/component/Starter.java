@@ -2,6 +2,7 @@ package by.gdev.component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,6 +103,9 @@ public class Starter {
      * after this we need revalidate again
      */
     public void prepareResources() throws Exception {
+    	log.info("Start loading");
+    	log.info(String.valueOf(osType));
+    	log.info(String.valueOf(osArc));
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
@@ -121,9 +125,9 @@ public class Starter {
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);	
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
-		list.add(resources);
-		list.add(dependencis);
 		list.add(fileRepo);
+		list.add(dependencis);
+		list.add(resources);
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		AccesHandler accesHandler = new AccesHandler();
@@ -135,6 +139,7 @@ public class Starter {
 		}
 		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
+		log.info("loading is complete");
     }
 
     /**
@@ -143,8 +148,9 @@ public class Starter {
      * @throws IOException 
      */
     public void runApp() throws IOException {
-		String jre = DesktopUtil.getJavaRun(java);
-		JavaProcessHelper javaProcess = new JavaProcessHelper(jre, new File(starterConfig.getWorkDirectory()), eventBus);
+    	log.info("Start application");
+    	Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
+		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(starterConfig.getWorkDirectory()), eventBus);
 		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getWorkDirectory())));
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);

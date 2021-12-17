@@ -11,7 +11,7 @@ public class HttpClientConfig {
 
 	public CloseableHttpClient getInstanceHttpClient() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-		cm.setDefaultMaxPerRoute(1);
+		cm.setDefaultMaxPerRoute(5);
 		cm.setMaxTotal(20);
 		CloseableHttpClient builder = HttpClients.custom()
 				.setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE).setConnectionManager(cm)
