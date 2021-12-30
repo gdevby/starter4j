@@ -109,7 +109,7 @@ public class Starter {
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();//поменять на 60 секунд
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig, httpConfig.getInstanceHttpClient());
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, Paths.get("target"), 600000);
@@ -137,7 +137,7 @@ public class Starter {
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(true);
+		downloader.startDownload(false);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
     }

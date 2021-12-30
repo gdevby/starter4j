@@ -6,12 +6,12 @@ package by.gdev.http.head.cache.impl;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
-
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -111,12 +111,13 @@ public class DownloaderImpl implements Downloader {
 	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
-		for (DownloadElement d : processedElements) {
-			double speed = d.getDownloadBytes();
-			if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
-				speed = 5.0;
-			sum += speed;
-		}
+		Iterator<DownloadElement> iterator = processedElements.iterator();
+		 while(iterator.hasNext()) {
+			 double speed = iterator.next().getDownloadBytes();
+				if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
+					speed = 5.0;
+				sum += speed;
+		 }
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}

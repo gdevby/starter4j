@@ -13,10 +13,8 @@ import java.util.stream.Collectors;
 import com.google.common.eventbus.EventBus;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
-@Slf4j
 public class JavaProcessHelper {
 	private final String jvmPath;
 	private final List<String> commands;
