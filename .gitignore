@@ -17,3 +17,4 @@ tempAppConfig.json
 **/.classpath
 **/.project
 **/.settings
+/install.sh

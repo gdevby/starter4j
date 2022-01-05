@@ -71,7 +71,7 @@ public class JavaProcessHelper {
         for (String c : list)
             this.commands.add(c);
     }
-    
+    //Имя jar берем из конфтга
     public List<Path> librariesForRunning(Path p) throws IOException{
     	return Files.walk(p, 2).filter(e -> !e.equals(p) && String.valueOf(e).endsWith(".jar")).map(e -> e.toAbsolutePath()).collect(Collectors.toList());
     }

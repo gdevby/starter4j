@@ -6,8 +6,8 @@ package by.gdev.http.head.cache.impl;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -57,7 +57,8 @@ public class DownloaderImpl implements Downloader {
 	 */
 	private volatile DownloaderStatusEnum status;
 	private DownloadRunnableImpl runnable;
-	
+	private volatile Integer allCountElement;
+	private volatile long fullDownloadSize;
 	
 	public DownloaderImpl(EventBus eventBus,CloseableHttpClient httpclient ,RequestConfig requestConfig) {
 		this.eventBus = eventBus;
@@ -69,14 +70,17 @@ public class DownloaderImpl implements Downloader {
 
 	@Override
 	public void addContainer(DownloaderContainer container) {
-		container.getRepo().getResources().forEach(metadata -> {
-			DownloadElement element = new DownloadElement();
-			element.setPathToDownload(container.getDestinationRepositories());
-			element.setHandlers(container.getHandlers());
-			element.setMetadata(metadata);
-			element.setRepo(container.getRepo());
-			downloadElements.add(element);
-		});
+		if (Objects.nonNull(container.getRepo().getResources())) {
+			container.getRepo().getResources().forEach(metadata -> {
+				DownloadElement element = new DownloadElement();
+				element.setMetadata(metadata);
+				element.setRepo(container.getRepo());
+				element.setPathToDownload(container.getDestinationRepositories());
+				element.setHandlers(container.getHandlers());
+				downloadElements.add(element);
+			});
+		}
+		fullDownloadSize = totalSize(downloadElements);
 	}
 
 	@Override
@@ -84,6 +88,7 @@ public class DownloaderImpl implements Downloader {
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
+			allCountElement = downloadElements.size();
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++) 
 				listThread.add(CompletableFuture.runAsync(runnable));
@@ -107,17 +112,24 @@ public class DownloaderImpl implements Downloader {
 		status = DownloaderStatusEnum.CANCEL;
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
-	
+
 	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
-		Iterator<DownloadElement> iterator = processedElements.iterator();
-		 while(iterator.hasNext()) {
-			 double speed = iterator.next().getDownloadBytes();
-				if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
-					speed = 5.0;
-				sum += speed;
-		 }
+		long down = 0;
+		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
+	     for (DownloadElement elem : list) {
+		    	 double speed = elem.getSpeed();
+		    	 if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
+		    		 speed = 5.0;
+		    	 sum += speed;
+		    	 down += elem.getDownloadBytes();
+		    	 statusDownload.setDownloadSize(down);
+	     }
+	    
+	    statusDownload.setAllDownloadSize(fullDownloadSize);
+	    statusDownload.setLeftFiles(processedElements.size());
+		statusDownload.setAllFiles(allCountElement);
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}
@@ -128,12 +140,26 @@ public class DownloaderImpl implements Downloader {
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
-			workedAnyThread = listThread.stream().allMatch(e -> !e.isDone());
-			LocalTime now = LocalTime.now();
-			if (now.getSecond() == start.getSecond() + 1) {
-				eventBus.post(averageSpeed());
-				start = now;
+			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());
+			if (start.isBefore(LocalTime.now())) {
+				start = start.plusSeconds(3);
+				if (allCountElement != 0) {
+					log.info(start.toString());
+					eventBus.post(averageSpeed());
+				}
 			}
 		}
+	}
+	
+	private long totalSize(Queue<DownloadElement> downloadElements) {
+		List<Long> sizeList = new ArrayList<Long>();
+		downloadElements.forEach(size->{
+			sizeList.add(size.getMetadata().getSize());
+		});
+		long sum = 0;
+		for (long l : sizeList) {
+			sum +=l;
+		}
+		return sum;
 	}
 }

@@ -15,7 +15,8 @@ public class ConsoleSubscriber {
 
     @Subscribe
     public void messageToSpeed(DownloaderStatus status) {
-    	log.info("download speed: " + String.format("%.2f", status.getSpeed()) + "KB/m");
+    	log.info("download speed {} KB/m, upload file: {}, from {}",String.format("%.2f", status.getSpeed()),status.getLeftFiles(), status.getAllFiles());
+    	log.info("Uploaded {} KB from {} KB", status.getDownloadSize(), status.getAllDownloadSize());
     }
     
     @Subscribe
