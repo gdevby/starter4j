@@ -28,6 +28,14 @@ public class DownloaderStatus {
 	 * Speed in KB
 	 */
 	private double speed;
+	/**
+	 * Summary download traffic for every resources
+	 */
+	private long downloadSize;
+	/**
+	 * Summary download traffic.
+	 */
+	private long allDownloadSize;
 	private Integer leftFiles;
 	private Integer allFiles;
 	private List<Throwable> throwables;

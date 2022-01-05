@@ -92,7 +92,10 @@ public class HttpServiceImpl implements HttpService {
 			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
 		else
 			request.setLastModified("");
+		if(response.containsHeader(Headers.CONTENTLENGTH.getValue()))
 			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+		else
+			request.setContentLength("");
 		return request;
 	}
 	
@@ -121,15 +124,18 @@ public class HttpServiceImpl implements HttpService {
 					out.write(buffer, 0, curread);
 					curread = in.read(buffer);
 				}
-				try {
-					request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+				if (response.containsHeader(Headers.ETAG.getValue()))
 					request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
-					request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue());
-				}catch (NullPointerException e) {
-					request.setContentLength("");
+				else
 					request.setETag("");
+				if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
+					request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
+				else
 					request.setLastModified("");
-				}
+				if(response.containsHeader(Headers.CONTENTLENGTH.getValue()))
+					request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
+				else
+					request.setContentLength("");
 			} finally {
 				httpGet.abort();
 				IOUtils.closeQuietly(in);

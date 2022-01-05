@@ -132,12 +132,12 @@ public class Starter {
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		AccesHandler accesHandler = new AccesHandler();
 		for (Repo repo : list) {
+			container.filterNotExistResoursesAndSetRepo(repo, starterConfig.getWorkDirectory());
 			container.setDestinationRepositories(starterConfig.getWorkDirectory());
-			container.setRepo(repo);
 			container.setHandlers(Arrays.asList(postHandler, accesHandler));
 			downloader.addContainer(container);
 		}
-		downloader.startDownload(false);
+		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
     }
