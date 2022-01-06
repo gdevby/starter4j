@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.eventbus.EventBus;
 
+import by.gdev.util.model.download.Repo;
 import lombok.Data;
 
 @Data
@@ -71,8 +73,15 @@ public class JavaProcessHelper {
         for (String c : list)
             this.commands.add(c);
     }
-    //Имя jar берем из конфтга
-    public List<Path> librariesForRunning(Path p) throws IOException{
-    	return Files.walk(p, 2).filter(e -> !e.equals(p) && String.valueOf(e).endsWith(".jar")).map(e -> e.toAbsolutePath()).collect(Collectors.toList());
+    
+    public List<Path> librariesForRunning(String workDirectory, Repo fileRepo, Repo dependencis) {
+    	List<Path> list = new ArrayList<Path>();
+    	dependencis.getResources().forEach(dep->{
+    		list.add(Paths.get(workDirectory, dep.getPath()).toAbsolutePath());
+    	});
+    	fileRepo.getResources().forEach(core->{
+    		list.add(Paths.get(workDirectory, core.getPath()).toAbsolutePath());
+    	});
+    	return list;
     }
 }

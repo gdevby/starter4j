@@ -57,6 +57,8 @@ public class Starter {
 	private Arch osArc;
 	private AppConfig all;
 	private Repo java;
+	private Repo fileRepo;
+	private Repo dependencis;
 	
     public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
@@ -109,7 +111,7 @@ public class Starter {
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();//поменять на 60 секунд
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig, httpConfig.getInstanceHttpClient());
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, Paths.get("target"), 600000);
@@ -117,8 +119,8 @@ public class Starter {
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
-		Repo fileRepo = all.getAppFileRepo();
-		Repo dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		fileRepo = all.getAppFileRepo();
+		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
@@ -151,7 +153,7 @@ public class Starter {
     	log.info("Start application");
     	Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(starterConfig.getWorkDirectory()), eventBus);
-		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(Paths.get(starterConfig.getWorkDirectory())));
+		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
