@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * This class implements the launch of file downloads by URI
  */
+
 public class DownloadRunnableImpl implements Runnable {
 	private volatile DownloaderStatusEnum status;
 	private Queue<DownloadElement> downloadElements;
@@ -76,20 +76,20 @@ public class DownloadRunnableImpl implements Runnable {
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
-			for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
+			int attempts = 1;
+			for (int attempt = 0; attempt < attempts; attempt++) {
 				try {
 					BufferedInputStream in = null;
 					BufferedOutputStream out = null;
 					boolean resume = false;
-					LocalTime startTime = LocalTime.now();
+					LocalTime startTime = LocalTime.now();			
 					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) 
 							+ URLEncoder.encode(element.getMetadata().getRelativeUrl(), StandardCharsets.UTF_8.name()));
 					log.trace(String.valueOf(httpGet));
 					try {
 						element.setStart(startTime);
-						if (!file.getParentFile().exists()) {
+						if (!file.getParentFile().exists())
 							file.getParentFile().mkdirs();
-						}
 						if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
 								&& file.length() != element.getMetadata().getSize()) {
 							httpGet.addHeader("Range",
@@ -115,9 +115,6 @@ public class DownloadRunnableImpl implements Runnable {
 						log.trace("downloaded file: "+httpGet.getURI() + " -> " + file);
 						LocalTime endTime = LocalTime.now();
 						element.setEnd(endTime);
-						long thirty = Duration.between(startTime, endTime).getNano();
-						double speed = (element.getDownloadBytes() / 1024) / (thirty / 60000000);
-						element.setSpeed(speed);
 						processedElements.add(element);
 					} finally {
 						httpGet.abort();
@@ -125,10 +122,10 @@ public class DownloadRunnableImpl implements Runnable {
 						in.close();
 					}
 				} catch (SocketTimeoutException e) {
-					if (attempt == DEFAULT_MAX_ATTEMPTS)
+					if (attempts == DEFAULT_MAX_ATTEMPTS)
 						throw new SocketTimeoutException();
 					else
-						attempt++;
+						attempts++;
 				}
 			}	
 		}
