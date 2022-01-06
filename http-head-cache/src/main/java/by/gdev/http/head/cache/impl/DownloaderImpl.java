@@ -3,6 +3,7 @@
  */
 package by.gdev.http.head.cache.impl;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -116,17 +117,17 @@ public class DownloaderImpl implements Downloader {
 	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		double sum = 0;
-		long down = 0;
+		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
-	     for (DownloadElement elem : list) {
-		    	 double speed = elem.getSpeed();
-		    	 if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
-		    		 speed = 5.0;
-		    	 sum += speed;
-		    	 down += elem.getDownloadBytes();
-		    	 statusDownload.setDownloadSize(down);
+		for (DownloadElement elem : list) {
+			double thirty = Duration.between(elem.getStart(), elem.getEnd()).getNano();
+			double speed = (elem.getDownloadBytes() / 1024) / (thirty / 60000000);
+			if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
+	    		 speed = 5.0;
+		    sum += speed;
+		    downloadBytesNow += elem.getDownloadBytes();
+		    statusDownload.setDownloadSize(downloadBytesNow);
 	     }
-	    
 	    statusDownload.setAllDownloadSize(fullDownloadSize);
 	    statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);

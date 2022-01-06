@@ -56,8 +56,8 @@ public class AppConfigModel{
     			"../../starter-app/src/main/resources", 
     			"../../starter-app/example-compiled-app/target/dependencies", 
     			"../../starter-app/example-compiled-app/target", 
-//    			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
-    			Arrays.asList("http://127.0.0.1:81/"),
+    			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
+//    			Arrays.asList("http://127.0.0.1:81/"),
     			false, 
     			false);
     }

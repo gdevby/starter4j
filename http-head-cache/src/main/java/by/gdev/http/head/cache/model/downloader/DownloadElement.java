@@ -29,7 +29,7 @@ public class DownloadElement {
 	private LocalTime end;
 	private Repo repo;
 	private volatile long downloadBytes;
-	private volatile double speed;
+//	private volatile double speed;
 	private volatile Throwable error;
 
 }
