@@ -1,9 +1,12 @@
 package by.gdev.util;
 
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
@@ -18,6 +21,10 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
+import javax.swing.JFileChooser;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -28,15 +35,16 @@ import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Class utilities. Chagned mode fo the file for linux and mac {@link DesktopUtil#PERMISSIONS}
+ * Class utilities. Chagned mode fo the file for linux and mac
+ * {@link DesktopUtil#PERMISSIONS}
  * 
  * or merge and https://github.com/wille/oslib
  */
 
 @Slf4j
 public class DesktopUtil {
-	 private static final String PROTECTION = "protection.txt";
-	 private FileLock lock;
+	private static final String PROTECTION = "protection.txt";
+	private FileLock lock;
 	@SuppressWarnings("serial")
 	public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {
 		{
@@ -53,10 +61,10 @@ public class DesktopUtil {
 			add(PosixFilePermission.GROUP_EXECUTE);
 		}
 	};
+
 	/**
-	 * Defined default working directory + path.
-	 * Examples for WINDOWS C:\\Users\\user\\AppData\\Roaming\\MyAppName 
-	 * LINUX /home/user/MyAppName
+	 * Defined default working directory + path. Examples for WINDOWS
+	 * C:\\Users\\user\\AppData\\Roaming\\MyAppName LINUX /home/user/MyAppName
 	 * 
 	 * @param type {@link OSType}
 	 * @param path is MyAppName in description
@@ -83,9 +91,7 @@ public class DesktopUtil {
 		}
 		return file;
 	}
-	
-	
-	
+
 	public static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
 		byte[] b = createChecksum(file, algorithm);
 		StringBuilder result = new StringBuilder();
@@ -127,6 +133,7 @@ public class DesktopUtil {
 			b.append("w.exe");
 		return b.toString();
 	}
+
 	/**
 	 * Used to call without checked exception.
 	 * 
@@ -141,6 +148,7 @@ public class DesktopUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
 	/**
 	 * {@inheritDoc CheckedFunction}
 	 */
@@ -161,17 +169,20 @@ public class DesktopUtil {
 			e.printStackTrace();
 		}
 	}
-	public static int numberOfAttempts(List <String>urls, int maxAttepmts, RequestConfig requestConfig, CloseableHttpClient httpclient) {
+
+	public static int numberOfAttempts(List<String> urls, int maxAttepmts, RequestConfig requestConfig,
+			CloseableHttpClient httpclient) {
 		int attempt = 1;
-		
+
 		for (String url : urls) {
 			try {
 				HttpGet http = new HttpGet(url);
 				http.setConfig(requestConfig);
 				httpclient.execute(http);
-				return  maxAttepmts;
-				
-			} catch (IOException e) {}
+				return maxAttepmts;
+
+			} catch (IOException e) {
+			}
 		}
 		return attempt;
 	}
@@ -182,19 +193,6 @@ public class DesktopUtil {
         if (file.getParentFile() != null)
             file.getParentFile().mkdirs();
     }	
-	
-	public void activeDoubleDownloadingResourcesLock(String container) throws IOException {
-        File f = new File(container, PROTECTION);
-        createDirectory(f);
-        if (f.exists()) {
-            FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-            lock = ch.tryLock();
-            if (Objects.isNull(lock)) {
-            	log.warn("Lock could not be acquired ");
-                System.exit(4);
-            }
-        }
-    }
 	
 	public void diactivateDoubleDownloadingResourcesLock() throws IOException {
         if (Objects.nonNull(lock))
@@ -215,28 +213,81 @@ public class DesktopUtil {
         return b.toString();
     }
 
-    /**
-     * Allows to get the path to the executable file
-     * @param java 
-     * @return
-     */
+	public void activeDoubleDownloadingResourcesLock(String container) throws IOException {
+		File f = new File(container, PROTECTION);
+		createDirectory(f);
+		if (f.exists()) {
+			FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+			lock = ch.tryLock();
+			if (Objects.isNull(lock)) {
+				log.warn("Lock could not be acquired ");
+				System.exit(4);
+			}
+		}
+	}
+
+	/**
+	 * Allows to get the path to the executable file
+	 * 
+	 * @param java
+	 * @return
+	 */
 	public static String getJavaRun(Repo java) {
 		String javaRun = null;
-		 for (Metadata s : java.getResources()) {
+		for (Metadata s : java.getResources()) {
 //			 if (s.isExecutable() && s.getPath().endsWith(appendBootstrapperJvm2(s.getPath()))) {
-			 if (s.isExecutable()) {
-				 javaRun = s.getPath();
-			 }
-		 }
+			if (s.isExecutable()) {
+				javaRun = s.getPath();
+			}
+		}
 		return javaRun;
 	}
-	
-	
-	private static String appendBootstrapperJvm2(String path) {
+
+	public static String appendBootstrapperJvm2(String path) {
 		StringBuilder b = new StringBuilder();
 		if (OSInfo.getOSType() == OSInfo.OSType.MACOSX) {
 			b.append("Contents").append(File.separatorChar).append("Home").append(File.separatorChar);
 		}
 		return appendToJVM(new File(b.toString()).getPath());
+	}
+
+	/**
+	 * For JavaFX used Application.getHostServices().showDocument
+	 * 
+	 * @param type
+	 * @param uri
+	 * @param alertError
+	 */
+	public static void openLink(OSType type, String uri) {
+		try {
+			Desktop.getDesktop().browse(new URI(uri));
+		} catch (IOException | URISyntaxException e) {
+			log.warn("can't open link", e);
+			if (type.equals(OSType.LINUX))
+				try {
+					Runtime.getRuntime().exec("gnome-open " + uri);
+				} catch (IOException e1) {
+					log.warn("can't open link for linix", e);
+				}
+		}
+	}
+	/**
+	 * Some windows has problem with JFileChooser when you use look and feel
+	 */
+	public static void initLookAndFeel() {
+		LookAndFeel defaultLookAndFeel = null;
+		try {
+			defaultLookAndFeel = UIManager.getLookAndFeel();
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			new JFileChooser();
+		} catch (Throwable t) {
+			log.warn("problem with ", t);
+			if (Objects.nonNull(defaultLookAndFeel))
+				try {
+					UIManager.setLookAndFeel(defaultLookAndFeel);
+				} catch (Throwable e) {
+					log.warn("coudn't set defualt look and feel", e);
+				}
+		}
 	}
 }
