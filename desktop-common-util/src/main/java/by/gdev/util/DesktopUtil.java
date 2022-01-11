@@ -214,18 +214,6 @@ public class DesktopUtil {
         }
         return b.toString();
     }
-    
-//    public static String convertListToString(String del, List<Path> list) {
-//        StringBuilder b = new StringBuilder();
-//        for (Path string : list) {
-//            b.append(string).append(del);
-//        }
-//        return b.toString();
-//    }
-    
-    
-    
-    
 
     /**
      * Allows to get the path to the executable file

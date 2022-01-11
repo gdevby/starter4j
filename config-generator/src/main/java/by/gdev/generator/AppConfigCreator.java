@@ -1,9 +1,12 @@
 package by.gdev.generator;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -81,6 +84,7 @@ public class AppConfigCreator {
 	private Repo createRepo(Path jvms, Path folder, String str, AppConfigModel configFile) throws IOException {
 		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(DesktopUtil.wrap(e -> {
 			Path s = jvms.relativize(e);
+			String simvLink = "";
 			Metadata m = new Metadata();
 			if (s.endsWith("java") | s.endsWith("java.exe")) 
 				m.setExecutable(true);
@@ -90,6 +94,23 @@ public class AppConfigCreator {
 			if (Objects.nonNull(str))
 				s = Paths.get(str, s.toString());
 			m.setRelativeUrl(s.toString());
+			BasicFileAttributes attr = Files.readAttributes(e, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+			if (attr.isSymbolicLink()) {
+				File link = new File(Files.readSymbolicLink(e).toString());
+				System.out.println(e + " / " + e.toFile().getCanonicalFile().length());
+				if (link.getParent() == null) {
+					simvLink = Paths.get(s.getParent().toString(),link.toString()).toString();
+					m.setSha1("");
+					m.setSize(0);
+				}
+				else {
+					simvLink = Paths.get(s.getParent().getParent().toString(), link.getName()).toString();
+					m.setSha1("");
+					m.setSize(0);
+				}
+			}
+			m.setLink(simvLink.toString());
+			
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();
