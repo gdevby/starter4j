@@ -20,6 +20,7 @@ public class AppConfig {
     /**
      * Applications version
      */
+    //TODO use string and added special tool to find newer
     private double appVersion;
     /**
      * Main class of the launched application
