@@ -148,13 +148,15 @@ public class ProgressBarLauncher extends JFrame {
 		if (progressBar.isIndeterminate()) {
 			SwingUtilities.invokeLater(() -> {
 				progressBar.setIndeterminate(false);
-				uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"),
-						status.getDownloadSize() / (1024 * 1024), status.getAllDownloadSize() / (1024 * 1024),
-						resourceBundle.getString("mb")));
+				int uploaded = (int) status.getDownloadSize() / (1024 * 1024);
+				int allUpload = (int) status.getAllDownloadSize() / (1024 * 1024);
+				uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"), uploaded,
+						allUpload, resourceBundle.getString("mb")));
 				Dimension dim = uploadStatus.getPreferredSize();
 				uploadStatus.setBounds(getSize().width / 2 - dim.width / 2, heightProgressBar / 2 - dim.height / 2,
 						dim.width, dim.height);
-				progressBar.setValue((int) (status.getDownloadSize() / status.getAllDownloadSize()));
+				progressBar.setMaximum(allUpload);
+				progressBar.setValue(uploaded);
 
 			});
 		}
