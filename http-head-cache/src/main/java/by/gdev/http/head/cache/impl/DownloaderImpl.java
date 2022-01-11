@@ -128,6 +128,7 @@ public class DownloaderImpl implements Downloader {
 		    downloadBytesNow += elem.getDownloadBytes();
 		    statusDownload.setDownloadSize(downloadBytesNow);
 	     }
+		//TODO Where the status?
 	    statusDownload.setAllDownloadSize(fullDownloadSize);
 	    statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);

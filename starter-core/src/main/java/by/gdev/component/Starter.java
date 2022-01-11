@@ -1,5 +1,6 @@
 package by.gdev.component;
 
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,6 +39,7 @@ import by.gdev.model.AppConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcessHelper;
+import by.gdev.ui.ProgressBarLauncher;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -46,8 +48,8 @@ import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * I want to see all possible implementations and idea.
- * So we can implement upper abstraction with system.out messages!
+ * I want to see all possible implementations and idea. So we can implement
+ * upper abstraction with system.out messages!
  */
 @Slf4j
 public class Starter {
@@ -59,32 +61,41 @@ public class Starter {
 	private Repo java;
 	private Repo fileRepo;
 	private Repo dependencis;
-	
-    public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
+	private ProgressBarLauncher barLauncher;
+
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
 		this.starterConfig = starterConfig;
 	}
-    
-	/**
-     * Get information about current OS
-     */
-    public void collectOSInfo() {
-    	osType = OSInfo.getOSType();
-    	osArc = OSInfo.getJavaBit();
-    }
 
-    //TODO aleksandr to delete
-    public void checkCommonProblems() {
-        log.info("call method {}", "checkCommonProblems");
-    }
-    
-    /**
-     * Validate files,java  and return what we need to download
-     */
+	/**
+	 * Get information about current OS
+	 */
+	public void collectOSInfo() {
+
+		osType = OSInfo.getOSType();
+		osArc = OSInfo.getJavaBit();
+		if (!GraphicsEnvironment.isHeadless()) {
+			barLauncher = new ProgressBarLauncher(osType, "get installed app name", "get installed app version", true,
+					ResourceBundle.getBundle("application", new Localise().getLocal()));
+			eventBus.register(barLauncher);
+			barLauncher.setVisible(true);
+		}
+	}
+
+	// TODO aleksandr to delete
+	public void checkCommonProblems() {
+		log.info("call method {}", "checkCommonProblems");
+	}
+
+	/**
+	 * Validate files,java and return what we need to download
+	 */
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(), new File(starterConfig.workDir(starterConfig.getWorkDirectory()))));
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
+				new File(starterConfig.workDir(starterConfig.getWorkDirectory()))));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory())));
 		validateEnvironment.add(new ValidateTempNull());
 		validateEnvironment.add(new ValidateTempDir());
@@ -100,31 +111,38 @@ public class Starter {
 		}
 	}
 
-    /**
-     * Download resources(java,files,.jar) and and prepare them to use,
-     * after this we need revalidate again
-     */
-    public void prepareResources() throws Exception {
-    	log.info("Start loading");
-    	log.info(String.valueOf(osType));
-    	log.info(String.valueOf(osArc));
+	/**
+	 * Download resources(java,files,.jar) and and prepare them to use, after this
+	 * we need revalidate again
+	 */
+	public void prepareResources() throws Exception {
+		log.info("Start loading");
+		log.info(String.valueOf(osType));
+		log.info(String.valueOf(osArc));
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig, httpConfig.getInstanceHttpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, Paths.get("target"), 600000);
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig,
+				httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
+				maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
+				Paths.get("target"), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
 		fileRepo = all.getAppFileRepo();
-		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0) + all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0) + all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)
+				+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)
+				+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		JVMConfig jvm = gsonService.getObject(
+				all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),
+				JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
-		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);	
+		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(fileRepo);
@@ -142,22 +160,25 @@ public class Starter {
 		downloader.startDownload(true);
 		desktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
-    }
+	}
 
-    /**
-     * Run app and wait some command to switch off , cas we run in new process
-     * switch off command 'Starter run app'
-     * @throws IOException 
-     */
-    public void runApp() throws IOException {
-    	log.info("Start application");
-    	Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
-		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(starterConfig.getWorkDirectory()), eventBus);
-		String  classPath = DesktopUtil.convertListToString(File.pathSeparator, javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
+	/**
+	 * Run app and wait some command to switch off , cas we run in new process
+	 * switch off command 'Starter run app'
+	 * 
+	 * @throws IOException
+	 */
+	public void runApp() throws IOException {
+		log.info("Start application");
+		Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
+		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),
+				new File(starterConfig.getWorkDirectory()), eventBus);
+		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
+				javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
 		javaProcess.start();
-    }
+	}
 
 }
