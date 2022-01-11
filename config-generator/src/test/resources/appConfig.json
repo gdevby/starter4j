@@ -1,0 +1,70 @@
+{
+  "comment": "Config file for desktop-starter example",
+  "appName": "starter-app",
+  "appVersion": 1.0,
+  "mainClass": "by.gdev.app.Main",
+  "appArguments": [
+    "",
+    ""
+  ],
+  "jvmArguments": [
+    "",
+    ""
+  ],
+  "appFileRepo": {
+    "repositories": [
+      "http://localhost:81/"
+    ],
+    "resources": [
+      {
+        "sha1": "e0d732abfcdd9f6901b88c120ee2b56f7fcd837b",
+        "size": 4767,
+        "path": "starter-app-1.0.jar",
+        "relativeUrl": "starter-app/starter-app-1.0.jar"
+      }
+    ],
+    "remoteServerSHA1": false
+  },
+  "appResources": {
+    "repositories": [
+      "http://localhost:81/"
+    ],
+    "resources": [
+      {
+        "sha1": "8cf9c5edeb08212c8c0945c2f1973735f31edd66",
+        "size": 1451,
+        "path": "resources.json",
+        "relativeUrl": "starter-app/1.0/resources.json"
+      }
+    ],
+    "remoteServerSHA1": false
+  },
+  "appDependencies": {
+    "repositories": [
+      "http://localhost:81/"
+    ],
+    "resources": [
+      {
+        "sha1": "f06ffc1476825a1991d492cd5e7edd32dd71dfc5",
+        "size": 702,
+        "path": "dependencises.json",
+        "relativeUrl": "starter-app/1.0/dependencises.json"
+      }
+    ],
+    "remoteServerSHA1": false
+  },
+  "javaRepo": {
+    "repositories": [
+      "http://localhost:81/"
+    ],
+    "resources": [
+      {
+        "sha1": "8fa873ab9d00d8cfa359d29d734a82afab0af2e7",
+        "size": 2540,
+        "path": "javaConfig.json",
+        "relativeUrl": "starter-app/javaConfig.json"
+      }
+    ],
+    "remoteServerSHA1": false
+  }
+}

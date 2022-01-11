@@ -39,6 +39,10 @@ public class Metadata {
      * If executable=true, this file is executable.
      */
     private boolean executable;
+    /**
+     * Поле указывающее на то, является ли файл символической ссылкой
+     */
+    private String link;
 
     public static Metadata createMetadata (Path config) throws NoSuchAlgorithmException, IOException {
 		Metadata metadata = new Metadata();

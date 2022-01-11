@@ -29,6 +29,7 @@ public class DownloaderContainer {
 	private Repo repo;
 	private List<PostHandler> handlers;
 
+	//TODO почему хэш файлов не эквавалентен?
 	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory) throws NoSuchAlgorithmException, IOException {
 		this.repo = new Repo();
 		List<Metadata> listRes = new ArrayList<Metadata>();
@@ -36,9 +37,11 @@ public class DownloaderContainer {
 			File localFile = Paths.get(workDirectory, meta.getPath()).toAbsolutePath().toFile();
 			if (localFile.exists()) {
 				String shaLocalFile = DesktopUtil.getChecksum(localFile,Headers.SHA1.getValue());
-				log.trace(meta.getPath() + " = " + shaLocalFile + " / " + meta.getSha1());
-				if (!shaLocalFile.equals(meta.getSha1()))
+//				log.trace(meta.getPath() + " = " + shaLocalFile + " / " + meta.getSha1());
+				if (!shaLocalFile.equals(meta.getSha1())) {
+					System.out.println(meta.getPath() + " = " + shaLocalFile + " / " + meta.getSha1());
 					listRes.add(meta);
+				}
 			}else
 				listRes.add(meta);
 		}
