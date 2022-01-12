@@ -26,6 +26,7 @@ import by.gdev.handler.ValidatedPartionSize;
 import by.gdev.http.head.cache.config.HttpClientConfig;
 import by.gdev.http.head.cache.handler.AccesHandler;
 import by.gdev.http.head.cache.handler.PostHandlerImpl;
+import by.gdev.http.head.cache.handler.SimvolicLinkHandler;
 import by.gdev.http.head.cache.impl.DownloaderImpl;
 import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
 import by.gdev.http.head.cache.impl.GsonServiceImpl;
@@ -94,13 +95,12 @@ public class Starter {
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
-				new File(starterConfig.workDir(starterConfig.getWorkDirectory()))));
-		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory())));
-		validateEnvironment.add(new ValidateTempNull());
-		validateEnvironment.add(new ValidateTempDir());
-		validateEnvironment.add(new ValidateFont());
-		validateEnvironment.add(new ValidateUpdate());
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
+		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
+		validateEnvironment.add(new ValidateTempNull(bundle));
+		validateEnvironment.add(new ValidateTempDir(bundle));
+		validateEnvironment.add(new ValidateFont(bundle));
+		validateEnvironment.add(new ValidateUpdate(bundle));
 		for (ValidateEnvironment val : validateEnvironment) {
 			if (!val.validate()) {
 				log.error(bundle.getString("validate.error") + " " + val.getClass().getName());
@@ -127,8 +127,7 @@ public class Starter {
 				httpConfig.getInstanceHttpClient());
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
 				maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				Paths.get("target"), 600000);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,Paths.get("target"), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
@@ -151,10 +150,11 @@ public class Starter {
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		AccesHandler accesHandler = new AccesHandler();
+		SimvolicLinkHandler linkHandler = new SimvolicLinkHandler();
 		for (Repo repo : list) {
 			container.filterNotExistResoursesAndSetRepo(repo, starterConfig.getWorkDirectory());
 			container.setDestinationRepositories(starterConfig.getWorkDirectory());
-			container.setHandlers(Arrays.asList(postHandler, accesHandler));
+			container.setHandlers(Arrays.asList(postHandler, accesHandler, linkHandler));
 			downloader.addContainer(container);
 		}
 		downloader.startDownload(true);
@@ -178,7 +178,7 @@ public class Starter {
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
-		javaProcess.start();
+		javaProcess.start(); 
 	}
 
 }

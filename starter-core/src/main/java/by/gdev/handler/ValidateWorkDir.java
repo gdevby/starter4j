@@ -3,12 +3,14 @@ package by.gdev.handler;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ValidateWorkDir extends ValisatedEnviromentAbstract {
+public class ValidateWorkDir implements ValidateEnvironment {
 	String workDir;
+	ResourceBundle bundle;
 	
 	
 	@Override
@@ -22,6 +24,6 @@ public class ValidateWorkDir extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validate.workdir");
+		return bundle.getString("validate.workdir");
 	}
 }

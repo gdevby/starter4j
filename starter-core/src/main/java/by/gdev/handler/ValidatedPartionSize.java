@@ -5,18 +5,17 @@ import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
+@AllArgsConstructor
+public class ValidatedPartionSize implements ValidateEnvironment {
 	private long minMemorySize;
 	private File workDir;
-
-	public ValidatedPartionSize(long minMemorySize, File workDir) {
-		this.minMemorySize = minMemorySize;
-		this.workDir = workDir;
-	}
+	ResourceBundle bundle;
 
 	@Override
 	public boolean validate() {
@@ -36,7 +35,7 @@ public class ValidatedPartionSize extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return String.format(localizationBandle.getString("validate.size"), workDir , workDir.getFreeSpace() / 1024 / 1024, workDir);
+		return String.format(bundle.getString("validate.size"), workDir , workDir.getFreeSpace() / 1024 / 1024, workDir);
 		
 		
 	}

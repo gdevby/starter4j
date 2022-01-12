@@ -1,8 +1,13 @@
 package by.gdev.handler;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class ValidateTempNull extends ValisatedEnviromentAbstract {
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+public class ValidateTempNull implements ValidateEnvironment {
+	ResourceBundle bundle;
 
 	@Override
 	public boolean validate() {
@@ -11,7 +16,7 @@ public class ValidateTempNull extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validate.tempnull");
+		return bundle.getString("validate.tempnull");
 				
 	}
 }
