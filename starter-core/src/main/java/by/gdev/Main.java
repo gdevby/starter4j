@@ -23,7 +23,6 @@ public class Main {
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		eventBus.register(new ConsoleSubscriber());
-
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		try {

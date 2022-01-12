@@ -49,7 +49,7 @@ public class StarterAppConfig{
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500, 
 				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app/1.0", //download from github
-				"target/test_folder/testContainer/",
+				"Bootstrap/",
 				null, Arrays.asList("http://www.google.com","http://www.baidu.com"));
 	}
 	

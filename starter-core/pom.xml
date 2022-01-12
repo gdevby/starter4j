@@ -91,7 +91,7 @@
 				<version>5.11.2</version>
 				<configuration>
 				<!-- 1080 -->
-					<serverPort>9028</serverPort>
+					<serverPort>6972</serverPort>
 				</configuration>
 				<executions>
 					<execution>

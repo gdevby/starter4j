@@ -95,7 +95,8 @@ public class Starter {
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
+				new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
@@ -127,7 +128,8 @@ public class Starter {
 				httpConfig.getInstanceHttpClient());
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
 				maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,Paths.get("target"), 600000);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
+				Paths.get(starterConfig.getWorkDirectory(), "config"), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
@@ -178,7 +180,7 @@ public class Starter {
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
-		javaProcess.start(); 
+		javaProcess.start();
 	}
 
 }

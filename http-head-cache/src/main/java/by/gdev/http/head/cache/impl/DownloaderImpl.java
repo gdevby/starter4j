@@ -30,8 +30,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Robert Makrytski
- *	This class is responsible for the state of the file upload
+ * @author Robert Makrytski This class is responsible for the state of the file
+ *         upload
  */
 
 @Slf4j
@@ -60,8 +60,8 @@ public class DownloaderImpl implements Downloader {
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
 	private volatile long fullDownloadSize;
-	
-	public DownloaderImpl(EventBus eventBus,CloseableHttpClient httpclient ,RequestConfig requestConfig) {
+
+	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
@@ -91,7 +91,7 @@ public class DownloaderImpl implements Downloader {
 			runnable.setStatus(status);
 			allCountElement = downloadElements.size();
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
-			for (int i = 0; i < 3; i++) 
+			for (int i = 0; i < 3; i++)
 				listThread.add(CompletableFuture.runAsync(runnable));
 			if (sync) {
 				waitThreadDone(listThread);
@@ -103,7 +103,7 @@ public class DownloaderImpl implements Downloader {
 						log.error("Error", e);
 					}
 				}).get();
-			}	
+			}
 		} else
 			throw new StatusExeption(status.toString());
 	}
@@ -123,19 +123,19 @@ public class DownloaderImpl implements Downloader {
 			double thirty = Duration.between(elem.getStart(), elem.getEnd()).getNano();
 			double speed = (elem.getDownloadBytes() / 1024) / (thirty / 60000000);
 			if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
-	    		 speed = 5.0;
-		    sum += speed;
-		    downloadBytesNow += elem.getDownloadBytes();
-		    statusDownload.setDownloadSize(downloadBytesNow);
-	     }
-		//TODO Where the status?
-	    statusDownload.setAllDownloadSize(fullDownloadSize);
-	    statusDownload.setLeftFiles(processedElements.size());
+				speed = 5.0;
+			sum += speed;
+			downloadBytesNow += elem.getDownloadBytes();
+			statusDownload.setDownloadSize(downloadBytesNow);
+		}
+		statusDownload.setDownloaderStatusEnum(status);
+		statusDownload.setAllDownloadSize(fullDownloadSize);
+		statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);
 		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}
-	
+
 	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
@@ -152,15 +152,15 @@ public class DownloaderImpl implements Downloader {
 			}
 		}
 	}
-	
+
 	private long totalSize(Queue<DownloadElement> downloadElements) {
 		List<Long> sizeList = new ArrayList<Long>();
-		downloadElements.forEach(size->{
+		downloadElements.forEach(size -> {
 			sizeList.add(size.getMetadata().getSize());
 		});
 		long sum = 0;
 		for (long l : sizeList) {
-			sum +=l;
+			sum += l;
 		}
 		return sum;
 	}
