@@ -4,14 +4,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 import org.openide.filesystems.FileUtil;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ValidateTempDir extends ValisatedEnviromentAbstract {
-
+@AllArgsConstructor
+public class ValidateTempDir implements ValidateEnvironment {
+	
+	ResourceBundle bundle;
+	
 	@Override
 	public boolean validate() {
 		Path folder = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -28,6 +33,6 @@ public class ValidateTempDir extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validate.tempdir");
+		return bundle.getString("validate.tempdir");
 	}
 }

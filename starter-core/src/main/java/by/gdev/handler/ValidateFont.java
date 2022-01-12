@@ -1,13 +1,19 @@
 package by.gdev.handler;
 
+import java.util.ResourceBundle;
+
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ValidateFont extends ValisatedEnviromentAbstract {
-
+@AllArgsConstructor
+public class ValidateFont implements ValidateEnvironment {
+	
+	ResourceBundle bundle;
+	
 	@Override
 	public boolean validate() {
 			try {
@@ -20,6 +26,6 @@ public class ValidateFont extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validate.font");
+		return bundle.getString("validate.font");
 	}
 }

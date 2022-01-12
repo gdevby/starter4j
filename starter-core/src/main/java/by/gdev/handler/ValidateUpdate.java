@@ -1,13 +1,18 @@
 package by.gdev.handler;
 
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.os.OSExecutorFactoryMethod;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ValidateUpdate extends ValisatedEnviromentAbstract {
+@AllArgsConstructor
+public class ValidateUpdate implements ValidateEnvironment {
+	
+	ResourceBundle bundle;
 
 	@Override
 	public boolean validate() {
@@ -27,6 +32,6 @@ public class ValidateUpdate extends ValisatedEnviromentAbstract {
 
 	@Override
 	public String getExceptionMessage() {
-		return localizationBandle.getString("validate.update");
+		return bundle.getString("validate.update");
 	}
 }

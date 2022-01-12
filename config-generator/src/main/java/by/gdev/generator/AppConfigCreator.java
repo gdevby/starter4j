@@ -91,13 +91,9 @@ public class AppConfigCreator {
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString());
 			m.setSize(e.toFile().length());
-			if (Objects.nonNull(str))
-				s = Paths.get(str, s.toString());
-			m.setRelativeUrl(s.toString());
 			BasicFileAttributes attr = Files.readAttributes(e, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 			if (attr.isSymbolicLink()) {
 				File link = new File(Files.readSymbolicLink(e).toString());
-				System.out.println(e + " / " + e.toFile().getCanonicalFile().length());
 				if (link.getParent() == null) {
 					simvLink = Paths.get(s.getParent().toString(),link.toString()).toString();
 					m.setSha1("");
@@ -110,7 +106,9 @@ public class AppConfigCreator {
 				}
 			}
 			m.setLink(simvLink.toString());
-			
+			if (Objects.nonNull(str))
+				s = Paths.get(str, s.toString());
+			m.setRelativeUrl(s.toString());
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();
