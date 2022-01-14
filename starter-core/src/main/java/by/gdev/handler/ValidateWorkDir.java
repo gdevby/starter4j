@@ -12,7 +12,7 @@ public class ValidateWorkDir implements ValidateEnvironment {
 	String workDir;
 	ResourceBundle bundle;
 	
-	
+ 
 	@Override
 	public boolean validate() {
 		if (new File(workDir).exists()) {
@@ -21,7 +21,7 @@ public class ValidateWorkDir implements ValidateEnvironment {
 		}
 		return true;
 	}
-
+	//TODO add dir for message
 	@Override
 	public String getExceptionMessage() {
 		return bundle.getString("validate.workdir");
