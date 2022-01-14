@@ -76,7 +76,7 @@ public class Starter {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {
-			barLauncher = new ProgressBarLauncher(osType, "get installed app name", "get installed app version", true,
+			barLauncher = new ProgressBarLauncher(osType, "get installed app name", true,
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(barLauncher);
 			barLauncher.setVisible(true);
