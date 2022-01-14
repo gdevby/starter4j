@@ -19,7 +19,7 @@ public class ValidateWorkDir implements ValidateEnvironment {
 			if (!Files.isWritable(Paths.get(workDir)) || !Files.isReadable(Paths.get(workDir)))
 				return false;
 		}
-		return true;
+		return false;
 	}
 	//TODO add dir for message
 	@Override
