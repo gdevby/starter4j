@@ -1,6 +1,8 @@
 package by.gdev.generator;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -22,16 +24,14 @@ public class HttpRequestHandlerServer implements HttpRequestHandler{
 	
 	@Override
 	public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
-		String defaultPath = "target/out/" + request.getRequestLine().getUri().substring(1);
-		if (request.getRequestLine().getUri().substring(1).startsWith("jvms")) {
-			defaultPath = "" + request.getRequestLine().getUri().substring(1);
-		}
+		String decodeValue = URLDecoder.decode(request.getRequestLine().getUri(), StandardCharsets.UTF_8.name());
+		String defaultPath = "target/out/" + decodeValue.substring(1);
+		if (decodeValue.substring(1).startsWith("jvms")) 
+			defaultPath = "" + decodeValue.substring(1);
 		
-		if (request.getRequestLine().getUri().substring(1).startsWith(acm.getAppName()+"/jre_default/")) {
-			defaultPath = request.getRequestLine().getUri().replaceAll(acm.getAppName(), Paths.get(acm.getJavaFolder(), 
-					String.valueOf(OSInfo.getOSType()).toLowerCase(), String.valueOf(OSInfo.getJavaBit())).toString()).substring(1);
-		}
-		
+		if (decodeValue.substring(1).startsWith(acm.getAppName()+"/jre_default/"))
+			defaultPath = decodeValue.replaceAll(acm.getAppName(), Paths.get(acm.getJavaFolder(), String.valueOf(OSInfo.getOSType()).toLowerCase(), String.valueOf(OSInfo.getJavaBit())).toString()).substring(1);
+			
 		byte[] array = Files.readAllBytes(Paths.get(defaultPath));
          response.setStatusCode(HttpStatus.SC_OK);
          response.setEntity(new ByteArrayEntity(array));

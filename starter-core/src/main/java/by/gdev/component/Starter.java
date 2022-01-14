@@ -73,7 +73,6 @@ public class Starter {
 	 * Get information about current OS
 	 */
 	public void collectOSInfo() {
-
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {

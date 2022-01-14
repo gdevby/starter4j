@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
@@ -82,12 +80,9 @@ public class DownloadRunnableImpl implements Runnable {
 					BufferedInputStream in = null;
 					BufferedOutputStream out = null;
 					boolean resume = false;
-					LocalTime startTime = LocalTime.now();			
-					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) 
-							+ URLEncoder.encode(element.getMetadata().getRelativeUrl(), StandardCharsets.UTF_8.name()));
+					HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
 					log.trace(String.valueOf(httpGet));
 					try {
-						element.setStart(startTime);
 						if (!file.getParentFile().exists())
 							file.getParentFile().mkdirs();
 						if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
@@ -101,6 +96,7 @@ public class DownloadRunnableImpl implements Runnable {
 						HttpEntity entity = response.getEntity();
 						in = new BufferedInputStream(entity.getContent());
 						out = new BufferedOutputStream(new FileOutputStream(file, resume));
+						processedElements.add(element);
 						byte[] buffer = new byte[1024];
 						int curread = in.read(buffer);
 						while (curread != -1) {
@@ -115,7 +111,6 @@ public class DownloadRunnableImpl implements Runnable {
 						log.trace("downloaded file: "+httpGet.getURI() + " -> " + file);
 						LocalTime endTime = LocalTime.now();
 						element.setEnd(endTime);
-						processedElements.add(element);
 					} finally {
 						httpGet.abort();
 						out.close();

@@ -60,12 +60,15 @@ public class DownloaderImpl implements Downloader {
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
 	private volatile long fullDownloadSize;
+	private LocalTime start;
+
 
 	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
+		start = LocalTime.now();
 		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig);
 	}
 
@@ -116,37 +119,33 @@ public class DownloaderImpl implements Downloader {
 
 	private DownloaderStatus averageSpeed() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
-		double sum = 0;
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
+		double thirty = Duration.between(start, LocalTime.now()).getSeconds();
 		for (DownloadElement elem : list) {
-			double thirty = Duration.between(elem.getStart(), elem.getEnd()).getNano();
-			double speed = (elem.getDownloadBytes() / 1024) / (thirty / 60000000);
-			if (speed == Double.NaN || speed == Double.NEGATIVE_INFINITY || speed == Double.POSITIVE_INFINITY)
-				speed = 5.0;
-			sum += speed;
 			downloadBytesNow += elem.getDownloadBytes();
 			statusDownload.setDownloadSize(downloadBytesNow);
 		}
+		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
 		statusDownload.setAllDownloadSize(fullDownloadSize);
 		statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);
-		statusDownload.setSpeed(sum / processedElements.size());
 		return statusDownload;
 	}
 
 	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
+		LocalTime test = LocalTime.now().plusSeconds(1);
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
 			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());
 			if (start.isBefore(LocalTime.now())) {
-				start = start.plusSeconds(3);
+				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
-					log.info(start.toString());
+					if (start.getSecond() != test.getSecond())
 					eventBus.post(averageSpeed());
 				}
 			}

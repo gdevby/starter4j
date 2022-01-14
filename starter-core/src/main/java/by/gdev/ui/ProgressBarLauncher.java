@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
+import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
 import lombok.extern.slf4j.Slf4j;
@@ -145,21 +146,29 @@ public class ProgressBarLauncher extends JFrame {
 
 	@Subscribe
 	public void messageToSpeed(DownloaderStatus status) {
-		if (progressBar.isIndeterminate()) {
+		if (progressBar.isIndeterminate() && DownloaderStatusEnum.WORK.equals(status.getDownloaderStatusEnum())) {
 			SwingUtilities.invokeLater(() -> {
 				progressBar.setIndeterminate(false);
-				int uploaded = (int) status.getDownloadSize() / (1024 * 1024);
-				int allUpload = (int) status.getAllDownloadSize() / (1024 * 1024);
-				uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"), uploaded,
-						allUpload, resourceBundle.getString("mb")));
-				Dimension dim = uploadStatus.getPreferredSize();
-				uploadStatus.setBounds(getSize().width / 2 - dim.width / 2, heightProgressBar / 2 - dim.height / 2,
-						dim.width, dim.height);
-				progressBar.setMaximum(allUpload);
-				progressBar.setValue(uploaded);
-
+				updateUploadProgressBar(status);
+			});
+		} else if(!progressBar.isIndeterminate()) {
+			SwingUtilities.invokeLater(() -> {
+				updateUploadProgressBar(status);
 			});
 		}
+	}
+
+	private void updateUploadProgressBar(DownloaderStatus status) {
+		int uploaded = (int) status.getDownloadSize() / (1024 * 1024);
+		int allUpload = (int) status.getAllDownloadSize() / (1024 * 1024);
+		uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"), uploaded,
+				allUpload, resourceBundle.getString("mb")));
+		Dimension dim = uploadStatus.getPreferredSize();
+		uploadStatus.setBounds(getSize().width / 2 - dim.width / 2, heightProgressBar / 2 - dim.height / 2,
+				dim.width, dim.height);
+		progressBar.setMaximum(allUpload);
+		progressBar.setValue(uploaded);
+		progressBar.repaint();
 	}
 
 }
