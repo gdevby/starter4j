@@ -34,13 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ProgressBarLauncher extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JProgressBar progressBar;
-	private String gdevBy = "https://gdev.by";
+	private String gdevBy = "https://github.com/gdevby/desktop-starter-launch-update-bootstrap";
 	private JLabel uploadStatus = new JLabel();
-	private int heightProgressBar;
 	private ResourceBundle resourceBundle;
 
-	public ProgressBarLauncher(OSType type, String appName, String version, boolean indeterminate,
-			ResourceBundle resourceBundle) {
+	public ProgressBarLauncher(OSType type, String appName, boolean indeterminate, ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		setResizable(false);
 		setUndecorated(true);
@@ -49,7 +47,6 @@ public class ProgressBarLauncher extends JFrame {
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
 		setSize(new Dimension(width / 5, height / 6));
-		Dimension size = getSize();
 		DesktopUtil.initLookAndFeel();
 
 		JPanel p = new JPanel(new BorderLayout(0, 0));
@@ -66,45 +63,28 @@ public class ProgressBarLauncher extends JFrame {
 		};
 
 		background.setOpaque(false);
-		JLabel label = new JLabel("Java app launcher " + gdevBy);
+		JLabel label = new JLabel("app launcher gdev.by");
 		label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		Font f = label.getFont();
 		label.setFont(f.deriveFont(Font.BOLD).deriveFont((float) (f.getSize() - 2)));
-		heightProgressBar = (int) (label.getPreferredSize().getHeight() * 1.5);
 		p.setOpaque(true);
 		JLabel nameLabel = new JLabel(appName);
 		f = nameLabel.getFont();
 		nameLabel.setFont(f.deriveFont((float) (f.getSize() + 5)));
 		nameLabel.setHorizontalAlignment(JLabel.CENTER);
 
-		JLabel versionLabel = new JLabel(version);
-		versionLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 10));
-		f = versionLabel.getFont();
-		versionLabel.setFont(f.deriveFont((float) (f.getSize() + 3)));
-		versionLabel.setHorizontalAlignment(JLabel.RIGHT);
-
 		uploadStatus.setFont(uploadStatus.getFont().deriveFont(Font.BOLD));
+		uploadStatus.setHorizontalAlignment(JLabel.RIGHT);
+		uploadStatus.setBorder(BorderFactory.createEmptyBorder(0, 0, 3, 3));
 
-		progressBar = new JProgressBar() {
-			private static final long serialVersionUID = -2846842560241143992L;
-
-			@Override
-			protected void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				if (!progressBar.isIndeterminate()) {
-					Dimension dim = uploadStatus.getPreferredSize();
-					uploadStatus.paint(g.create(getSize().width / 2 - dim.width / 2,
-							heightProgressBar / 2 - dim.height / 2, dim.width, dim.height));
-				}
-			}
-		};
+		progressBar = new JProgressBar();
+		progressBar.setDoubleBuffered(true);
 		progressBar.setIndeterminate(indeterminate);
-		progressBar.setPreferredSize(new Dimension(size.width, heightProgressBar));
 		progressBar.setBorder(BorderFactory.createEmptyBorder());
 
-		background.add(versionLabel, BorderLayout.NORTH);
 		background.add(nameLabel, BorderLayout.CENTER);
-		background.add(label, BorderLayout.SOUTH);
+		background.add(label, BorderLayout.NORTH);
+		background.add(uploadStatus, BorderLayout.SOUTH);
 
 		p.add(background, BorderLayout.CENTER);
 		p.add(progressBar, BorderLayout.SOUTH);
@@ -151,7 +131,7 @@ public class ProgressBarLauncher extends JFrame {
 				progressBar.setIndeterminate(false);
 				updateUploadProgressBar(status);
 			});
-		} else if(!progressBar.isIndeterminate()) {
+		} else if (!progressBar.isIndeterminate()) {
 			SwingUtilities.invokeLater(() -> {
 				updateUploadProgressBar(status);
 			});
@@ -161,14 +141,10 @@ public class ProgressBarLauncher extends JFrame {
 	private void updateUploadProgressBar(DownloaderStatus status) {
 		int uploaded = (int) status.getDownloadSize() / (1024 * 1024);
 		int allUpload = (int) status.getAllDownloadSize() / (1024 * 1024);
-		uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"), uploaded,
-				allUpload, resourceBundle.getString("mb")));
-		Dimension dim = uploadStatus.getPreferredSize();
-		uploadStatus.setBounds(getSize().width / 2 - dim.width / 2, heightProgressBar / 2 - dim.height / 2,
-				dim.width, dim.height);
+		uploadStatus.setText(String.format("%s %s/%s %s ", resourceBundle.getString("uploading"), uploaded, allUpload,
+				resourceBundle.getString("mb")));
 		progressBar.setMaximum(allUpload);
 		progressBar.setValue(uploaded);
-		progressBar.repaint();
 	}
 
 }
