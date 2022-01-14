@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockserver.integration.ClientAndServer;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
 import com.google.gson.Gson;
 
 import by.gdev.generator.model.AppConfigModel;
@@ -36,6 +37,7 @@ public class StarterCoreTest {
 	static Downloader downloader;
 	static ClientAndServer mockServer;
 	static AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
+	static String testWorkDirectory = "target/out/testContainer/";
 	
 	@BeforeClass
 	public static void init() throws IOException {
@@ -49,7 +51,7 @@ public class StarterCoreTest {
 		 
 		 
 		 	Gson gson = new Gson();
-			Path testFolder = Paths.get("target/test_folder");
+			Path testFolder = Paths.get(testWorkDirectory);
 			if (testFolder.toFile().exists()) {
 				FileUtils.deleteDirectory(testFolder.toFile());
 			}
@@ -71,9 +73,9 @@ public class StarterCoreTest {
 	
 	@Test
 	public void mainTest() throws Exception {
-		String[] configGenerator = {"-name", "test-starter-app", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass" , "desktop.starter.app.Main"};
+		String[] configGenerator = {"-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass" , "desktop.starter.app.Main"};
 		by.gdev.generator.Main.main(configGenerator);
-		String[] starterCoreArg = { "-mainAppConfig","http://127.0.0.1:65079/test-starter-app/0.9"};
+		String[] starterCoreArg = { "-mainAppConfig",UrlEscapers.urlFragmentEscaper().escape("http://127.0.0.1:65079/test-core/0.9"), "-workDirectory" , testWorkDirectory};
 		by.gdev.Main.main(starterCoreArg);
 	}
 }

@@ -101,7 +101,7 @@ public class DownloadTest {
 		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		DownloaderContainer container = new DownloaderContainer();
-		container.setDestinationRepositories("target/test_folder/containerTest/");
+		container.setDestinationRepositories("target/test_folder/");
 		container.setRepo(repo);
 		container.setHandlers(Arrays.asList(postHandler));
 		downloader.addContainer(container);

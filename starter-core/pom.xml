@@ -91,7 +91,8 @@
 				<version>5.11.2</version>
 				<configuration>
 				<!-- 1080 -->
-					<serverPort>6972</serverPort>
+					<serverPort>3631</serverPort>
+					 <initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>
 				</configuration>
 				<executions>
 					<execution>
