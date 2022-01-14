@@ -3,25 +3,29 @@ package by.gdev.handler;
 import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
+import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @AllArgsConstructor
 public class ValidateFont implements ValidateEnvironment {
-	
+
 	ResourceBundle bundle;
-	
+
 	@Override
 	public boolean validate() {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-				log.error("Error", e);
+		DesktopUtil.initLookAndFeel();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ExceptionInInitializerError error) {
+			if (error.getCause() instanceof IllegalArgumentException) {
+				if (error.getCause().getMessage().contains("Text-specific LCD")) {
+					return false;
+				}
 			}
-			return true;
+		} catch (Exception e) {
+		}
+		return true;
 	}
 
 	@Override
