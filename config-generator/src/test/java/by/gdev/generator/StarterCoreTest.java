@@ -75,7 +75,8 @@ public class StarterCoreTest {
 	public void mainTest() throws Exception {
 		String[] configGenerator = {"-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass" , "desktop.starter.app.Main"};
 		by.gdev.generator.Main.main(configGenerator);
-		String[] starterCoreArg = { "-mainAppConfig",UrlEscapers.urlFragmentEscaper().escape("http://127.0.0.1:65079/test-core/0.9"), "-workDirectory" , testWorkDirectory};
+		String[] starterCoreArg = { "-mainAppConfig",UrlEscapers.urlFragmentEscaper().escape("http://127.0.0.1:65079/test-core/0.9"), 
+				"-workDirectory" , testWorkDirectory, "-stop"};
 		by.gdev.Main.main(starterCoreArg);
 	}
 }

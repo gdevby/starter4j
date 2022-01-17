@@ -3,6 +3,7 @@ package by.gdev.handler;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+import by.gdev.model.ValidationExceptionMessage;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.os.OSExecutorFactoryMethod;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class ValidateUpdate implements ValidateEnvironment {
 	}
 
 	@Override
-	public String getExceptionMessage() {
-		return bundle.getString("validate.update");
+	public ValidationExceptionMessage getExceptionMessage() {
+		return new ValidationExceptionMessage(bundle.getString("validate.update"));
 	}
 }

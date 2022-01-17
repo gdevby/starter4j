@@ -45,12 +45,17 @@ public class StarterAppConfig{
 	@Parameter(names = "-urlConnection", description = "List of sites for checking Internet connection access")
 	private List <String> urlConnection;
 	
+	
+	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
+	private boolean stop;
+	
 	public static final StarterAppConfig DEFAULT_CONFIG;
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500, 
 				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app/1.0", //download from github
 				"Bootstrap/",
-				null, Arrays.asList("http://www.google.com","http://www.baidu.com"));
+				null, Arrays.asList("http://www.google.com","http://www.baidu.com"),
+				false);
 	}
 	
 	

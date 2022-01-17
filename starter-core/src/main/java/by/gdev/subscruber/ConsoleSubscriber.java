@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
 import by.gdev.model.StatusModel;
+import by.gdev.model.ValidationExceptionMessage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,10 +21,15 @@ public class ConsoleSubscriber {
     }
     
     @Subscribe
-    private void test(StatusModel status) {
+    private void procces(StatusModel status) {
     	if (status.getLine().equals("starter can be closed"))
     		System.exit(0);
     	else
 			log.info(String.valueOf(status.getProcess()));
 	}
+    
+    @Subscribe
+    public void valodateMessage(ValidationExceptionMessage message) {
+    	log.error(message.printValidationMessage());
+    }
 }
