@@ -30,8 +30,8 @@ public class ProcessMonitor extends Thread {
 	        InputStreamReader reader = new InputStreamReader(raw.getInputStream());
 	        BufferedReader buf = new BufferedReader(reader);
 	        String line;
-	        StatusModel status = new StatusModel();
 	        while (this.process.isRunning()) {
+	        	StatusModel status = new StatusModel();
 	            try {
 	                while (Objects.nonNull(line = buf.readLine())) {
 	                	status.setLine(line);
@@ -39,7 +39,8 @@ public class ProcessMonitor extends Thread {
 	                	listener.post(status);
 	                }
 	            } catch (IOException t) {
-	            	log.error("Error Stream", t);
+	            	status.setExeption(t);
+	            	System.exit(0);
 	            } finally {
 	                try {
 	                    buf.close();

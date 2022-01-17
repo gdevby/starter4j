@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import javax.swing.UnsupportedLookAndFeelException;
 
+import by.gdev.model.ValidationExceptionMessage;
+
 public interface ValidateEnvironment {
 
 	/**
@@ -22,5 +24,5 @@ public interface ValidateEnvironment {
 	 * @return
 	 */
 	//TODO create type ValidationExceptionMessage and used for eventBus.post(val.getExceptionMessage());
-	String getExceptionMessage();
+	ValidationExceptionMessage getExceptionMessage();
 }

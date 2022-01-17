@@ -7,4 +7,5 @@ import lombok.Data;
 public class StatusModel {
 	JavaProcess process;
 	String line;
+	Exception exeption;
 }

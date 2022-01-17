@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
+import by.gdev.model.ValidationExceptionMessage;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -21,9 +22,8 @@ public class ValidateWorkDir implements ValidateEnvironment {
 		}
 		return true;
 	}
-	//TODO add dir for message
 	@Override
-	public String getExceptionMessage() {
-		return bundle.getString("validate.workdir");
+	public ValidationExceptionMessage getExceptionMessage() {
+		return new ValidationExceptionMessage(String.format(bundle.getString("validate.workdir"), workDir));
 	}
 }

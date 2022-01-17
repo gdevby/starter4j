@@ -39,6 +39,7 @@ import by.gdev.http.head.cache.service.HttpService;
 import by.gdev.model.AppConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.ui.ProgressBarLauncher;
 import by.gdev.util.DesktopUtil;
@@ -62,6 +63,7 @@ public class Starter {
 	private Repo java;
 	private Repo fileRepo;
 	private Repo dependencis;
+	JavaProcess procces;
 	private ProgressBarLauncher barLauncher;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
@@ -94,8 +96,7 @@ public class Starter {
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
-				new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),	new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
@@ -168,18 +169,20 @@ public class Starter {
 	 * switch off command 'Starter run app'
 	 * 
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public void runApp() throws IOException {
+	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
 		Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
-		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),
-				new File(starterConfig.getWorkDirectory()), eventBus);
-		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
-				javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
+		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),new File(starterConfig.getWorkDirectory()), eventBus);
+		String classPath = DesktopUtil.convertListToString(File.pathSeparator,javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
-		javaProcess.start();
+		procces = javaProcess.start();
+		if (starterConfig.isStop()) {
+			Thread.sleep(600);
+			procces.getProcess().destroy();
+		}
 	}
-
 }
