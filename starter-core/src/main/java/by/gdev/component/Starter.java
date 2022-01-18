@@ -42,7 +42,8 @@ import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
-import by.gdev.ui.ProgressBarLauncher;
+import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.ValidatorMessageSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -65,7 +66,7 @@ public class Starter {
 	private Repo fileRepo;
 	private Repo dependencis;
 	JavaProcess procces;
-	private ProgressBarLauncher barLauncher;
+	private StarterStatusFrame starterStatusFrame;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
@@ -79,10 +80,11 @@ public class Starter {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {
-			barLauncher = new ProgressBarLauncher(osType, "get installed app name", true,
+			starterStatusFrame = new StarterStatusFrame(osType, "get installed app name", true,
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
-			eventBus.register(barLauncher);
-			barLauncher.setVisible(true);
+			eventBus.register(starterStatusFrame);
+			eventBus.register(new ValidatorMessageSubscriber(starterStatusFrame));
+			starterStatusFrame.setVisible(true);
 		}
 	}
 
