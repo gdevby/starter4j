@@ -3,6 +3,7 @@ package by.gdev.component;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -129,19 +130,15 @@ public class Starter {
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
 				maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				Paths.get(starterConfig.getWorkDirectory(), "config"), 600000);
+				Paths.get("target/out", "config"), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
 		fileRepo = all.getAppFileRepo();
-		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)
-				+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)
-				+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		JVMConfig jvm = gsonService.getObject(
-				all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),
-				JVMConfig.class, false);
+		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
@@ -154,6 +151,7 @@ public class Starter {
 		AccesHandler accesHandler = new AccesHandler();
 		SimvolicLinkHandler linkHandler = new SimvolicLinkHandler();
 		for (Repo repo : list) {
+			container.conteinerAllSize(repo);
 			container.filterNotExistResoursesAndSetRepo(repo, starterConfig.getWorkDirectory());
 			container.setDestinationRepositories(starterConfig.getWorkDirectory());
 			container.setHandlers(Arrays.asList(postHandler, accesHandler, linkHandler));
