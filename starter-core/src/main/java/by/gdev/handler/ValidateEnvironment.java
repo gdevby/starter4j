@@ -23,6 +23,5 @@ public interface ValidateEnvironment {
 	 * возвращает сообщение для показа и после будет генерирывать события для busevent
 	 * @return
 	 */
-	//TODO create type ValidationExceptionMessage and used for eventBus.post(val.getExceptionMessage());
 	ValidationExceptionMessage getExceptionMessage();
 }

@@ -3,6 +3,9 @@
  */
 package by.gdev.http.head.cache.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -56,10 +59,13 @@ public class DownloaderImpl implements Downloader {
 	/**
 	 * Shown status of the downloading
 	 */
+	private List<Long> allConteinerSize = new ArrayList<Long>();
 	private volatile DownloaderStatusEnum status;
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
-	private volatile long fullDownloadSize;
+//	private volatile long fullDownloadSize;
+	private long fullDownloadSize1;
+	private long downloadBytesNow1;
 	private LocalTime start;
 
 
@@ -84,11 +90,14 @@ public class DownloaderImpl implements Downloader {
 				downloadElements.add(element);
 			});
 		}
-		fullDownloadSize = totalSize(downloadElements);
+//		fullDownloadSize = totalSize(downloadElements);
+		allConteinerSize.add(container.getContainerSize());
+		pathToDownload = container.getDestinationRepositories();
 	}
 
 	@Override
-	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption {
+	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
+		fullDownloadSize1 = totalSize1(allConteinerSize);
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
@@ -102,7 +111,7 @@ public class DownloaderImpl implements Downloader {
 				CompletableFuture.runAsync(() -> {
 					try {
 						waitThreadDone(listThread);
-					} catch (InterruptedException e) {
+					} catch (IOException|InterruptedException e) {
 						log.error("Error", e);
 					}
 				}).get();
@@ -117,24 +126,26 @@ public class DownloaderImpl implements Downloader {
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
 
-	private DownloaderStatus averageSpeed() {
+	private DownloaderStatus averageSpeed() throws IOException {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
 		double thirty = Duration.between(start, LocalTime.now()).getSeconds();
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
-			statusDownload.setDownloadSize(downloadBytesNow);
+//			statusDownload.setDownloadSize(downloadBytesNow);
+//			statusDownload.setDownloadSize(sizeDownloadNow());
 		}
+		statusDownload.setDownloadSize(sizeDownloadNow());
 		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
-		statusDownload.setAllDownloadSize(fullDownloadSize);
+		statusDownload.setAllDownloadSize(fullDownloadSize1);
 		statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);
 		return statusDownload;
 	}
 
-	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException {
+	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException, IOException {
 		LocalTime start = LocalTime.now();
 		LocalTime test = LocalTime.now().plusSeconds(1);
 		boolean workedAnyThread = true;
@@ -152,15 +163,26 @@ public class DownloaderImpl implements Downloader {
 		}
 	}
 
-	private long totalSize(Queue<DownloadElement> downloadElements) {
-		List<Long> sizeList = new ArrayList<Long>();
-		downloadElements.forEach(size -> {
-			sizeList.add(size.getMetadata().getSize());
-		});
+//	private long totalSize(Queue<DownloadElement> downloadElements) {
+//		List<Long> sizeList = new ArrayList<Long>();
+//		downloadElements.forEach(size -> {
+//			sizeList.add(size.getMetadata().getSize());
+//		});
+//		long sum = 0;
+//		for (long l : sizeList) {
+//			sum += l;
+//		}
+//		return sum;
+//	}
+	
+	private long totalSize1(List<Long> containerSize) {
 		long sum = 0;
-		for (long l : sizeList) {
+		for (long l : containerSize)
 			sum += l;
-		}
 		return sum;
+	}
+	
+	private long sizeDownloadNow() throws IOException {
+		return Files.walk(Paths.get(pathToDownload)).filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
 	}
 }
