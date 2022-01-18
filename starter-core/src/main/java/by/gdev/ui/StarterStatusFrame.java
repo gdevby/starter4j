@@ -31,14 +31,14 @@ import by.gdev.util.OSInfo.OSType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ProgressBarLauncher extends JFrame {
+public class StarterStatusFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JProgressBar progressBar;
 	private String gdevBy = "https://github.com/gdevby/desktop-starter-launch-update-bootstrap";
 	private JLabel uploadStatus = new JLabel();
 	private ResourceBundle resourceBundle;
 
-	public ProgressBarLauncher(OSType type, String appName, boolean indeterminate, ResourceBundle resourceBundle) {
+	public StarterStatusFrame(OSType type, String appName, boolean indeterminate, ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		setResizable(false);
 		setUndecorated(true);
@@ -117,7 +117,7 @@ public class ProgressBarLauncher extends JFrame {
 	private BufferedImage getImage() {
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(ProgressBarLauncher.class.getResourceAsStream("/background.jpg"));
+			image = ImageIO.read(StarterStatusFrame.class.getResourceAsStream("/background.jpg"));
 		} catch (IOException e) {
 			log.warn("can't load image", e);
 		}
