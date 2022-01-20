@@ -20,7 +20,7 @@ public class ValidateWorkDir implements ValidateEnvironment {
 			if (!Files.isWritable(Paths.get(workDir)) || !Files.isReadable(Paths.get(workDir)))
 				return false;
 		}
-		return false;
+		return true;
 	}
 	@Override
 	public ValidationExceptionMessage getExceptionMessage() {

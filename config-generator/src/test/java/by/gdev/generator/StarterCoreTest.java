@@ -13,7 +13,6 @@ import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockserver.integration.ClientAndServer;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
@@ -35,7 +34,6 @@ public class StarterCoreTest {
 	static HttpServer server;
 	static GsonService gsonService;
 	static Downloader downloader;
-	static ClientAndServer mockServer;
 	static AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
 	static String testWorkDirectory = "target/out/testContainer/";
 	
