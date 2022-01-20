@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-import org.openide.filesystems.FileUtil;
-
 import by.gdev.model.ValidationExceptionMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,7 @@ public class ValidateTempDir implements ValidateEnvironment {
 			if (Files.isRegularFile(folder))
 				Files.delete(folder);
 			if (!Files.exists(folder))
-				FileUtil.createFolder(folder.toFile());
+				Files.createDirectory(folder);
 		} catch (IOException e) {
 			log.error("Error", e);
 		}
