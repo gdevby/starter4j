@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache.config;
+package by.gdev.http.upload.config;
 
 import java.util.concurrent.TimeUnit;
 

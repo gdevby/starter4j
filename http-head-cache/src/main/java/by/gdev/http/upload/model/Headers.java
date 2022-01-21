@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache.model;
+package by.gdev.http.upload.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

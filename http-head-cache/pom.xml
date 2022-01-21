@@ -7,7 +7,7 @@
 		<artifactId>starter</artifactId>
 		<version>${revision}</version>
 	</parent>
-	<artifactId>http-head-cache</artifactId>
+	<artifactId>http-upload</artifactId>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>

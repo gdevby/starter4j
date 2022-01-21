@@ -1,16 +1,16 @@
 /**
  * 
  */
-package by.gdev.http.head.cache.service;
+package by.gdev.http.upload.service;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.head.cache.exeption.StatusExeption;
-import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
-import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
+import by.gdev.http.upload.exeption.StatusExeption;
+import by.gdev.http.upload.model.downloader.DownloaderContainer;
+import by.gdev.http.upload.model.downloader.DownloaderStatus;
 
 /**
  * Allow to download files and show status of the downloading. Statistics and

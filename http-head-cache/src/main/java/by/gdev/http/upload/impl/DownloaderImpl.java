@@ -1,7 +1,7 @@
 /**
  * 
  */
-package by.gdev.http.head.cache.impl;
+package by.gdev.http.upload.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,12 +22,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.head.cache.exeption.StatusExeption;
-import by.gdev.http.head.cache.model.downloader.DownloadElement;
-import by.gdev.http.head.cache.model.downloader.DownloaderContainer;
-import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
-import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
-import by.gdev.http.head.cache.service.Downloader;
+import by.gdev.http.upload.exeption.StatusExeption;
+import by.gdev.http.upload.model.downloader.DownloadElement;
+import by.gdev.http.upload.model.downloader.DownloaderContainer;
+import by.gdev.http.upload.model.downloader.DownloaderStatus;
+import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.upload.service.Downloader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
