@@ -26,14 +26,14 @@ import org.mockserver.model.HttpResponse;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.config.HttpClientConfig;
-import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
-import by.gdev.http.head.cache.impl.GsonServiceImpl;
-import by.gdev.http.head.cache.impl.HttpServiceImpl;
 import by.gdev.http.head.cache.model.MyTestType;
-import by.gdev.http.head.cache.service.FileCacheService;
-import by.gdev.http.head.cache.service.GsonService;
-import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.http.upload.config.HttpClientConfig;
+import by.gdev.http.upload.impl.FileCacheServiceImpl;
+import by.gdev.http.upload.impl.GsonServiceImpl;
+import by.gdev.http.upload.impl.HttpServiceImpl;
+import by.gdev.http.upload.service.FileCacheService;
+import by.gdev.http.upload.service.GsonService;
+import by.gdev.http.upload.service.HttpService;
 
 public class GsonServiceImplTest1 {
 	static GsonService gsonService;

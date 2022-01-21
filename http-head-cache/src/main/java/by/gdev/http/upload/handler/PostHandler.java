@@ -1,9 +1,9 @@
 /**
  * 
  */
-package by.gdev.http.head.cache.handler;
+package by.gdev.http.upload.handler;
 
-import by.gdev.http.head.cache.model.downloader.DownloadElement;
+import by.gdev.http.upload.model.downloader.DownloadElement;
 
 /**
  * @author Robert Makrytski

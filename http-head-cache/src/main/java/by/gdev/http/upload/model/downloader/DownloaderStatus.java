@@ -1,7 +1,7 @@
 /**
  * 
  */
-package by.gdev.http.head.cache.model.downloader;
+package by.gdev.http.upload.model.downloader;
 
 import java.time.Duration;
 import java.util.List;

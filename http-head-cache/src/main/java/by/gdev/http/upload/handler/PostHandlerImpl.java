@@ -1,11 +1,11 @@
-package by.gdev.http.head.cache.handler;
+package by.gdev.http.upload.handler;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import by.gdev.http.head.cache.model.Headers;
-import by.gdev.http.head.cache.model.downloader.DownloadElement;
+import by.gdev.http.upload.model.Headers;
+import by.gdev.http.upload.model.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

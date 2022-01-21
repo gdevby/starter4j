@@ -13,7 +13,7 @@
         <module>starter-core</module>
         <module>desktop-common-util</module>
         <module>config-generator</module>
-        <module>http-head-cache</module>
+        <module>http-upload</module>
         <module>desktop-common-util-additional</module>
     </modules>
 

@@ -1,9 +1,9 @@
 /**
  * 
  */
-package by.gdev.http.head.cache.model.downloader;
+package by.gdev.http.upload.model.downloader;
 
-import by.gdev.http.head.cache.service.Downloader;
+import by.gdev.http.upload.service.Downloader;
 
 /**
  * Transfer of the state

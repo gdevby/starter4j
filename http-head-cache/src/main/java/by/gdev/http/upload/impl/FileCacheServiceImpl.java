@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache.impl;
+package by.gdev.http.upload.impl;
 
 
 import java.io.FileNotFoundException;
@@ -13,10 +13,10 @@ import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.model.Headers;
-import by.gdev.http.head.cache.model.RequestMetadata;
-import by.gdev.http.head.cache.service.FileCacheService;
-import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.http.upload.model.Headers;
+import by.gdev.http.upload.model.RequestMetadata;
+import by.gdev.http.upload.service.FileCacheService;
+import by.gdev.http.upload.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;

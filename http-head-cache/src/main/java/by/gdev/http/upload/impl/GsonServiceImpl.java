@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache.impl;
+package by.gdev.http.upload.impl;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -10,8 +10,8 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.head.cache.service.FileCacheService;
-import by.gdev.http.head.cache.service.GsonService;
+import by.gdev.http.upload.service.FileCacheService;
+import by.gdev.http.upload.service.GsonService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,9 +1,9 @@
-package by.gdev.http.head.cache.service;
+package by.gdev.http.upload.service;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import by.gdev.http.head.cache.model.RequestMetadata;
+import by.gdev.http.upload.model.RequestMetadata;
 /**
  * 
  * This service sent http get, http head request and saved response to file

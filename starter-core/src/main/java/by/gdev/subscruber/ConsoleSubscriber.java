@@ -2,7 +2,7 @@ package by.gdev.subscruber;
 
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.head.cache.model.downloader.DownloaderStatus;
+import by.gdev.http.upload.model.downloader.DownloaderStatus;
 import by.gdev.model.StatusModel;
 import by.gdev.model.ValidationExceptionMessage;
 import lombok.extern.slf4j.Slf4j;

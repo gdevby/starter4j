@@ -1,11 +1,11 @@
-package by.gdev.http.head.cache.handler;
+package by.gdev.http.upload.handler;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import by.gdev.http.head.cache.model.downloader.DownloadElement;
+import by.gdev.http.upload.model.downloader.DownloadElement;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

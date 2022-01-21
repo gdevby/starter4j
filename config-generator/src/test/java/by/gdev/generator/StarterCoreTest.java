@@ -19,15 +19,15 @@ import com.google.common.net.UrlEscapers;
 import com.google.gson.Gson;
 
 import by.gdev.generator.model.AppConfigModel;
-import by.gdev.http.head.cache.config.HttpClientConfig;
-import by.gdev.http.head.cache.impl.DownloaderImpl;
-import by.gdev.http.head.cache.impl.FileCacheServiceImpl;
-import by.gdev.http.head.cache.impl.GsonServiceImpl;
-import by.gdev.http.head.cache.impl.HttpServiceImpl;
-import by.gdev.http.head.cache.service.Downloader;
-import by.gdev.http.head.cache.service.FileCacheService;
-import by.gdev.http.head.cache.service.GsonService;
-import by.gdev.http.head.cache.service.HttpService;
+import by.gdev.http.upload.config.HttpClientConfig;
+import by.gdev.http.upload.impl.DownloaderImpl;
+import by.gdev.http.upload.impl.FileCacheServiceImpl;
+import by.gdev.http.upload.impl.GsonServiceImpl;
+import by.gdev.http.upload.impl.HttpServiceImpl;
+import by.gdev.http.upload.service.Downloader;
+import by.gdev.http.upload.service.FileCacheService;
+import by.gdev.http.upload.service.GsonService;
+import by.gdev.http.upload.service.HttpService;
 import by.gdev.subscruber.ConsoleSubscriber;
 
 public class StarterCoreTest {

@@ -1,4 +1,4 @@
-package by.gdev.http.head.cache.impl;
+package by.gdev.http.upload.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -17,8 +17,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import by.gdev.http.head.cache.model.downloader.DownloadElement;
-import by.gdev.http.head.cache.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.upload.model.downloader.DownloadElement;
+import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
