@@ -87,8 +87,7 @@
 				<version>5.11.2</version>
 				<configuration>
 				<!-- 1080 -->
-					<serverPort>6884</serverPort>
-					 <initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>
+					<serverPort>6784</serverPort>
 				</configuration>
 				<executions>
 					<execution>
