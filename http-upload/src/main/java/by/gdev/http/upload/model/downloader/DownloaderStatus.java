@@ -38,6 +38,9 @@ public class DownloaderStatus {
 	private long allDownloadSize;
 	private Integer leftFiles;
 	private Integer allFiles;
+	/**
+	 * To get errors after asynchronous upload all files
+	 */
 	private List<Throwable> throwables;
 	private DownloaderStatusEnum downloaderStatusEnum;
 

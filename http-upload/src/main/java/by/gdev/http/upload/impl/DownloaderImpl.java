@@ -107,10 +107,12 @@ public class DownloaderImpl implements Downloader {
 				listThread.add(CompletableFuture.runAsync(runnable));
 			if (sync) {
 				waitThreadDone(listThread);
+
 			} else {
 				CompletableFuture.runAsync(() -> {
 					try {
 						waitThreadDone(listThread);
+
 					} catch (IOException|InterruptedException e) {
 						log.error("Error", e);
 					}
@@ -161,6 +163,9 @@ public class DownloaderImpl implements Downloader {
 				}
 			}
 		}
+		//TODO send event DONE if not cancel and add errors
+		//if cancel only sent event with status cancel 
+		//TODO throw error if there is the error  if synch
 	}
 
 //	private long totalSize(Queue<DownloadElement> downloadElements) {

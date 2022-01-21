@@ -23,11 +23,12 @@ public class PostHandlerImpl implements PostHandler {
 			
 //			Objects.isNull(element.getMetadata().getLink())
 			
-			
+			//TODO 
 			if(sizeLocalFile != element.getMetadata().getSize() && Objects.isNull(element.getMetadata().getLink())) {
 				element.setError(new Throwable("The size of the file is not equal: " + element.getMetadata().getPath()));
 				System.out.println("The size of the file is not equal: " + element.getMetadata().getPath());
 			}
+			//TODO System.out.println
 			if (!shaLocalFile.equals(element.getMetadata().getSha1()) && Objects.isNull(element.getMetadata().getLink())) {
 				element.setError(new Throwable("The hash sum of the file is not equal: " + element.getMetadata().getPath()));
 				System.out.println("The hash sum of the file is not equal: " + element.getMetadata().getPath());

@@ -42,7 +42,8 @@ import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.ui.StarterStatusFrame;
-import by.gdev.ui.ValidatorMessageSubscriber;
+import by.gdev.ui.subscriber.UploadErrorMessageSubscriber;
+import by.gdev.ui.subscriber.ValidatorMessageSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -66,10 +67,12 @@ public class Starter {
 	private Repo dependencis;
 	JavaProcess procces;
 	private StarterStatusFrame starterStatusFrame;
+	ResourceBundle bundle;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
 		this.starterConfig = starterConfig;
+		bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 	}
 
 	/**
@@ -83,6 +86,7 @@ public class Starter {
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
 			eventBus.register(new ValidatorMessageSubscriber(starterStatusFrame));
+			eventBus.register(new UploadErrorMessageSubscriber(bundle, eventBus));
 			starterStatusFrame.setVisible(true);
 		}
 	}
@@ -96,7 +100,7 @@ public class Starter {
 	 * Validate files,java and return what we need to download
 	 */
 	public void validateEnvironmentAndAppRequirements() throws Exception {
-		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+		
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
 		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),	new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
