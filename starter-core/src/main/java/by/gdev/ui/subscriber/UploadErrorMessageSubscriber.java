@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.upload.exeption.HashSumError;
+import by.gdev.http.upload.exeption.HashSumAndSizeError;
 import by.gdev.http.upload.exeption.UploadFileException;
 import by.gdev.http.upload.model.downloader.DownloaderStatus;
 import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
@@ -27,8 +27,8 @@ public class UploadErrorMessageSubscriber {
 					String s = String.format(bundle.getString("upload.error"), t1.getUri(), t1.getLocalPath(),
 							t1.getLocalizedMessage());
 					eventBus.post(new ValidationExceptionMessage(s));
-				}else if (t instanceof HashSumError) {
-					HashSumError t1 = (HashSumError) t;
+				}else if (t instanceof HashSumAndSizeError) {
+					HashSumAndSizeError t1 = (HashSumAndSizeError) t;
 					String s = String.format(bundle.getString("upload.error.hash.sum"), t1.getUri());
 					eventBus.post(new ValidationExceptionMessage(s));
 				}
