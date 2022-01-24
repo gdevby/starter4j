@@ -129,13 +129,10 @@ public class Starter {
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig,
-				httpConfig.getInstanceHttpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
-				maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				Paths.get("target/out", "config"), 600000);
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,starterConfig.getCacheDirectory(), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
