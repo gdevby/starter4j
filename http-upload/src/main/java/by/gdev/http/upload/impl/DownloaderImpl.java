@@ -63,8 +63,7 @@ public class DownloaderImpl implements Downloader {
 	private volatile DownloaderStatusEnum status;
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
-//	private volatile long fullDownloadSize;
-	private long fullDownloadSize1;
+	private long fullDownloadSize;
 	private long downloadBytesNow1;
 	private LocalTime start;
 
@@ -90,14 +89,13 @@ public class DownloaderImpl implements Downloader {
 				downloadElements.add(element);
 			});
 		}
-//		fullDownloadSize = totalSize(downloadElements);
 		allConteinerSize.add(container.getContainerSize());
 		pathToDownload = container.getDestinationRepositories();
 	}
 
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		fullDownloadSize1 = totalSize1(allConteinerSize);
+		fullDownloadSize = totalSize(allConteinerSize);
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
@@ -132,16 +130,18 @@ public class DownloaderImpl implements Downloader {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
+		List<Throwable> errorList = new ArrayList<Throwable>();
 		double thirty = Duration.between(start, LocalTime.now()).getSeconds();
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
-//			statusDownload.setDownloadSize(downloadBytesNow);
-//			statusDownload.setDownloadSize(sizeDownloadNow());
+			if (Objects.nonNull(elem.getError()))
+			errorList.add(elem.getError());
 		}
+		statusDownload.setThrowables(errorList);
 		statusDownload.setDownloadSize(sizeDownloadNow());
 		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
-		statusDownload.setAllDownloadSize(fullDownloadSize1);
+		statusDownload.setAllDownloadSize(fullDownloadSize);
 		statusDownload.setLeftFiles(processedElements.size());
 		statusDownload.setAllFiles(allCountElement);
 		return statusDownload;
@@ -149,7 +149,6 @@ public class DownloaderImpl implements Downloader {
 
 	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException, IOException {
 		LocalTime start = LocalTime.now();
-		LocalTime test = LocalTime.now().plusSeconds(1);
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
 			workedAnyThread = false;
@@ -158,29 +157,17 @@ public class DownloaderImpl implements Downloader {
 			if (start.isBefore(LocalTime.now())) {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
-					if (start.getSecond() != test.getSecond())
+					if (start.getSecond() != start.plusSeconds(1).getSecond())
 					eventBus.post(averageSpeed());
 				}
 			}
 		}
-		//TODO send event DONE if not cancel and add errors
-		//if cancel only sent event with status cancel 
-		//TODO throw error if there is the error  if synch
+		status = DownloaderStatusEnum.DONE;
+		if (status.equals(DownloaderStatusEnum.DONE) && !status.equals(DownloaderStatusEnum.CANCEL))
+			eventBus.post(averageSpeed());
 	}
-
-//	private long totalSize(Queue<DownloadElement> downloadElements) {
-//		List<Long> sizeList = new ArrayList<Long>();
-//		downloadElements.forEach(size -> {
-//			sizeList.add(size.getMetadata().getSize());
-//		});
-//		long sum = 0;
-//		for (long l : sizeList) {
-//			sum += l;
-//		}
-//		return sum;
-//	}
 	
-	private long totalSize1(List<Long> containerSize) {
+	private long totalSize(List<Long> containerSize) {
 		long sum = 0;
 		for (long l : containerSize)
 			sum += l;

@@ -100,9 +100,9 @@ public class Starter {
 	 * Validate files,java and return what we need to download
 	 */
 	public void validateEnvironmentAndAppRequirements() throws Exception {
-		
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
-		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),	new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
+		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
+				new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
 		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
@@ -141,9 +141,13 @@ public class Starter {
 		DownloaderContainer container = new DownloaderContainer();
 		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
 		fileRepo = all.getAppFileRepo();
-		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		JVMConfig jvm = gsonService.getObject(all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),JVMConfig.class, false);
+		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)
+				+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)
+				+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		JVMConfig jvm = gsonService.getObject(
+				all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),
+				JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
@@ -172,13 +176,15 @@ public class Starter {
 	 * switch off command 'Starter run app'
 	 * 
 	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
 		Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
-		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),new File(starterConfig.getWorkDirectory()), eventBus);
-		String classPath = DesktopUtil.convertListToString(File.pathSeparator,javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
+		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),
+				new File(starterConfig.getWorkDirectory()), eventBus);
+		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
+				javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
 		javaProcess.addCommands(all.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(all.getMainClass());
