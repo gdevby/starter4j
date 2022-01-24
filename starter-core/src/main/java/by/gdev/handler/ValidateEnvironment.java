@@ -9,7 +9,7 @@ import by.gdev.model.ValidationExceptionMessage;
 public interface ValidateEnvironment {
 
 	/**
-	 * Этот метод валидирует один случай
+	 * This method validates a specific case
 	 * @return
 	 * @throws InterruptedException 
 	 * @throws IOException 
@@ -20,7 +20,7 @@ public interface ValidateEnvironment {
 	 */
 	boolean validate();
 	/**
-	 * возвращает сообщение для показа и после будет генерирывать события для busevent
+	 * Returns an error message
 	 * @return
 	 */
 	ValidationExceptionMessage getExceptionMessage();

@@ -41,17 +41,11 @@
 			<version>5.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>30.1.1-jre</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
 			<version>5.11.2</version>
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>
@@ -87,7 +81,7 @@
 				<version>5.11.2</version>
 				<configuration>
 				<!-- 1080 -->
-					<serverPort>6784</serverPort>
+					<serverPort>6794</serverPort>
 				</configuration>
 				<executions>
 					<execution>
@@ -109,5 +103,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
