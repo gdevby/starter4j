@@ -3,11 +3,11 @@ package by.gdev.model;
 import lombok.Data;
 
 @Data
-//TODO переименовать 
-public class ValidationExceptionMessage {
+
+public class ExceptionMessage {
 	String message;
 	
-	public ValidationExceptionMessage(String message) {
+	public ExceptionMessage(String message) {
 		this.message = message;
 	}
 	
