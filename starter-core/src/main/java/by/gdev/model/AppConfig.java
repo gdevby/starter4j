@@ -8,6 +8,7 @@ import by.gdev.util.model.download.Repo;
 /**
  * Updating for every version.
  * This class describes the main appconfig
+ * @author Robert Makrytski
  */
  
 @Data
