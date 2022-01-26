@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.beust.jcommander.Parameter;
 
 import by.gdev.util.DesktopUtil;
@@ -23,11 +21,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StarterAppConfig{
-	private static final String APP_CONFIG = "/appConfig.json";
-	
+public class StarterAppConfig {
+
+	private static final String APP_CONFIG = "appConfig.json";
+	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
+
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
-    private long minMemorySize;
+	private long minMemorySize;
 	@Parameter(names = "-mainAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default")
 	private String serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
@@ -38,51 +38,50 @@ public class StarterAppConfig{
 	private Path cacheDirectory;
 	@Parameter(names = "-version", description = "Specifies the version of the application to launch. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. "
 			+ "This way we can install old versions of the application. For this you need set exactly version.")
-	private Double version;
+	private String version;
 	@Parameter(names = "-urlConnection", description = "List of sites for checking Internet connection access")
-	private List <String> urlConnection;
+	private List<String> urlConnection;
 	@Parameter(names = "-attempts", description = "The number of allowed attempts to restore the connection")
 	private int maxAttempts;
-	@Parameter(names = "-connectTimeout", description = "Value to set setConnectTimeout")
+	@Parameter(names = "-connectTimeout", description = "set connect timeout")
 	private int connectTimeout;
-	@Parameter(names = "-socketTimeout", description = "Value to set setSocketTimeout")
+	@Parameter(names = "-socketTimeout", description = "set socket timeout")
 	private int socketTimeout;
 	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
 	private boolean stop;
-	
+
 	public static final StarterAppConfig DEFAULT_CONFIG;
 	static {
-		DEFAULT_CONFIG = new StarterAppConfig(500, 
-				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", //download from github
-				"Bootstrap/", Paths.get("Bootstrap/cache"), 1.0, 
-				Arrays.asList("http://www.google.com","http://www.baidu.com"), 
-				3,60000,60000, false);
+		DEFAULT_CONFIG = new StarterAppConfig(500,
+				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", // download
+																														// from
+																														// github
+				"starter/", Paths.get("starter/cache"), "1.0",
+				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, false);
 	}
-	
-	public String getServerFileConifg(StarterAppConfig config) {
-		if (Objects.isNull(config.getVersion()))
-			return config.getServerFile() + APP_CONFIG;
+
+	public String getServerFileConfig(StarterAppConfig config, String version) {
+		if (Objects.isNull(version))
+			return String.join("/", config.getServerFile(), APP_CONFIG);
 		else {
-			String[] str = config.getServerFile().split("/");
-			String[] newstr = ArrayUtils.insert(str.length, str, String.valueOf(config.getVersion()));
-			String joinedString = String.join("/", newstr) + APP_CONFIG;
-			return joinedString;
+			return String.join("/", config.getServerFile(), version, APP_CONFIG);
 		}
 	}
-	
+
 	public String workDir(String workDirectory) throws IOException {
 		Path installer = Paths.get("installer.properties");
 		String dir = "";
 		if (new File(installer.toAbsolutePath().toString()).exists()) {
 			Properties property = new Properties();
-			 FileInputStream fis = new FileInputStream(String.valueOf(installer.toAbsolutePath()));
-			 property.load(fis);
-			 dir = property.getProperty("work.dir");
+			FileInputStream fis = new FileInputStream(String.valueOf(installer.toAbsolutePath()));
+			property.load(fis);
+			dir = property.getProperty("work.dir");
 		}
-		 if (!workDirectory.equals(""))
-			 return workDirectory;
-		 else if (!dir.equals(""))
-			 return dir;
-		 else return DesktopUtil.getSystemPath(OSInfo.OSType.LINUX, "starter").toString();
+		if (!workDirectory.equals(""))
+			return workDirectory;
+		else if (!dir.equals(""))
+			return dir;
+		else
+			return DesktopUtil.getSystemPath(OSInfo.OSType.LINUX, "starter").toString();
 	}
 }

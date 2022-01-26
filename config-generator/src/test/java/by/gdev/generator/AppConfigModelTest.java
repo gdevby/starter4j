@@ -16,7 +16,7 @@ public class AppConfigModelTest {
 		String[] argv = { "-name", "new-name", "-version", "1.1", "-jvmArguments", "first", "-jvmArguments","second", "-skinJVMGeneration"};
 		JCommander.newBuilder().addObject(acm).build().parse(argv);
 		Assert.assertEquals(acm.getAppName(), "new-name");
-		Assert.assertEquals(acm.getAppVersion(), 1.1, 0.0);
+		Assert.assertEquals(acm.getAppVersion(), "1.1");
 		Assert.assertEquals(acm.getJvmArguments(), Arrays.asList("first", "second"));
 		Assert.assertTrue(acm.isSkinJVMGeneration());
 	}

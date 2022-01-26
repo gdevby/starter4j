@@ -10,7 +10,6 @@ import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
 import by.gdev.model.StarterAppConfig;
-import by.gdev.subscruber.ConsoleSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class Main {
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		try {
 			Starter s = new Starter(eventBus, starterConfig);
-			s.collectOSInfo();
+			s.collectOSInfoAndRegisterSubscriber();
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();
 			s.runApp();
