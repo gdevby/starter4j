@@ -31,6 +31,6 @@ public class ValidateFont implements ValidateEnvironment {
 
 	@Override
 	public ExceptionMessage getExceptionMessage() {
-		return new ExceptionMessage(bundle.getString("validate.font"));
+		return new ExceptionMessage(bundle.getString("validate.font"),"https://gdev.by/help/java/font-error.html");
 	}
 }

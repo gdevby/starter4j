@@ -20,7 +20,7 @@ public class ConsoleSubscriber {
     public void message(String s) {
     	log.info(s);
     }
-
+    //TODO it is not the messageToSpeed improve method
     @Subscribe
     public void messageToSpeed(DownloaderStatus status) {
     	log.info(String.format(bundle.getString("upload.speed"), String.format("%.1f", status.getSpeed()),status.getLeftFiles(), status.getAllFiles(), status.getDownloadSize()/1048576, status.getAllDownloadSize()/1048576));
@@ -43,7 +43,7 @@ public class ConsoleSubscriber {
 	}
     
     @Subscribe
-    public void valodateMessage(ExceptionMessage message) {
+    public void validateMessage(ExceptionMessage message) {
     	log.error(message.printValidationMessage());
     }
 }
