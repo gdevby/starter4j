@@ -16,7 +16,7 @@ public class AppConfigModel{
 	@Parameter(names = "-name", description = "Application Name")
     private String appName;	
 	@Parameter(names = "-version", description = "Application version")
-    private double appVersion;	
+    private String appVersion;	
 	@Parameter(names = "-mainClass", description = "The main class for running the application")
     private String mainClass;  
 	@Parameter(names = "-appArguments", description = "Application arguments")
@@ -46,7 +46,7 @@ public class AppConfigModel{
 	static {		
     	DEFAULT_APP_CONFIG_MODEL = new AppConfigModel(
     			"starter-app",
-    			1.0, 
+    			"1.0", 
     			"desktop.starter.app.Main", 
     			Arrays.asList("",""),
     			Arrays.asList("-Xmx512m","-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true"),

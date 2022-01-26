@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DesktopUtil {
 	private static final String PROTECTION = "protection.txt";
-	private FileLock lock;
+	private static FileLock lock;
 	@SuppressWarnings("serial")
 	public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {
 		{
@@ -162,9 +162,9 @@ public class DesktopUtil {
 		};
 	}
 
-	public static void sleep(int seconds) {
+	public static void sleep(int milliSeconds) {
 		try {
-			Thread.sleep(1000 * seconds);
+			Thread.sleep(milliSeconds);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -186,34 +186,37 @@ public class DesktopUtil {
 		}
 		return attempt;
 	}
-	
-    private static void createDirectory(File file) throws IOException {
-        if (file.isFile())
-            return;
-        if (file.getParentFile() != null)
-            file.getParentFile().mkdirs();
-    }	
-	
-	public void diactivateDoubleDownloadingResourcesLock() throws IOException {
-        if (Objects.nonNull(lock))
-            lock.release();
-    }
-	
-	/**
-	 * Converts an array to a string separating each element with the specified delimiter
-	 * @param del separator
-	 * @param list an array whose elements need to be converted to a single string
-	 * @return A string of the list array, each element of which is delimited by the specified delimiter
-	 */
-    public static String convertListToString(String del, List<Path> list) {
-        StringBuilder b = new StringBuilder();
-        for (Path string : list) {
-            b.append(string).append(del);
-        }
-        return b.toString();
-    }
 
-	public void activeDoubleDownloadingResourcesLock(String container) throws IOException {
+	private static void createDirectory(File file) throws IOException {
+		if (file.isFile())
+			return;
+		if (file.getParentFile() != null)
+			file.getParentFile().mkdirs();
+	}
+
+	public static void diactivateDoubleDownloadingResourcesLock() throws IOException {
+		if (Objects.nonNull(lock))
+			lock.release();
+	}
+
+	/**
+	 * Converts an array to a string separating each element with the specified
+	 * delimiter
+	 * 
+	 * @param del  separator
+	 * @param list an array whose elements need to be converted to a single string
+	 * @return A string of the list array, each element of which is delimited by the
+	 *         specified delimiter
+	 */
+	public static String convertListToString(String del, List<Path> list) {
+		StringBuilder b = new StringBuilder();
+		for (Path string : list) {
+			b.append(string).append(del);
+		}
+		return b.toString();
+	}
+
+	public static void activeDoubleDownloadingResourcesLock(String container) throws IOException {
 		File f = new File(container, PROTECTION);
 		createDirectory(f);
 		if (f.exists()) {
@@ -271,6 +274,7 @@ public class DesktopUtil {
 				}
 		}
 	}
+
 	/**
 	 * Some windows has problem with JFileChooser when you use look and feel
 	 */

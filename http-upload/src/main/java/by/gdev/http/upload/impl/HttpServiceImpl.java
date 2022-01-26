@@ -110,7 +110,7 @@ public class HttpServiceImpl implements HttpService {
 				HttpEntity entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == 404) {
 	                EntityUtils.consume(entity);
-	                throw new FileNotFoundException(String.valueOf(response.getStatusLine()));
+	                throw new FileNotFoundException(String.valueOf(response.getStatusLine() +" " + url));
 	            }		
 				if (response.getStatusLine().getStatusCode() > 500) {
 	                EntityUtils.consume(entity);

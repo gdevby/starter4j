@@ -16,7 +16,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.net.UrlEscapers;
 import com.google.gson.Gson;
 
 import by.gdev.generator.model.AppConfigModel;
@@ -76,7 +75,7 @@ public class StarterCoreTest {
 	public void mainTest() throws Exception {
 		String[] configGenerator = {"-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass" , "desktop.starter.app.Main"};
 		by.gdev.generator.Main.main(configGenerator);
-		String[] starterCoreArg = { "-mainAppConfig",UrlEscapers.urlFragmentEscaper().escape("http://127.0.0.1:65079/test-core/0.9"), 
+		String[] starterCoreArg = { "-version", "0.9", "-mainAppConfig","http://127.0.0.1:65079/test-core", 
 				"-workDirectory" , testWorkDirectory, "-stop"};
 		by.gdev.Main.main(starterCoreArg);
 	}

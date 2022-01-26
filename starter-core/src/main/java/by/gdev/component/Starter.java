@@ -2,9 +2,11 @@ package by.gdev.component;
 
 import java.awt.GraphicsEnvironment;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,24 +39,29 @@ import by.gdev.http.upload.service.FileCacheService;
 import by.gdev.http.upload.service.GsonService;
 import by.gdev.http.upload.service.HttpService;
 import by.gdev.model.AppConfig;
+import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.UpdateFrame;
 import by.gdev.ui.subscriber.UploadErrorMessageSubscriber;
 import by.gdev.ui.subscriber.ValidatorMessageSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.StringVersionComparator;
 import by.gdev.util.model.download.Repo;
+import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * I want to see all possible implementations and idea. So we can implement
  * upper abstraction with system.out messages!
+ * 
  * @author Robert Makrytski
  */
 @Slf4j
@@ -63,7 +70,7 @@ public class Starter {
 	private StarterAppConfig starterConfig;
 	private OSType osType;
 	private Arch osArc;
-	private AppConfig all;
+	private AppConfig remoteAppConfig;
 	private Repo java;
 	private Repo fileRepo;
 	private Repo dependencis;
@@ -80,7 +87,7 @@ public class Starter {
 	/**
 	 * Get information about current OS
 	 */
-	public void collectOSInfo() {
+	public void collectOSInfoAndRegisterSubscriber() {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {
@@ -129,25 +136,35 @@ public class Starter {
 		log.info("Start loading");
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
-		DesktopUtil desktopUtil = new DesktopUtil();
-		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
+		DesktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,starterConfig.getCacheDirectory(), 600000);
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
+				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
+				requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
+				maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
+				starterConfig.getCacheDirectory(), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		all = gsonService.getObject(starterConfig.getServerFileConifg(starterConfig), AppConfig.class, false);
-		fileRepo = all.getAppFileRepo();
-		dependencis = gsonService.getObject(all.getAppDependencies().getRepositories().get(0)
-				+ all.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		Repo resources = gsonService.getObject(all.getAppResources().getRepositories().get(0)
-				+ all.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		JVMConfig jvm = gsonService.getObject(
-				all.getJavaRepo().getRepositories().get(0) + all.getJavaRepo().getResources().get(0).getRelativeUrl(),
-				JVMConfig.class, false);
+		// to shtis
+
+		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null),
+				AppConfig.class, false);
+
+		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
+		
+		updateApp(gsonService, fileMapperService);
+
+		fileRepo = remoteAppConfig.getAppFileRepo();
+		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)
+				+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)
+				+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)
+				+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
@@ -167,8 +184,41 @@ public class Starter {
 			downloader.addContainer(container);
 		}
 		downloader.startDownload(true);
-		desktopUtil.diactivateDoubleDownloadingResourcesLock();
+		DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
+	}
+
+	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		AppLocalConfig appLocalConfig;
+		try {
+			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		} catch (Exception e) {
+			appLocalConfig = new AppLocalConfig();
+			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
+		StringVersionComparator versionComparator = new StringVersionComparator();
+		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) != 1) {
+			if (!GraphicsEnvironment.isHeadless()) {
+				// used old config without update
+				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
+
+					remoteAppConfig = gsonService.getObject(
+							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+							AppConfig.class, false);
+				} else {
+					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle,
+							appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion(), fileMapperService);
+					if (frame.getUserChoose() == 1) {
+						remoteAppConfig = gsonService.getObject(
+								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+								AppConfig.class, false);
+					}
+				}
+
+			}
+		}
 	}
 
 	/**
@@ -185,9 +235,9 @@ public class Starter {
 				new File(starterConfig.getWorkDirectory()), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
 				javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
-		javaProcess.addCommands(all.getJvmArguments());
+		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
-		javaProcess.addCommand(all.getMainClass());
+		javaProcess.addCommand(remoteAppConfig.getMainClass());
 		procces = javaProcess.start();
 		if (starterConfig.isStop()) {
 			Thread.sleep(600);

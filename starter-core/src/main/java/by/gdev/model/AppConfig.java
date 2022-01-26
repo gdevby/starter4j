@@ -19,9 +19,9 @@ public class AppConfig {
      */
     private String appName;
     /**
-     * Applications version
+     * Applications version, example 0.9.12.10
      */
-    private double appVersion;
+    private String appVersion;
     /**
      * Main class of the launched application
      */
