@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.config.RequestConfig;
@@ -19,6 +20,7 @@ import com.google.common.net.UrlEscapers;
 import com.google.gson.Gson;
 
 import by.gdev.generator.model.AppConfigModel;
+import by.gdev.handler.Localise;
 import by.gdev.http.upload.config.HttpClientConfig;
 import by.gdev.http.upload.impl.DownloaderImpl;
 import by.gdev.http.upload.impl.FileCacheServiceImpl;
@@ -56,7 +58,8 @@ public class StarterCoreTest {
 			testFolder.toFile().mkdirs();
 			HttpClientConfig httpConfig = new HttpClientConfig();
 			EventBus eventBus = new EventBus();
-			eventBus.register(new ConsoleSubscriber());
+			ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+			eventBus.register(new ConsoleSubscriber(bundle));
 			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 			HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
 			FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);

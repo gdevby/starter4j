@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * We can config direct link and part path.
- *
+ * @author Robert Makrytski
  */
 @Data
 public class RepoVersion {

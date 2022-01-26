@@ -2,7 +2,7 @@ package by.gdev.handler;
 
 import java.util.ResourceBundle;
 
-import by.gdev.model.ValidationExceptionMessage;
+import by.gdev.model.ExceptionMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class ValidateUpdate implements ValidateEnvironment {
 	}
 
 	@Override
-	public ValidationExceptionMessage getExceptionMessage() {
-		return new ValidationExceptionMessage(bundle.getString("validate.update"));
+	public ExceptionMessage getExceptionMessage() {
+		return new ExceptionMessage(bundle.getString("validate.update"));
 	}
 }

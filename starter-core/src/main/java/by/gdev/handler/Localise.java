@@ -24,7 +24,7 @@ public class Localise {
 				if (string.equals(Locale.getDefault().toString())) {
 					locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
 				}else {
-					locale = new Locale.Builder().setLanguage("ru").build();
+					locale = new Locale.Builder().setLanguage("en").build();
 				}
 			}
 		} catch (IOException e) {
