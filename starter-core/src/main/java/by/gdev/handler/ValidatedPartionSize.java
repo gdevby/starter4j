@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-import by.gdev.model.ValidationExceptionMessage;
+import by.gdev.model.ExceptionMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +35,7 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 	}
 	
 	@Override
-	public ValidationExceptionMessage getExceptionMessage() {
-		return new ValidationExceptionMessage(String.format(bundle.getString("validate.size"), workDir , workDir.getFreeSpace() / 1024 / 1024, workDir));
+	public ExceptionMessage getExceptionMessage() {
+		return new ExceptionMessage(String.format(bundle.getString("validate.size"), workDir , workDir.getFreeSpace() / 1024 / 1024, workDir));
 	}
 }

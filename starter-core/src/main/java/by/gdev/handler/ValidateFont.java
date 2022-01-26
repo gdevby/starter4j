@@ -4,7 +4,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
 
-import by.gdev.model.ValidationExceptionMessage;
+import by.gdev.model.ExceptionMessage;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 
@@ -30,7 +30,7 @@ public class ValidateFont implements ValidateEnvironment {
 	}
 
 	@Override
-	public ValidationExceptionMessage getExceptionMessage() {
-		return new ValidationExceptionMessage(bundle.getString("validate.font"));
+	public ExceptionMessage getExceptionMessage() {
+		return new ExceptionMessage(bundle.getString("validate.font"));
 	}
 }

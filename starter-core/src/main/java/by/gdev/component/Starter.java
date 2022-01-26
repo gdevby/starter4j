@@ -41,6 +41,7 @@ import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
+import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.subscriber.UploadErrorMessageSubscriber;
 import by.gdev.ui.subscriber.ValidatorMessageSubscriber;
@@ -54,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * I want to see all possible implementations and idea. So we can implement
  * upper abstraction with system.out messages!
+ * @author Robert Makrytski
  */
 @Slf4j
 public class Starter {
@@ -87,6 +89,7 @@ public class Starter {
 			eventBus.register(starterStatusFrame);
 			eventBus.register(new ValidatorMessageSubscriber(starterStatusFrame));
 			eventBus.register(new UploadErrorMessageSubscriber(bundle, eventBus));
+			eventBus.register(new ConsoleSubscriber(bundle));
 			starterStatusFrame.setVisible(true);
 		}
 	}
@@ -129,13 +132,10 @@ public class Starter {
 		DesktopUtil desktopUtil = new DesktopUtil();
 		desktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), 4, requestConfig,
-				httpConfig.getInstanceHttpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
-				maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				Paths.get("target/out", "config"), 600000);
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,starterConfig.getCacheDirectory(), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();

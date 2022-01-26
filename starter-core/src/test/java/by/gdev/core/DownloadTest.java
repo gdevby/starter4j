@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ import org.mockserver.model.HttpResponse;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 
+import by.gdev.handler.Localise;
 import by.gdev.http.upload.config.HttpClientConfig;
 import by.gdev.http.upload.exeption.StatusExeption;
 import by.gdev.http.upload.handler.PostHandlerImpl;
@@ -82,7 +84,8 @@ public class DownloadTest {
 		
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		EventBus eventBus = new EventBus();
-		eventBus.register(new ConsoleSubscriber());
+		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+		eventBus.register(new ConsoleSubscriber(bundle));
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);

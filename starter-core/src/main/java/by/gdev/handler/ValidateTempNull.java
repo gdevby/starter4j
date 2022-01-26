@@ -3,7 +3,7 @@ package by.gdev.handler;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import by.gdev.model.ValidationExceptionMessage;
+import by.gdev.model.ExceptionMessage;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class ValidateTempNull implements ValidateEnvironment {
 	}
 
 	@Override
-	public ValidationExceptionMessage getExceptionMessage() {
-		return new ValidationExceptionMessage(bundle.getString("validate.tempnull")); 
+	public ExceptionMessage getExceptionMessage() {
+		return new ExceptionMessage(bundle.getString("validate.tempnull")); 
 	}
 }
