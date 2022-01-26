@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
@@ -22,10 +24,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.util.DesktopUtil;
+import by.gdev.util.OSInfo.OSType;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,8 +40,9 @@ public class UpdateFrame extends JFrame {
 	private static final long serialVersionUID = 2832387031191814036L;
 	private AtomicInteger userChoose = new AtomicInteger();
 
-	public UpdateFrame(JFrame progressFrame, ResourceBundle resourceBundle, String currentVersion, String newVersion,
-			FileMapperService fileMapperService) {
+	public UpdateFrame(JFrame progressFrame, ResourceBundle resourceBundle, AppLocalConfig appLocalConfig,
+			AppConfig remoteAppConfig, StarterAppConfig starterAppConfig,
+			FileMapperService fileMapperService, OSType osType) {
 		progressFrame.setVisible(false);
 		setResizable(false);
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -59,9 +65,9 @@ public class UpdateFrame extends JFrame {
 		};
 		p.setOpaque(false);
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+		String link = String.join("/",starterAppConfig.getServerFile(), StarterAppConfig.APP_CHANGES_LOG);
 		JLabel text = new JLabelHtmlWrapper(
-				String.format(resourceBundle.getString("update.app"), currentVersion, newVersion));
+				String.format(resourceBundle.getString("update.app"), appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()));
 		text.setFont(text.getFont().deriveFont(Font.BOLD));
 		text.setHorizontalAlignment(JLabel.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -73,16 +79,24 @@ public class UpdateFrame extends JFrame {
 		addButton(new JButton(resourceBundle.getString("update")), buttonPanel, 2);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		verticalPanel.add(buttonPanel);
-		JCheckBox j = new JCheckBox(String.format(resourceBundle.getString("not.show.again"),newVersion));
+		JCheckBox j = new JCheckBox(String.format(resourceBundle.getString("not.show.again"), remoteAppConfig.getAppVersion()));
 		j.setAlignmentX(Component.CENTER_ALIGNMENT);
 		j.addActionListener((e) -> {
 			try {
 				AppLocalConfig app = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
 						AppLocalConfig.class);
-				app.setSkipUpdateVersion(newVersion);
+				app.setSkipUpdateVersion(remoteAppConfig.getAppVersion());
 				fileMapperService.write(app, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 			} catch (IOException e1) {
 				log.error("error",e1);
+			}
+		});
+		text.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					DesktopUtil.openLink(osType, link);
+				}
 			}
 		});
 		verticalPanel.add(j);

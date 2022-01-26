@@ -24,11 +24,13 @@ import lombok.NoArgsConstructor;
 public class StarterAppConfig {
 
 	private static final String APP_CONFIG = "appConfig.json";
+	public static final String APP_CHANGES_LOG= "changes.log";
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
 	@Parameter(names = "-mainAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default")
+	//TODO change to URI and improved description
 	private String serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
 			+ "The second way is to put in file with installer.  The file name is installer.properties which contains work.dir=... This is for production. "

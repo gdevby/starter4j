@@ -152,7 +152,7 @@ public class Starter {
 		// to shtis
 
 		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null),
-				AppConfig.class, false);
+				AppConfig.class, true);
 
 		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
 		
@@ -160,14 +160,14 @@ public class Starter {
 
 		fileRepo = remoteAppConfig.getAppFileRepo();
 		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)
-				+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+				+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, true);
 		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)
-				+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+				+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
 		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)
-				+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+				+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
-		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, false);
+		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, true);
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(fileRepo);
 		list.add(dependencis);
@@ -199,7 +199,7 @@ public class Starter {
 			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 		}
 		StringVersionComparator versionComparator = new StringVersionComparator();
-		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) != 1) {
+		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == 1) {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
@@ -208,12 +208,14 @@ public class Starter {
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
 				} else {
-					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle,
-							appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion(), fileMapperService);
+					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig, starterConfig, fileMapperService,osType);
 					if (frame.getUserChoose() == 1) {
 						remoteAppConfig = gsonService.getObject(
 								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-								AppConfig.class, false);
+								AppConfig.class, true);
+					}else {
+						appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+						fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 					}
 				}
 
