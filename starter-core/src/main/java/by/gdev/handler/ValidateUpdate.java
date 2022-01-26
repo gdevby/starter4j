@@ -4,9 +4,8 @@ import java.util.ResourceBundle;
 
 import by.gdev.model.ExceptionMessage;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+//@Slf4j
 @AllArgsConstructor
 public class ValidateUpdate implements ValidateEnvironment {
 

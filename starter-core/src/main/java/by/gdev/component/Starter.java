@@ -42,13 +42,13 @@ import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.model.StatusModel;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.UpdateFrame;
-import by.gdev.ui.subscriber.UploadErrorMessageSubscriber;
-import by.gdev.ui.subscriber.ValidatorMessageSubscriber;
+import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -94,11 +94,13 @@ public class Starter {
 			starterStatusFrame = new StarterStatusFrame(osType, "get installed app name", true,
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
-			eventBus.register(new ValidatorMessageSubscriber(starterStatusFrame));
-			eventBus.register(new UploadErrorMessageSubscriber(bundle, eventBus));
+			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType));
 			eventBus.register(new ConsoleSubscriber(bundle));
 			starterStatusFrame.setVisible(true);
 		}
+		StatusModel m = new StatusModel();
+		m.setErrorCode(-1073740791);
+		eventBus.post(m);
 	}
 
 	// TODO aleksandr to delete
@@ -151,16 +153,19 @@ public class Starter {
 		DownloaderContainer container = new DownloaderContainer();
 		// to shtis
 
-		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null),
-				AppConfig.class, true);
+		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,
+				true);
 
-		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
-		
+		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,
+				starterConfig.getWorkDirectory());
+
 		updateApp(gsonService, fileMapperService);
 
 		fileRepo = remoteAppConfig.getAppFileRepo();
-		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)
-				+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, true);
+		dependencis = gsonService.getObject(
+				remoteAppConfig.getAppDependencies().getRepositories().get(0)
+						+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(),
+				Repo.class, true);
 		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)
 				+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
 		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)
@@ -208,12 +213,13 @@ public class Starter {
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
 				} else {
-					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig, starterConfig, fileMapperService,osType);
+					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig,
+							starterConfig, fileMapperService, osType);
 					if (frame.getUserChoose() == 1) {
 						remoteAppConfig = gsonService.getObject(
 								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 								AppConfig.class, true);
-					}else {
+					} else {
 						appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
 						fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 					}
