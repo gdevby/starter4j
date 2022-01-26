@@ -1,22 +1,19 @@
 package by.gdev.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -41,8 +38,8 @@ public class UpdateFrame extends JFrame {
 	private AtomicInteger userChoose = new AtomicInteger();
 
 	public UpdateFrame(JFrame progressFrame, ResourceBundle resourceBundle, AppLocalConfig appLocalConfig,
-			AppConfig remoteAppConfig, StarterAppConfig starterAppConfig,
-			FileMapperService fileMapperService, OSType osType) {
+			AppConfig remoteAppConfig, StarterAppConfig starterAppConfig, FileMapperService fileMapperService,
+			OSType osType) {
 		progressFrame.setVisible(false);
 		setResizable(false);
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -52,22 +49,12 @@ public class UpdateFrame extends JFrame {
 		setSize(new Dimension(width / 4, height / 5));
 		this.setLocation(width / 2 - this.getSize().width / 2, height / 2 - this.getSize().height / 2);
 		progressFrame.setVisible(false);
-		BufferedImage image = getImage();
-		JPanel p = new JPanel(new BorderLayout(0, 0)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void paint(Graphics g) {
-				if (Objects.nonNull(image))
-					g.drawImage(image, 0, 0, null);
-				super.paint(g);
-			}
-		};
-		p.setOpaque(false);
+		JPanel p = new JPanel(new BorderLayout(0, 0));
+		p.setBackground(Color.WHITE);
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		String link = String.join("/",starterAppConfig.getServerFile(), StarterAppConfig.APP_CHANGES_LOG);
-		JLabel text = new JLabelHtmlWrapper(
-				String.format(resourceBundle.getString("update.app"), appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()));
+		String link = String.join("/", starterAppConfig.getServerFile(), StarterAppConfig.APP_CHANGES_LOG);
+		JLabel text = new JLabelHtmlWrapper(String.format(resourceBundle.getString("update.app"),
+				appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()));
 		text.setFont(text.getFont().deriveFont(Font.BOLD));
 		text.setHorizontalAlignment(JLabel.CENTER);
 		JPanel buttonPanel = new JPanel(new FlowLayout());
@@ -79,7 +66,8 @@ public class UpdateFrame extends JFrame {
 		addButton(new JButton(resourceBundle.getString("update")), buttonPanel, 2);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		verticalPanel.add(buttonPanel);
-		JCheckBox j = new JCheckBox(String.format(resourceBundle.getString("not.show.again"), remoteAppConfig.getAppVersion()));
+		JCheckBox j = new JCheckBox(
+				String.format(resourceBundle.getString("not.show.again"), remoteAppConfig.getAppVersion()));
 		j.setAlignmentX(Component.CENTER_ALIGNMENT);
 		j.addActionListener((e) -> {
 			try {
@@ -88,15 +76,27 @@ public class UpdateFrame extends JFrame {
 				app.setSkipUpdateVersion(remoteAppConfig.getAppVersion());
 				fileMapperService.write(app, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 			} catch (IOException e1) {
-				log.error("error",e1);
+				log.error("error", e1);
 			}
 		});
 		text.addMouseListener(new MouseAdapter() {
+			private Color c = text.getForeground();
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					DesktopUtil.openLink(osType, link);
 				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				text.setForeground(Color.BLACK);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				text.setForeground(c);
 			}
 		});
 		verticalPanel.add(j);
@@ -106,24 +106,13 @@ public class UpdateFrame extends JFrame {
 		p.add(text, BorderLayout.CENTER);
 		p.add(verticalPanel, BorderLayout.SOUTH);
 		this.add(p);
-		
+
 		setVisible(true);
-		
-		
+
 		while (isVisible()) {
 			DesktopUtil.sleep(100);
 		}
 		progressFrame.setVisible(true);
-	}
-
-	private BufferedImage getImage() {
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(StarterStatusFrame.class.getResourceAsStream("/background.jpg"));
-		} catch (IOException e) {
-			log.warn("can't load image", e);
-		}
-		return image;
 	}
 
 	private void addButton(JButton b, JPanel panel, int code) {
