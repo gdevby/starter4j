@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-//TODO проверить работоспособность всего и сделать коммит, после чего удалить JavaProcess и перенести весь его функционал сюда
 public class ProcessMonitor extends Thread {
 	private final JavaProcess process;
 	private EventBus listener;

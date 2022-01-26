@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
 	
-	//TODO может удалить?!
     @Subscribe
     public void message(String s) {
     	log.info(s);
