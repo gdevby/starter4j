@@ -46,7 +46,7 @@ public class StarterStatusFrame extends JFrame {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
-		setSize(new Dimension(width / 5, height / 6));
+		setSize(new Dimension(width/5 , height / 5));
 		DesktopUtil.initLookAndFeel();
 
 		JPanel p = new JPanel(new BorderLayout(0, 0));
@@ -56,8 +56,9 @@ public class StarterStatusFrame extends JFrame {
 
 			@Override
 			public void paint(Graphics g) {
-				if (Objects.nonNull(image))
-					g.drawImage(image, 0, 0, null);
+				if (Objects.nonNull(image)) {
+					g.drawImage(image, 0, 0, getSize().width,getSize().height, null);
+				}
 				super.paint(g);
 			}
 		};
@@ -72,6 +73,7 @@ public class StarterStatusFrame extends JFrame {
 		f = nameLabel.getFont();
 		nameLabel.setFont(f.deriveFont((float) (f.getSize() + 5)));
 		nameLabel.setHorizontalAlignment(JLabel.CENTER);
+		nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, getSize().height/3, 0));
 
 		uploadStatus.setFont(uploadStatus.getFont().deriveFont(Font.BOLD));
 		uploadStatus.setHorizontalAlignment(JLabel.RIGHT);
