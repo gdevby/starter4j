@@ -3,7 +3,8 @@ package by.gdev.http.upload.handler;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 import by.gdev.http.upload.exeption.HashSumAndSizeError;
 import by.gdev.http.upload.model.Headers;
@@ -17,15 +18,22 @@ import lombok.extern.slf4j.Slf4j;
 public class PostHandlerImpl implements PostHandler {
 
 	@Override
-	public void postProcessDownloadElement(DownloadElement element)  {
+	public void postProcessDownloadElement(DownloadElement element) {
 		try {
-			String shaLocalFile = DesktopUtil.getChecksum(new File(element.getPathToDownload() + element.getMetadata().getPath()),Headers.SHA1.getValue());
+			String shaLocalFile = DesktopUtil.getChecksum(
+					new File(element.getPathToDownload() + element.getMetadata().getPath()), Headers.SHA1.getValue());
 			long sizeLocalFile = new File(element.getPathToDownload() + element.getMetadata().getPath()).length();
-			if (sizeLocalFile != element.getMetadata().getSize() && Objects.isNull(element.getMetadata().getLink())) 
-				element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(), element.getPathToDownload() + element.getMetadata().getPath(), "The size of the file is not equal"));
-			
-			if (!shaLocalFile.equals(element.getMetadata().getSha1()) && Objects.isNull(element.getMetadata().getLink()) )
-				element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(), element.getPathToDownload() + element.getMetadata().getPath(), "The hash sum of the file is not equal"));
+			if (sizeLocalFile != element.getMetadata().getSize()
+					&& StringUtils.isEmpty(element.getMetadata().getLink()))
+				element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(),
+						element.getPathToDownload() + element.getMetadata().getPath(),
+						"The size should be " + element.getMetadata().getSize()));
+			if (!shaLocalFile.equals(element.getMetadata().getSha1())
+					&& StringUtils.isEmpty(element.getMetadata().getLink()))
+				element.setError(new HashSumAndSizeError(
+						element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
+						element.getPathToDownload() + element.getMetadata().getPath(),
+						"The hash sum should be " + element.getMetadata().getSha1()));
 		} catch (IOException | NoSuchAlgorithmException e) {
 			log.error("Erorr", e);
 		}

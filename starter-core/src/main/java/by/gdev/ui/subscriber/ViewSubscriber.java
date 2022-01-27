@@ -47,14 +47,14 @@ public class ViewSubscriber {
 		if (DownloaderStatusEnum.DONE.equals(status.getDownloaderStatusEnum())) {
 			if (!status.getThrowables().isEmpty()) {
 				Throwable t = status.getThrowables().get(0);
-				if (t instanceof UploadFileException) {
+				if (t instanceof HashSumAndSizeError) {
+					HashSumAndSizeError t1 = (HashSumAndSizeError) t;
+					String s = String.format(bundle.getString("upload.error.hash.sum"),t1.getUri(), t1.getMessage());
+					message(new ExceptionMessage(s,t1.getUri()));
+				} else if (t instanceof UploadFileException) {
 					UploadFileException t1 = (UploadFileException) t;
 					String s = String.format(bundle.getString("upload.error"), t1.getUri(), t1.getLocalPath(),
 							t1.getLocalizedMessage());
-					message(new ExceptionMessage(s));
-				} else if (t instanceof HashSumAndSizeError) {
-					HashSumAndSizeError t1 = (HashSumAndSizeError) t;
-					String s = String.format(bundle.getString("upload.error.hash.sum"), t1.getUri());
 					message(new ExceptionMessage(s));
 				}
 			}
