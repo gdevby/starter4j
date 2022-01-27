@@ -78,10 +78,11 @@ public class Starter {
 	private StarterStatusFrame starterStatusFrame;
 	ResourceBundle bundle;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
 		this.eventBus = eventBus;
+		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+		
 	}
 
 	/**
