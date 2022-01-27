@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.io.FileUtils;
+
 import com.beust.jcommander.JCommander;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,6 +39,8 @@ public class Main {
 		AppConfig appConfig = appConfigCreator.createConfig(acm);
 		log.info("save config before uploading {}", new File(TARGET_OUT_FOLDER,APP_CONFIG).getAbsolutePath());	
 		fileMapperService.write(appConfig, Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), String.valueOf(acm.getAppVersion()), APP_CONFIG).toString());
+		FileUtils.copyFile(Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), String.valueOf(acm.getAppVersion()), APP_CONFIG).toFile(), 
+				Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), APP_CONFIG).toFile());
 		log.info("DONE");
 	}
 }

@@ -42,7 +42,6 @@ import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
-import by.gdev.model.StatusModel;
 import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.subscruber.ConsoleSubscriber;
@@ -74,9 +73,9 @@ public class Starter {
 	private Repo java;
 	private Repo fileRepo;
 	private Repo dependencis;
-	JavaProcess procces;
+	private JavaProcess procces;
 	private StarterStatusFrame starterStatusFrame;
-	ResourceBundle bundle;
+	private ResourceBundle bundle;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig) {
 		this.eventBus = eventBus;
@@ -98,9 +97,6 @@ public class Starter {
 			eventBus.register(new ConsoleSubscriber(bundle));
 			starterStatusFrame.setVisible(true);
 		}
-		StatusModel m = new StatusModel();
-		m.setErrorCode(-1073740791);
-		eventBus.post(m);
 	}
 
 	// TODO aleksandr to delete
@@ -140,36 +136,20 @@ public class Starter {
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
-				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				requestConfig, httpConfig.getInstanceHttpClient());
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
-				maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				starterConfig.getCacheDirectory(), 600000);
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		// to shtis
-
-		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,
-				true);
-
-		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,
-				starterConfig.getWorkDirectory());
-
+		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,true);
+		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
 		updateApp(gsonService, fileMapperService);
-
 		fileRepo = remoteAppConfig.getAppFileRepo();
-		dependencis = gsonService.getObject(
-				remoteAppConfig.getAppDependencies().getRepositories().get(0)
-						+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(),
-				Repo.class, true);
-		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)
-				+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
-		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)
-				+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
+		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(),Repo.class, true);
+		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
+		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
 		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, true);
