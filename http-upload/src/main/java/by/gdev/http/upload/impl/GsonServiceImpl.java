@@ -30,7 +30,6 @@ public class GsonServiceImpl implements GsonService {
 	
 	@Override
 	public <T> T getObject(String url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
-		log.trace("request -> " + url);
 		Path pathFile = fileService.getRawObject(url, cache);
 		try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
 			return gson.fromJson(read, class1);
