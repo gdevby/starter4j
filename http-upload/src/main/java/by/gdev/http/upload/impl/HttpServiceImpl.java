@@ -104,6 +104,8 @@ public class HttpServiceImpl implements HttpService {
 		HttpGet httpGet = new HttpGet(url);
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
+		if (!path.toFile().getParentFile().exists())
+			path.toFile().getParentFile().mkdirs();
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
 			try {
 				CloseableHttpResponse response = getResponse(httpGet);

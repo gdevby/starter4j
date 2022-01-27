@@ -20,6 +20,9 @@ import by.gdev.http.upload.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @AllArgsConstructor
 public class FileCacheServiceImpl implements FileCacheService {
 	private HttpService httpService;
@@ -57,13 +60,16 @@ public class FileCacheServiceImpl implements FileCacheService {
 			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
+				log.trace("Get file from cache: " + urlPath.getFileName());
 				return urlPath;
 			} else {
+				log.trace("Hash sum cache file not equal. The file will be downloaded: " + urlPath.getFileName());
 				RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 				createSha(serverMetadata, urlPath, metaFile);
 				return urlPath;
 			}
 		} else {
+			log.trace("File not exists. The file will be downloaded: " + urlPath.getFileName());
 			httpService.getRequestByUrlAndSave(url, urlPath);
 			checkMetadataFile(metaFile, url);
 			return urlPath;

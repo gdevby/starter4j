@@ -139,6 +139,7 @@ public class DownloaderImpl implements Downloader {
 		}
 		statusDownload.setThrowables(errorList);
 		statusDownload.setDownloadSize(sizeDownloadNow());
+		//TODO отдавать скорость в килобайтах, дальше проверять ее в собскрайбере 
 		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
 		statusDownload.setAllDownloadSize(fullDownloadSize);
@@ -158,7 +159,7 @@ public class DownloaderImpl implements Downloader {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
 					if (start.getSecond() != start.plusSeconds(1).getSecond())
-					eventBus.post(averageSpeed());
+							eventBus.post(averageSpeed());
 				}
 			}
 		}

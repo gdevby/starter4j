@@ -33,7 +33,6 @@ public class ProcessMonitor extends Thread {
 		InputStreamReader reader = new InputStreamReader(raw.getInputStream());
 		BufferedReader buf = new BufferedReader(reader);
 		String line;
-		//TODO зачем два цикла?
 		while (this.process.isRunning()) {
 			try {
 				while (Objects.nonNull(line = buf.readLine())) {
@@ -45,7 +44,7 @@ public class ProcessMonitor extends Thread {
 			} catch (IOException t) {
 				DesktopUtil.sleep(1);
 				StatusModel status = new StatusModel();
-				status.setErrorCode(raw.exitValue());
+//				status.setErrorCode(raw.exitValue());
 				status.setExeption(t);
             	listener.post(status);
 			} finally {

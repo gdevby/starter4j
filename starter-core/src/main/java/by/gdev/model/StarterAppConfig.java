@@ -29,8 +29,8 @@ public class StarterAppConfig {
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
-	@Parameter(names = "-mainAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default")
-	//TODO change to URI and improved description
+	
+	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description")
 	private String serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
 			+ "The second way is to put in file with installer.  The file name is installer.properties which contains work.dir=... This is for production. "
@@ -45,9 +45,9 @@ public class StarterAppConfig {
 	private List<String> urlConnection;
 	@Parameter(names = "-attempts", description = "The number of allowed attempts to restore the connection")
 	private int maxAttempts;
-	@Parameter(names = "-connectTimeout", description = "set connect timeout")
+	@Parameter(names = "-connectTimeout", description = "Set connect timeout")
 	private int connectTimeout;
-	@Parameter(names = "-socketTimeout", description = "set socket timeout")
+	@Parameter(names = "-socketTimeout", description = "Set socket timeout")
 	private int socketTimeout;
 	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
 	private boolean stop;
@@ -55,9 +55,7 @@ public class StarterAppConfig {
 	public static final StarterAppConfig DEFAULT_CONFIG;
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500,
-				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", // download
-																														// from
-																														// github
+				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", 
 				"starter/", Paths.get("starter/cache"), "1.0",
 				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, false);
 	}
