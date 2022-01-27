@@ -56,20 +56,20 @@ public class FileCacheServiceImpl implements FileCacheService {
 		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
 		if (urlPath.toFile().lastModified() < purgeTime) 
 			Files.deleteIfExists(urlPath); 
-		if (urlPath.toFile().exists()) {
+		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
-				log.trace("Get file from cache: " + urlPath.getFileName());
+				log.trace("HTTP HEAD -> " + url);
 				return urlPath;
 			} else {
-				log.trace("Hash sum cache file not equal. The file will be downloaded: " + urlPath.getFileName());
+				log.trace("not proper hashsum HTTP GET -> " + url);
 				RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 				createSha(serverMetadata, urlPath, metaFile);
 				return urlPath;
 			}
 		} else {
-			log.trace("File not exists. The file will be downloaded: " + urlPath.getFileName());
+			log.trace("HTTP GET -> " + url);
 			httpService.getRequestByUrlAndSave(url, urlPath);
 			checkMetadataFile(metaFile, url);
 			return urlPath;
