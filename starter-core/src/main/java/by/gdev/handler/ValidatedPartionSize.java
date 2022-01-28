@@ -29,6 +29,7 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 		} catch (IOException e) {
 			log.error("Error", e);
 		}finally {
+			//TODO why on exit?
 			workDir.deleteOnExit();
 		}
 		return true;

@@ -49,6 +49,7 @@ public class ProcessMonitor extends Thread {
             	listener.post(status);
 			} finally {
 				try {
+					//TODO close
 					buf.close();
 				} catch (IOException e) {
 					log.error("Error", e);

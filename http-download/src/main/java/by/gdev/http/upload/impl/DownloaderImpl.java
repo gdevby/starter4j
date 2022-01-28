@@ -33,6 +33,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * TODO improve 
  * @author Robert Makrytski This class is responsible for the state of the file
  *         upload
  */
@@ -90,11 +91,13 @@ public class DownloaderImpl implements Downloader {
 			});
 		}
 		allConteinerSize.add(container.getContainerSize());
+		//TODO how does it work with dirrents paths?
 		pathToDownload = container.getDestinationRepositories();
 	}
 
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
+		//TODO name of the totalSize method
 		fullDownloadSize = totalSize(allConteinerSize);
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
@@ -118,7 +121,9 @@ public class DownloaderImpl implements Downloader {
 		} else
 			throw new StatusExeption(status.toString());
 	}
-
+	/**
+	 * After stop it should be IDLE 
+	 */
 	@Override
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
@@ -134,6 +139,7 @@ public class DownloaderImpl implements Downloader {
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
 			if (Objects.nonNull(elem.getError()))
+				//TODO tabulation 
 			errorList.add(elem.getError());
 		}
 		statusDownload.setThrowables(errorList);
@@ -162,13 +168,15 @@ public class DownloaderImpl implements Downloader {
 			}
 		}
 		status = DownloaderStatusEnum.DONE;
+		//what is the sence if we set done !status.equals(DownloaderStatusEnum.CANCEL))
 		if (status.equals(DownloaderStatusEnum.DONE) && !status.equals(DownloaderStatusEnum.CANCEL)) {
 			eventBus.post(buildDownuladerStatus());
-			if (buildDownuladerStatus().getThrowables().size() != 0) 
+			if (buildDownuladerStatus().getThrowables().size() != 0)
+				//TODO subscribe and exist in subscriber, because we can't use this downloader in other places
 			System.exit(-1);
 		}
 	}
-	
+	//TODO nane of the method
 	private long totalSize(List<Long> containerSize) {
 		long sum = 0;
 		for (long l : containerSize)

@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-//TODO REVIEW IN FUTURE
+//TODO REVIEW IN FUTURE, try to implement wihtou this
 public class JavaProcess {
 	private final List<String> commands;
     private final Process process;

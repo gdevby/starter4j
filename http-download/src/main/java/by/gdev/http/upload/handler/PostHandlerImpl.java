@@ -12,7 +12,11 @@ import by.gdev.http.upload.model.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+/**
+ * TODO
+ * @author Robert Makrytski
+ *
+ */
 @Slf4j
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {

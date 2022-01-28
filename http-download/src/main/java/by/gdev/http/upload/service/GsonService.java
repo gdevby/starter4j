@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
+ * TODO improve description for params
  * Converted json file content of the file to java object
  */
 

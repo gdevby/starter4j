@@ -9,7 +9,11 @@ import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.OSType;
 import lombok.extern.slf4j.Slf4j;
-
+/**
+ * TODO
+ * @author Robert Makrytski
+ *
+ */
 @Slf4j
 public class AccesHandler implements PostHandler{
 

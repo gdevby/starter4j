@@ -7,7 +7,11 @@ import java.nio.file.Paths;
 
 import by.gdev.http.upload.model.downloader.DownloadElement;
 import lombok.extern.slf4j.Slf4j;
-
+/**
+ * TODO
+ * @author Robert Makrytski
+ *
+ */
 @Slf4j
 public class SimvolicLinkHandler implements PostHandler {
 

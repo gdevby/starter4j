@@ -4,7 +4,11 @@ import java.io.IOException;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
+/**
+ * TODO
+ * @author Robert Makrytski
+ *
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UploadFileException extends IOException {

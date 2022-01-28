@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
-	
+	//TODO remove
     @Subscribe
     public void message(String s) {
     	log.info(s);

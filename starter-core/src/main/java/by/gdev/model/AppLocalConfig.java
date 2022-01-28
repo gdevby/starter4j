@@ -2,7 +2,7 @@ package by.gdev.model;
 
 import lombok.Data;
 /**
- * Saved on client parameters for the for starter  
+ * Saved on client parameters for the starter  
  * 
  * @author Robert Makrytski
  *

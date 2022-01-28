@@ -39,7 +39,7 @@ public class Metadata {
      * If executable=true, this file is executable.
      */
     private boolean executable;
-    /**
+    /**TODO 
      * Поле указывающее на то, является ли файл символической ссылкой
      */
     private String link;
