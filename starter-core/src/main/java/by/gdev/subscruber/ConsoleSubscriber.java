@@ -7,7 +7,7 @@ import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.upload.model.downloader.DownloaderStatus;
 import by.gdev.model.ExceptionMessage;
-import by.gdev.model.StatusModel;
+import by.gdev.model.StarterAppProcess;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +28,7 @@ public class ConsoleSubscriber {
     }
 
     @Subscribe
-    private void procces(StatusModel status) {
+    private void procces(StarterAppProcess status) {
     	if (Objects.nonNull(status.getErrorCode())) {
     		if (status.getErrorCode() == -1073740791)
     			log.error(bundle.getString("driver.error"));

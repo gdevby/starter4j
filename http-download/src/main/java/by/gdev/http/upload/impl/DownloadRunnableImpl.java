@@ -11,12 +11,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import by.gdev.http.upload.exeption.UploadFileException;
 import by.gdev.http.upload.model.downloader.DownloadElement;
 import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
 import lombok.Data;
@@ -55,7 +57,8 @@ public class DownloadRunnableImpl implements Runnable {
 						download(element);
 						element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
 					}catch(Throwable e1) {
-						log.error("Error in run method", e1);
+						element.setError(new UploadFileException(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
+								element.getMetadata().getPath(), e1.getLocalizedMessage()));
 					}
 				} else {
 					break;
@@ -72,6 +75,7 @@ public class DownloadRunnableImpl implements Runnable {
 	 */
 	
 	private void download(DownloadElement element) throws IOException, InterruptedException {
+		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
 			int attempts = 1;
@@ -96,7 +100,7 @@ public class DownloadRunnableImpl implements Runnable {
 						HttpEntity entity = response.getEntity();
 						in = new BufferedInputStream(entity.getContent());
 						out = new BufferedOutputStream(new FileOutputStream(file, resume));
-						processedElements.add(element);
+						
 						byte[] buffer = new byte[1024];
 						int curread = in.read(buffer);
 						while (curread != -1) {
@@ -113,8 +117,8 @@ public class DownloadRunnableImpl implements Runnable {
 						element.setEnd(endTime);
 					} finally {
 						httpGet.abort();
-						out.close();
-						in.close();
+						IOUtils.close(out);
+						IOUtils.close(in);
 					}
 				} catch (SocketTimeoutException e) {
 					if (attempts == DEFAULT_MAX_ATTEMPTS)

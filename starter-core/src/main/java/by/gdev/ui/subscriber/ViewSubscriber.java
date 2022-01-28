@@ -15,7 +15,7 @@ import by.gdev.http.upload.exeption.UploadFileException;
 import by.gdev.http.upload.model.downloader.DownloaderStatus;
 import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
-import by.gdev.model.StatusModel;
+import by.gdev.model.StarterAppProcess;
 import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.util.DesktopUtil;
@@ -30,7 +30,7 @@ public class ViewSubscriber {
 	private OSType osType;
 
 	@Subscribe
-	private void procces(StatusModel status) {
+	private void procces(StarterAppProcess status) {
 		if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791) {
 				message(new ExceptionMessage(bundle.getString("driver.error"),"https://gdev.by/help/java/closed-minecraft-1073740791.html"));
@@ -53,8 +53,7 @@ public class ViewSubscriber {
 					message(new ExceptionMessage(s,t1.getUri()));
 				} else if (t instanceof UploadFileException) {
 					UploadFileException t1 = (UploadFileException) t;
-					String s = String.format(bundle.getString("upload.error"), t1.getUri(), t1.getLocalPath(),
-							t1.getLocalizedMessage());
+					String s = String.format(bundle.getString("upload.error"), t1.getUri(), t1.getMessage());
 					message(new ExceptionMessage(s));
 				}
 			}
