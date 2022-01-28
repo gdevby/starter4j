@@ -1,7 +1,12 @@
 package by.gdev.util;
 
 import java.util.Comparator;
-
+/**
+ * Compared string. Split with '.' and compared every number. 
+ * 
+ * @author Robert Makrytski
+ *
+ */
 public class StringVersionComparator implements Comparator<String> {
     @Override
     public int compare(String o1, String o2) {

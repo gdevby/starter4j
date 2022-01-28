@@ -19,6 +19,7 @@ public class ValidateTempDir implements ValidateEnvironment {
 	@Override
 	public boolean validate() {
 		Path folder = Paths.get(System.getProperty("java.io.tmpdir"));
+		//TODO where is the false return value?
 		try {
 			if (Files.isRegularFile(folder))
 				Files.delete(folder);

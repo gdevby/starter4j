@@ -16,9 +16,9 @@ public class Repo {
 	private List<String> repositories;
 	private List<Metadata> resources;
 	/**
-	 * Saves sha1 on the server allow to add more flexibility todo implement low
+	 * Saves sha1 on the server allow to add more flexibility implement low
 	 * priority
-	 * NOt implemented
+	 * Not implemented
 	 */
 	private boolean remoteServerSHA1;
 }

@@ -17,7 +17,11 @@ import by.gdev.util.OSInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * TODO 
+ * @author Robert Makrytski
+ *
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -67,7 +71,7 @@ public class StarterAppConfig {
 			return String.join("/", config.getServerFile(), version, APP_CONFIG);
 		}
 	}
-
+	//TODO add for what is it?
 	public String workDir(String workDirectory) throws IOException {
 		Path installer = Paths.get("installer.properties");
 		String dir = "";

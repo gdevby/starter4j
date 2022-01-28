@@ -77,7 +77,9 @@ public class DownloadRunnableImpl implements Runnable {
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
+		//TODO if it download not proper file and hash sum is not proper. We need to remove this file somebody
 		if (file.length() != element.getMetadata().getSize() || element.getMetadata().getSize() == 0){
+			//TODO attempts = 1; ??? 
 			int attempts = 1;
 			for (int attempt = 0; attempt < attempts; attempt++) {
 				try {
@@ -112,6 +114,7 @@ public class DownloadRunnableImpl implements Runnable {
 								element.setDownloadBytes(element.getDownloadBytes() + curread);
 							}
 						}
+						//TODO in subscrber add
 						log.trace("downloaded file: "+httpGet.getURI() + " -> " + file);
 						LocalTime endTime = LocalTime.now();
 						element.setEnd(endTime);

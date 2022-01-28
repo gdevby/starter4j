@@ -58,6 +58,7 @@ import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * TODO changed description
  * I want to see all possible implementations and idea. So we can implement
  * upper abstraction with system.out messages!
  * 
@@ -100,7 +101,7 @@ public class Starter {
 		}
 	}
 
-	// TODO aleksandr to delete
+	// TODO aleksandr to delete???
 	public void checkCommonProblems() {
 		log.info("call method {}", "checkCommonProblems");
 	}
@@ -139,6 +140,7 @@ public class Starter {
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		//TODO create all bean (object in ) main class and use constructor or in constructor of the Starter
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
 		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
@@ -148,6 +150,7 @@ public class Starter {
 		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
 		updateApp(gsonService, fileMapperService);
 		fileRepo = remoteAppConfig.getAppFileRepo();
+		//TODO used arrays to get resources, test without net how does it work? cas we donwload only with url getRepositories().get(0)
 		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(),Repo.class, true);
 		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
 		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
