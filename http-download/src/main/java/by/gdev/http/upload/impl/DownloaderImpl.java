@@ -110,7 +110,6 @@ public class DownloaderImpl implements Downloader {
 				CompletableFuture.runAsync(() -> {
 					try {
 						waitThreadDone(listThread);
-
 					} catch (IOException|InterruptedException e) {
 						log.error("Error", e);
 					}
@@ -126,7 +125,7 @@ public class DownloaderImpl implements Downloader {
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
 
-	private DownloaderStatus averageSpeed() throws IOException {
+	private DownloaderStatus buildDownuladerStatus() throws IOException {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
@@ -139,7 +138,6 @@ public class DownloaderImpl implements Downloader {
 		}
 		statusDownload.setThrowables(errorList);
 		statusDownload.setDownloadSize(sizeDownloadNow());
-		//TODO отдавать скорость в килобайтах, дальше проверять ее в собскрайбере 
 		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
 		statusDownload.setAllDownloadSize(fullDownloadSize);
@@ -159,13 +157,16 @@ public class DownloaderImpl implements Downloader {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
 					if (start.getSecond() != start.plusSeconds(1).getSecond())
-							eventBus.post(averageSpeed());
+							eventBus.post(buildDownuladerStatus());
 				}
 			}
 		}
 		status = DownloaderStatusEnum.DONE;
-		if (status.equals(DownloaderStatusEnum.DONE) && !status.equals(DownloaderStatusEnum.CANCEL))
-			eventBus.post(averageSpeed());
+		if (status.equals(DownloaderStatusEnum.DONE) && !status.equals(DownloaderStatusEnum.CANCEL)) {
+			eventBus.post(buildDownuladerStatus());
+			if (buildDownuladerStatus().getThrowables().size() != 0) 
+			System.exit(-1);
+		}
 	}
 	
 	private long totalSize(List<Long> containerSize) {

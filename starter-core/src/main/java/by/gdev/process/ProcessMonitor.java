@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.model.StatusModel;
+import by.gdev.model.StarterAppProcess;
 import by.gdev.util.DesktopUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,15 +36,15 @@ public class ProcessMonitor extends Thread {
 		while (this.process.isRunning()) {
 			try {
 				while (Objects.nonNull(line = buf.readLine())) {
-					StatusModel status = new StatusModel();
+					StarterAppProcess status = new StarterAppProcess();
 					status.setLine(line);
 					status.setProcess(process);
 					listener.post(status);
 				}
 			} catch (IOException t) {
 				DesktopUtil.sleep(1);
-				StatusModel status = new StatusModel();
-//				status.setErrorCode(raw.exitValue());
+				StarterAppProcess status = new StarterAppProcess();
+				status.setErrorCode(raw.exitValue());
 				status.setExeption(t);
             	listener.post(status);
 			} finally {
