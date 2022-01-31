@@ -71,7 +71,10 @@ public class StarterAppConfig {
 			return String.join("/", config.getServerFile(), version, APP_CONFIG);
 		}
 	}
-	//TODO add for what is it?
+
+	/**
+	 * This method returns the working directory. 
+	 */
 	public String workDir(String workDirectory) throws IOException {
 		Path installer = Paths.get("installer.properties");
 		String dir = "";

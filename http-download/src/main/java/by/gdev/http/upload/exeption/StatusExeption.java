@@ -1,6 +1,6 @@
 package by.gdev.http.upload.exeption;
 /**
- * TODO
+ * Notifies you when there are errors in the loading state
  * @author Robert Makrytski
  *
  */

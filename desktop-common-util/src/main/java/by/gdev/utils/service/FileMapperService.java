@@ -1,10 +1,8 @@
 package by.gdev.utils.service;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -39,8 +37,7 @@ public class FileMapperService {
 	}
 
 	public <T> T read(String file, Class<T> cl) throws FileNotFoundException, IOException {
-		//TODO used 49 line to read with charset
-		try (BufferedReader read = new BufferedReader(new FileReader(Paths.get(workingDirectory, file).toFile()))) {
+		try (InputStreamReader read = new InputStreamReader(new FileInputStream(Paths.get(workingDirectory, file).toFile()),charset)) {
 			return gson.fromJson(read, cl);
 		}
 	}

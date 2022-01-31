@@ -33,9 +33,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * TODO improve 
- * @author Robert Makrytski This class is responsible for the state of the file
- *         upload
+ * This class is responsible for preparing files for download, displaying information about download status and errors.
+ * @author Robert Makrytski 
  */
 
 @Slf4j
@@ -97,8 +96,7 @@ public class DownloaderImpl implements Downloader {
 
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		//TODO name of the totalSize method
-		fullDownloadSize = totalSize(allConteinerSize);
+		fullDownloadSize = totalDownloadSize(allConteinerSize);
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
@@ -139,12 +137,11 @@ public class DownloaderImpl implements Downloader {
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
 			if (Objects.nonNull(elem.getError()))
-				//TODO tabulation 
-			errorList.add(elem.getError());
+				errorList.add(elem.getError());
 		}
 		statusDownload.setThrowables(errorList);
 		statusDownload.setDownloadSize(sizeDownloadNow());
-		statusDownload.setSpeed((downloadBytesNow/1048576) / thirty);
+		statusDownload.setSpeed((downloadBytesNow / 1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
 		statusDownload.setAllDownloadSize(fullDownloadSize);
 		statusDownload.setLeftFiles(processedElements.size());
@@ -168,16 +165,10 @@ public class DownloaderImpl implements Downloader {
 			}
 		}
 		status = DownloaderStatusEnum.DONE;
-		//what is the sence if we set done !status.equals(DownloaderStatusEnum.CANCEL))
-		if (status.equals(DownloaderStatusEnum.DONE) && !status.equals(DownloaderStatusEnum.CANCEL)) {
-			eventBus.post(buildDownuladerStatus());
-			if (buildDownuladerStatus().getThrowables().size() != 0)
-				//TODO subscribe and exist in subscriber, because we can't use this downloader in other places
-			System.exit(-1);
-		}
+		eventBus.post(buildDownuladerStatus());
 	}
-	//TODO nane of the method
-	private long totalSize(List<Long> containerSize) {
+	
+	private long totalDownloadSize(List<Long> containerSize) {
 		long sum = 0;
 		for (long l : containerSize)
 			sum += l;

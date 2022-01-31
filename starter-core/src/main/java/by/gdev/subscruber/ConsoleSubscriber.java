@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.upload.model.downloader.DownloaderStatus;
+import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppProcess;
 import lombok.AllArgsConstructor;
@@ -15,16 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
-	//TODO remove
-    @Subscribe
-    public void message(String s) {
-    	log.info(s);
-    }
 
     @Subscribe
     public void downloadStatusMessage(DownloaderStatus status) {
     	if (status.getLeftFiles() != 0)
     	log.info(String.format(bundle.getString("upload.speed"), String.format("%.1f", status.getSpeed()),status.getLeftFiles(), status.getAllFiles(), status.getDownloadSize()/1048576, status.getAllDownloadSize()/1048576));
+    	if (status.getDownloaderStatusEnum().equals(DownloaderStatusEnum.DONE))
+    		if (status.getThrowables().size() != 0)
+    			System.exit(-1);
     }
 
     @Subscribe

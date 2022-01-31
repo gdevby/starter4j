@@ -28,9 +28,6 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 			return res > minMemorySize * 1024 * 1024;
 		} catch (IOException e) {
 			log.error("Error", e);
-		}finally {
-			//TODO why on exit?
-			workDir.deleteOnExit();
 		}
 		return true;
 	}
