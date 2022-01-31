@@ -19,14 +19,15 @@ public class ValidateTempDir implements ValidateEnvironment {
 	@Override
 	public boolean validate() {
 		Path folder = Paths.get(System.getProperty("java.io.tmpdir"));
-		//TODO where is the false return value?
 		try {
 			if (Files.isRegularFile(folder))
 				Files.delete(folder);
 			if (!Files.exists(folder))
 				Files.createDirectory(folder);
 		} catch (IOException e) {
-			log.error("Error", e);
+			if (e.getMessage().contains("createScrollWrapper"))
+				return false;
+			else log.error("Error", e);
 		}
 			return true;
 	}

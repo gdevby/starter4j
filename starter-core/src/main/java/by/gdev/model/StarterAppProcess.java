@@ -3,7 +3,7 @@ package by.gdev.model;
 import by.gdev.process.JavaProcess;
 import lombok.Data;
 /**
- * TODO
+ * Displays the state of the running application
  * @author Robert Makrytski
  *
  */

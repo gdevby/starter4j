@@ -13,7 +13,7 @@ import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 /**
- * TODO
+ * Checks the hash sum and size of the downloaded file with the value specified in the config file
  * @author Robert Makrytski
  *
  */

@@ -58,7 +58,8 @@ import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * TODO changed description
+ * This class prepares information about the OS, validates the directories necessary for downloading, adds it to the download container and starts downloading files
+ * 
  * I want to see all possible implementations and idea. So we can implement
  * upper abstraction with system.out messages!
  * 
@@ -77,12 +78,20 @@ public class Starter {
 	private JavaProcess procces;
 	private StarterStatusFrame starterStatusFrame;
 	private ResourceBundle bundle;
+	private GsonService gsonService;
+	private RequestConfig requestConfig;
+	private HttpClientConfig httpConfig;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
 		this.eventBus = eventBus;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		
+		httpConfig = new HttpClientConfig();
+		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
+		gsonService = new GsonServiceImpl(Main.GSON, fileService);
 	}
 
 	/**
@@ -137,26 +146,18 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
-		HttpClientConfig httpConfig = new HttpClientConfig();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
-		//TODO create all bean (object in ) main class and use constructor or in constructor of the Starter
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
-		GsonService gsonService = new GsonServiceImpl(Main.GSON, fileService);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,true);
 		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
 		updateApp(gsonService, fileMapperService);
 		fileRepo = remoteAppConfig.getAppFileRepo();
-		//TODO used arrays to get resources, test without net how does it work? cas we donwload only with url getRepositories().get(0)
-		dependencis = gsonService.getObject(remoteAppConfig.getAppDependencies().getRepositories().get(0)+ remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(),Repo.class, true);
-		Repo resources = gsonService.getObject(remoteAppConfig.getAppResources().getRepositories().get(0)+ remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
-		JVMConfig jvm = gsonService.getObject(remoteAppConfig.getJavaRepo().getRepositories().get(0)+ remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
+		dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(), remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, true);
+		Repo resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(), remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
+		JVMConfig jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(), remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
-		String jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories().get(0);
-		java = gsonService.getObject(jvmDomain + jvmPath, Repo.class, true);
+		List<String> jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories();
+		java = gsonService.getObjectByUrls(jvmDomain, jvmPath, Repo.class, true);
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(fileRepo);
 		list.add(dependencis);

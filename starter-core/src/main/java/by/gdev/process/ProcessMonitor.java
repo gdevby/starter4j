@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
+import org.apache.commons.io.IOUtils;
+
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.model.StarterAppProcess;
@@ -49,8 +51,7 @@ public class ProcessMonitor extends Thread {
             	listener.post(status);
 			} finally {
 				try {
-					//TODO close
-					buf.close();
+					IOUtils.close(buf);
 				} catch (IOException e) {
 					log.error("Error", e);
 				}

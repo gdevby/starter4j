@@ -1,7 +1,7 @@
 package by.gdev.http.upload.exeption;
 
 /**
- * TODO
+ * This exception is thrown when the uploaded file does not match the size or hash amount specified in the config file
  * @author Robert Makrytski
  *
  */

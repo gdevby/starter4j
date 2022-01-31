@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import by.gdev.http.upload.model.downloader.DownloadElement;
 import lombok.extern.slf4j.Slf4j;
 /**
- * TODO
+ * Checks if the downloaded file is a symbolic link. If the file is a symbolic link, it creates it
  * @author Robert Makrytski
  *
  */

@@ -39,19 +39,20 @@ public class GsonServiceImpl implements GsonService {
 	 /**
 	  * {@inheritDoc}
 	  */
-	
-	@Override
-	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)	throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		Path pathFile = null;
-		for (String url : urls) {
-			try {
-				pathFile = fileService.getRawObject(url + urn, cache);
-			} catch (IOException e) {
-				log.error("Error" , e);
+		@Override
+		public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
+				throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			Path pathFile = null;
+			for (String url : urls) {
+				try {
+					pathFile = fileService.getRawObject(url + urn, cache);
+					try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
+						return gson.fromJson(read, class1);
+					}
+				} catch (IOException e) {
+					log.error("Error = "+e.getMessage());
+				}
 			}
+			throw new RuntimeException("RuntimeException in getObjectByUrls");
 		}
-			try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
-				return gson.fromJson(read, class1);
-		}
-	}
 }

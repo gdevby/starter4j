@@ -32,7 +32,6 @@ public class Main {
 		ResourceBundle bundle = null;
 		try {
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
-			
 			Starter s = new Starter(eventBus, starterConfig, bundle);
 			s.collectOSInfoAndRegisterSubscriber();
 			s.validateEnvironmentAndAppRequirements();

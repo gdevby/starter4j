@@ -5,7 +5,7 @@ import java.io.IOException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 /**
- * TODO
+ * Signal that there are errors in the uploaded file
  * @author Robert Makrytski
  *
  */

@@ -10,7 +10,7 @@ import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.OSType;
 import lombok.extern.slf4j.Slf4j;
 /**
- * TODO
+ * A handler that checks whether the uploaded file is executable. If yes, then sets the execution permissions
  * @author Robert Makrytski
  *
  */
@@ -19,7 +19,6 @@ public class AccesHandler implements PostHandler{
 
 	@Override
 	public void postProcessDownloadElement(DownloadElement e) {
-		
 		if (e.getMetadata().isExecutable())
 		if (OSInfo.getOSType() == OSType.LINUX | OSInfo.getOSType() == OSType.MACOSX) {
 		     try {
