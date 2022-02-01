@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 import by.gdev.handler.Localise;
 import by.gdev.http.upload.config.HttpClientConfig;
 import by.gdev.http.upload.exeption.StatusExeption;
-import by.gdev.http.upload.handler.PostHandlerImpl;
+import by.gdev.http.upload.handler.AccesHandler;
 import by.gdev.http.upload.impl.DownloaderImpl;
 import by.gdev.http.upload.impl.FileCacheServiceImpl;
 import by.gdev.http.upload.impl.GsonServiceImpl;
@@ -102,11 +102,11 @@ public class DownloadTest {
 	@Test
 	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
-		PostHandlerImpl postHandler = new PostHandlerImpl();
+		AccesHandler accesHandler = new AccesHandler();
 		DownloaderContainer container = new DownloaderContainer();
 		container.setDestinationRepositories("target/test_folder/");
 		container.setRepo(repo);
-		container.setHandlers(Arrays.asList(postHandler));
+		container.setHandlers(Arrays.asList(accesHandler));
 		downloader.addContainer(container);
 		downloader.startDownload(true);
 		Thread.sleep(1000);
@@ -117,11 +117,11 @@ public class DownloadTest {
 	@Test (expected = StatusExeption.class)
 	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
-		PostHandlerImpl postHandler = new PostHandlerImpl();
+		AccesHandler accesHandler = new AccesHandler();
 		DownloaderContainer container = new DownloaderContainer();
 		container.setDestinationRepositories("target/test_folder/containerTest/");
 		container.setRepo(repo);
-		container.setHandlers(Arrays.asList(postHandler));
+		container.setHandlers(Arrays.asList(accesHandler));
 		downloader.addContainer(container);
 		downloader.startDownload(true);
 		Thread.sleep(1000);

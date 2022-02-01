@@ -11,6 +11,7 @@ import com.google.common.eventbus.EventBus;
 
 import by.gdev.model.StarterAppProcess;
 import by.gdev.util.DesktopUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,23 +20,23 @@ import lombok.extern.slf4j.Slf4j;
  * @author Robert Makrytski
  *
  */
+@Data
 @Slf4j
 public class ProcessMonitor extends Thread {
-	private final JavaProcess process;
+	private final Process process;
 	private EventBus listener;
 
-	public ProcessMonitor(JavaProcess process, EventBus listener) {
+	public ProcessMonitor(Process process, EventBus listener) {
 		this.process = process;
 		this.listener = listener;
 	}
 
 	@Override
 	public void run() {
-		Process raw = this.process.getRawProcess();
-		InputStreamReader reader = new InputStreamReader(raw.getInputStream());
+		InputStreamReader reader = new InputStreamReader(process.getInputStream());
 		BufferedReader buf = new BufferedReader(reader);
 		String line;
-		while (this.process.isRunning()) {
+		while (isRunning()) {
 			try {
 				while (Objects.nonNull(line = buf.readLine())) {
 					StarterAppProcess status = new StarterAppProcess();
@@ -45,8 +46,10 @@ public class ProcessMonitor extends Thread {
 				}
 			} catch (IOException t) {
 				DesktopUtil.sleep(1);
+				log.trace("Exit value = " + process.exitValue());
 				StarterAppProcess status = new StarterAppProcess();
-				status.setErrorCode(raw.exitValue());
+				status.setProcess(this.process);
+				status.setErrorCode(process.exitValue());
 				status.setExeption(t);
             	listener.post(status);
 			} finally {
@@ -57,5 +60,15 @@ public class ProcessMonitor extends Thread {
 				}
 			}
 		}
+	}
+
+	public boolean isRunning() {
+		try {
+			this.process.exitValue();
+		} catch (IllegalThreadStateException ex) {
+			return true;
+		}
+
+		return false;
 	}
 }

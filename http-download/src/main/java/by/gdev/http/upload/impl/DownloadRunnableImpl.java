@@ -128,8 +128,6 @@ public class DownloadRunnableImpl implements Runnable {
 				} catch (SocketTimeoutException e) {
 					if (attempt == DEFAULT_MAX_ATTEMPTS)
 						throw new SocketTimeoutException();
-//					else
-//						attempts++;
 				}
 			}	
 	}

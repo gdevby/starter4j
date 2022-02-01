@@ -21,7 +21,7 @@ public class JavaProcessHelper {
     private File directory;
     private ProcessBuilder process;
     private EventBus listener;
-
+    ProcessMonitor monitor;
     
 	public JavaProcessHelper(String jvmPath, File directory, EventBus listener) {
 		this.jvmPath = jvmPath;
@@ -30,12 +30,17 @@ public class JavaProcessHelper {
     	this.commands = new ArrayList<>();
     }
     
-    public JavaProcess start() throws IOException {
-        List<String> full = getFullCommands();
-        return new JavaProcess(full, createProcess().start(), listener);
+    public void start() throws IOException {
+        monitor = new ProcessMonitor(createProcess().start(), listener);
+        monitor.start();
+    }
+
+    public void destroyProcess () {
+    	this.monitor.getProcess().destroyForcibly();
     }
     
-    private ProcessBuilder createProcess() {
+    
+    public ProcessBuilder createProcess() {
         if (Objects.isNull(process)) 
             process = new ProcessBuilder(getFullCommands()).directory(this.directory).redirectErrorStream(true);
         String javaOption = findJavaOptionAndGetName();
