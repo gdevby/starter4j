@@ -13,12 +13,12 @@ import java.util.Properties;
 import com.beust.jcommander.Parameter;
 
 import by.gdev.util.DesktopUtil;
-import by.gdev.util.OSInfo;
+import by.gdev.util.OSInfo.OSType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 /**
- * TODO 
+ * The class contains parameters for loading the application, which can be changed using arguments.
  * @author Robert Makrytski
  *
  */
@@ -33,7 +33,6 @@ public class StarterAppConfig {
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
-	
 	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description")
 	private String serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
@@ -75,7 +74,7 @@ public class StarterAppConfig {
 	/**
 	 * This method returns the working directory. 
 	 */
-	public String workDir(String workDirectory) throws IOException {
+	public String workDir(String workDirectory, OSType osType) throws IOException {
 		Path installer = Paths.get("installer.properties");
 		String dir = "";
 		if (new File(installer.toAbsolutePath().toString()).exists()) {
@@ -89,6 +88,6 @@ public class StarterAppConfig {
 		else if (!dir.equals(""))
 			return dir;
 		else
-			return DesktopUtil.getSystemPath(OSInfo.OSType.LINUX, "starter").toString();
+			return DesktopUtil.getSystemPath(osType, "starter").toString();
 	}
 }
