@@ -1,6 +1,5 @@
 package by.gdev.model;
 
-import by.gdev.process.JavaProcess;
 import lombok.Data;
 /**
  * Displays the state of the running application
@@ -9,7 +8,7 @@ import lombok.Data;
  */
 @Data
 public class StarterAppProcess {
-	private JavaProcess process;
+	private Process process;
 	private String line;
 	private Exception exeption;
 	private Integer errorCode;

@@ -89,6 +89,7 @@ public class DownloaderImpl implements Downloader {
 				downloadElements.add(element);
 			});
 		}
+		pathToDownload = container.getDestinationRepositories();
 		allConteinerSize.add(container.getContainerSize());
 	}
 
@@ -134,7 +135,6 @@ public class DownloaderImpl implements Downloader {
 		double thirty = Duration.between(start, LocalTime.now()).getSeconds();
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
-			pathToDownload = elem.getPathToDownload();
 			if (Objects.nonNull(elem.getError()))
 				errorList.add(elem.getError());
 		}

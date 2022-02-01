@@ -42,7 +42,6 @@ import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
-import by.gdev.process.JavaProcess;
 import by.gdev.process.JavaProcessHelper;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
@@ -75,7 +74,6 @@ public class Starter {
 	private Repo java;
 	private Repo fileRepo;
 	private Repo dependencis;
-	private JavaProcess procces;
 	private StarterStatusFrame starterStatusFrame;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
@@ -231,10 +229,10 @@ public class Starter {
 		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(remoteAppConfig.getMainClass());
-		procces = javaProcess.start();
+		javaProcess.start();
 		if (starterConfig.isStop()) {
-			Thread.sleep(600);
-			procces.getProcess().destroy();
+			javaProcess.destroyProcess();
+			starterStatusFrame.setVisible(false);
 		}
 	}
 }
