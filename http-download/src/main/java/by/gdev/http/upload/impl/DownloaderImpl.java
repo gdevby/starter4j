@@ -74,7 +74,7 @@ public class DownloaderImpl implements Downloader {
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
 		start = LocalTime.now();
-		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig);
+		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus);
 	}
 
 	@Override
@@ -90,8 +90,6 @@ public class DownloaderImpl implements Downloader {
 			});
 		}
 		allConteinerSize.add(container.getContainerSize());
-		//TODO how does it work with dirrents paths?
-		pathToDownload = container.getDestinationRepositories();
 	}
 
 	@Override
@@ -136,6 +134,7 @@ public class DownloaderImpl implements Downloader {
 		double thirty = Duration.between(start, LocalTime.now()).getSeconds();
 		for (DownloadElement elem : list) {
 			downloadBytesNow += elem.getDownloadBytes();
+			pathToDownload = elem.getPathToDownload();
 			if (Objects.nonNull(elem.getError()))
 				errorList.add(elem.getError());
 		}

@@ -18,6 +18,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+import com.google.common.eventbus.EventBus;
+
 import by.gdev.http.upload.exeption.UploadFileException;
 import by.gdev.http.upload.model.downloader.DownloadElement;
 import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
@@ -36,13 +38,15 @@ public class DownloadRunnableImpl implements Runnable {
 	private List<DownloadElement> processedElements;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
-	private final int DEFAULT_MAX_ATTEMPTS = 3;
+	private EventBus eventBus;
+	private int DEFAULT_MAX_ATTEMPTS = 3;
 
-	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements, CloseableHttpClient httpclient, RequestConfig requestConfig) {
+	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements, CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus) {
 		this.downloadElements = downloadElements;
 		this.processedElements = processedElements;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
+		this.eventBus = eventBus;
 	}
 	
 	@Override
@@ -78,9 +82,7 @@ public class DownloadRunnableImpl implements Runnable {
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
-			//TODO attempts = 1; ??? 
-			int attempts = 1;
-			for (int attempt = 0; attempt < attempts; attempt++) {
+			for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
 				try {
 					BufferedInputStream in = null;
 					BufferedOutputStream out = null;
@@ -111,22 +113,23 @@ public class DownloadRunnableImpl implements Runnable {
 								out.write(buffer, 0, curread);
 								curread = in.read(buffer);
 								element.setDownloadBytes(element.getDownloadBytes() + curread);
+								
 							}
 						}
-						//TODO in subscrber add
-						log.trace("downloaded file: "+httpGet.getURI() + " -> " + file);
+						eventBus.post(element);
 						LocalTime endTime = LocalTime.now();
 						element.setEnd(endTime);
+						DEFAULT_MAX_ATTEMPTS = 1;
 					} finally {
 						httpGet.abort();
 						IOUtils.close(out);
 						IOUtils.close(in);
 					}
 				} catch (SocketTimeoutException e) {
-					if (attempts == DEFAULT_MAX_ATTEMPTS)
+					if (attempt == DEFAULT_MAX_ATTEMPTS)
 						throw new SocketTimeoutException();
-					else
-						attempts++;
+//					else
+//						attempts++;
 				}
 			}	
 	}

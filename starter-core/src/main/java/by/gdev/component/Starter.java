@@ -121,8 +121,8 @@ public class Starter {
 	public void validateEnvironmentAndAppRequirements() throws Exception {
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
 		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
-				new File(starterConfig.workDir(starterConfig.getWorkDirectory())), bundle));
-		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory()), bundle));
+				new File(starterConfig.workDir(starterConfig.getWorkDirectory(), osType)), bundle));
+		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory(), osType), bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
 		validateEnvironment.add(new ValidateFont(bundle));

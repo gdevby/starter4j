@@ -1,10 +1,14 @@
 package by.gdev.subscruber;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import org.apache.http.client.methods.HttpGet;
+
 import com.google.common.eventbus.Subscribe;
 
+import by.gdev.http.upload.model.downloader.DownloadElement;
 import by.gdev.http.upload.model.downloader.DownloaderStatus;
 import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
@@ -45,5 +49,12 @@ public class ConsoleSubscriber {
     @Subscribe
     public void validateMessage(ExceptionMessage message) {
     	log.error(message.printValidationMessage());
+    }
+    
+    @Subscribe
+    public void downloadedFile(DownloadElement element) {
+    	File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
+    	HttpGet httpGet = new HttpGet(element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
+    	log.trace("downloaded file: "+httpGet.getURI() + " -> " + file);
     }
 }
