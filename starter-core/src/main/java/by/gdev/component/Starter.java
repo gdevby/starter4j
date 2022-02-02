@@ -108,11 +108,6 @@ public class Starter {
 		}
 	}
 
-	// TODO aleksandr to delete???
-	public void checkCommonProblems() {
-		log.info("call method {}", "checkCommonProblems");
-	}
-
 	/**
 	 * Validate files,java and return what we need to download
 	 */
