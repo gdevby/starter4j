@@ -2,7 +2,7 @@ package by.gdev.http.upload.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
+//TODO ???
 @Getter
 @RequiredArgsConstructor
 public enum Headers {

@@ -41,7 +41,7 @@ public class FileMapperService {
 			return gson.fromJson(read, cl);
 		}
 	}
-
+	//TODO ???
 	public Object readToken(Path file, Type typ) throws FileNotFoundException, IOException {
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(file.toFile()),charset)) {
 			return gson.fromJson(read, typ);

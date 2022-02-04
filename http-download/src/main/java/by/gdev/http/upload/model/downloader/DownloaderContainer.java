@@ -20,7 +20,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Saved status of the download elements and additional to send To {@link Downloader#addContainer(DownloaderContainer)}.
+ * Saved status of the download elements and additional to send To
+ * {@link Downloader#addContainer(DownloaderContainer)}.
  * 
  * @author Robert Makrytski
  *
@@ -33,28 +34,31 @@ public class DownloaderContainer {
 	private long containerSize;
 	private Repo repo;
 	private List<PostHandler> handlers;
-	
-	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory) throws NoSuchAlgorithmException, IOException {
+
+	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory)
+			throws NoSuchAlgorithmException, IOException {
 		this.repo = new Repo();
 		List<Metadata> listRes = new ArrayList<Metadata>();
 		for (Metadata meta : repo.getResources()) {
 			File localFile = Paths.get(workDirectory, meta.getPath()).toAbsolutePath().toFile();
 			if (localFile.exists()) {
-				String shaLocalFile = DesktopUtil.getChecksum(localFile,Headers.SHA1.getValue());
-				BasicFileAttributes attr = Files.readAttributes(localFile.toPath(), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+				String shaLocalFile = DesktopUtil.getChecksum(localFile, Headers.SHA1.getValue());
+				BasicFileAttributes attr = Files.readAttributes(localFile.toPath(), BasicFileAttributes.class,
+						LinkOption.NOFOLLOW_LINKS);
 				if (!attr.isSymbolicLink() & !shaLocalFile.equals(meta.getSha1())) {
 					listRes.add(meta);
-					log.warn("The hash sum of the file is not equal. File " + localFile + " will be deleted. Size = " + localFile.length()/1024/1024);
+					log.warn("The hash sum of the file is not equal. File " + localFile + " will be deleted. Size = "
+							+ localFile.length() / 1024 / 1024);
 					Files.delete(localFile.toPath());
 				}
-			}else {
+			} else {
 				listRes.add(meta);
 			}
 		}
 		this.repo.setResources(listRes);
 		this.repo.setRepositories(repo.getRepositories());
 	}
-	
+
 	public void conteinerAllSize(Repo repo) {
 		List<Long> sizeList = new ArrayList<Long>();
 		repo.getResources().forEach(size -> {
@@ -64,6 +68,6 @@ public class DownloaderContainer {
 		for (long l : sizeList) {
 			sum += l;
 		}
-	this.containerSize = sum;
+		this.containerSize = sum;
 	}
 }

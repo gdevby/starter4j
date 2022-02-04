@@ -31,6 +31,7 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getObject(String url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(url, cache);
+		//TODO where is encoding?
 		try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
 			return gson.fromJson(read, class1);
 		}
@@ -53,6 +54,7 @@ public class GsonServiceImpl implements GsonService {
 					log.error("Error = "+e.getMessage());
 				}
 			}
+			//TODO why runtime?
 			throw new RuntimeException("RuntimeException in getObjectByUrls");
 		}
 }

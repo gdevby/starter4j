@@ -32,8 +32,7 @@ import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 /**
   * This class is designed to convert files required for configuration into json format.
- * Input parameters directory with files to convert.
- * At the output, we receive a json file with a description of the metadata of each file in the input directory
+ * At the output, we receive a json files with a description of the metadata of each file in the input directory
  */
 public class AppConfigCreator {
 	public static final String APP_CONFIG_GENERATOR = "appConfigModel.json";
@@ -43,6 +42,7 @@ public class AppConfigCreator {
 	public static final String APP_DEPENDENCISES_CONFIG = "dependencies.json";
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
+	
 	FileMapperService fileMapperService;
 
 	public AppConfigCreator(FileMapperService fileMapperService) {
@@ -51,7 +51,7 @@ public class AppConfigCreator {
 
 	public AppConfig createConfig(AppConfigModel configFile)
 			throws IOException, NoSuchAlgorithmException {
-		AppConfig appConfig = new AppConfig();
+		
 		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();
 		Path appFolder = Paths.get(configFile.getAppFolder());
 		Path dependencies = Paths.get(configFile.getAppDependencies());
@@ -62,15 +62,17 @@ public class AppConfigCreator {
 		FileUtils.copyDirectory(dependencies.toFile(), Paths.get(TARGET_OUT_FOLDER, version, "dependencies").toFile());
 		FileUtils.copyFile(Paths.get(appFolder.toString(), configFile.getAppJar().toString()).toFile(), 
 				Paths.get(TARGET_OUT_FOLDER, version, configFile.getAppJar().toString()).toFile());
+		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG).toString());
+		fileMapperService.write(createRepo(dependencies.getParent(), dependencies, Paths.get(version).toString(), configFile), dependenciesConfig.toString());
+		fileMapperService.write(createRepo(resources, resources, Paths.get(version).toString(), configFile), resourcesConfig.toString());
+		
+		AppConfig appConfig = new AppConfig();
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
 		appConfig.setJvmArguments(configFile.getJvmArguments());	
 		appConfig.setMainClass(configFile.getMainClass());
 		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppJar()),version, configFile));
-		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG).toString());
-		fileMapperService.write(createRepo(dependencies.getParent(), dependencies, Paths.get(version).toString(), configFile), dependenciesConfig.toString());
-		fileMapperService.write(createRepo(resources, resources, Paths.get(version).toString(), configFile), resourcesConfig.toString());
 		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version, configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version, configFile));
 		if (!configFile.isSkinJVMGeneration()) {

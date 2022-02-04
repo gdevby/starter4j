@@ -1,5 +1,5 @@
 package by.gdev.http.upload.config;
-
+//TODO Change package by.gdev.http.download.config for all .not use upload
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.impl.client.CloseableHttpClient;
