@@ -1,9 +1,9 @@
 /**
  * 
  */
-package by.gdev.http.upload.handler;
+package by.gdev.http.download.handler;
 
-import by.gdev.http.upload.model.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloadElement;
 
 /**
  * Handler to check the uploaded file for errors

@@ -1,4 +1,4 @@
-package by.gdev.http.upload.exeption;
+package by.gdev.http.download.exeption;
 /**
  * Notifies you when there are errors in the loading state
  * @author Robert Makrytski

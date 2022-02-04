@@ -1,9 +1,9 @@
 /**
  * 
  */
-package by.gdev.http.upload.model.downloader;
+package by.gdev.http.upload.download.downloader;
 
-import by.gdev.http.upload.service.Downloader;
+import by.gdev.http.download.service.Downloader;
 
 /**
  * Transfer of the state

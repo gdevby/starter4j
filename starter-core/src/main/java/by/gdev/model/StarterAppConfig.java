@@ -55,14 +55,11 @@ public class StarterAppConfig {
 	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
 	private boolean stop;
 
-	public static final StarterAppConfig DEFAULT_CONFIG;
-	//TODO static???
-	static {
+	public static final StarterAppConfig 
 		DEFAULT_CONFIG = new StarterAppConfig(500,
 				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", 
 				"starter/", Paths.get("starter/cache"), "1.0",
 				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, false);
-	}
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		if (Objects.isNull(version))

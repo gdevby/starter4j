@@ -24,8 +24,8 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.upload.model.downloader.DownloaderStatus;
-import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.upload.download.downloader.DownloaderStatus;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package by.gdev.http.upload.model.downloader;
+package by.gdev.http.upload.download.downloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import by.gdev.http.upload.handler.PostHandler;
-import by.gdev.http.upload.model.Headers;
-import by.gdev.http.upload.service.Downloader;
+import by.gdev.http.download.handler.PostHandler;
+import by.gdev.http.download.model.Headers;
+import by.gdev.http.download.service.Downloader;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;

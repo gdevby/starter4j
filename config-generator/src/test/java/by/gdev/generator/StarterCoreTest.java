@@ -13,8 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import by.gdev.generator.model.AppConfigModel;
-import by.gdev.http.upload.service.Downloader;
-import by.gdev.http.upload.service.GsonService;
+import by.gdev.http.download.service.Downloader;
+import by.gdev.http.download.service.GsonService;
 
 public class StarterCoreTest {
 	static HttpServer server;

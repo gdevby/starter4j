@@ -1,4 +1,4 @@
-package by.gdev.http.upload.model;
+package by.gdev.http.download.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

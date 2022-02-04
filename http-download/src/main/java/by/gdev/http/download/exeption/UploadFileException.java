@@ -1,4 +1,4 @@
-package by.gdev.http.upload.exeption;
+package by.gdev.http.download.exeption;
 
 import java.io.IOException;
 

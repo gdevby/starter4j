@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,12 +38,6 @@ public class FileMapperService {
 	public <T> T read(String file, Class<T> cl) throws FileNotFoundException, IOException {
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(Paths.get(workingDirectory, file).toFile()),charset)) {
 			return gson.fromJson(read, cl);
-		}
-	}
-	//TODO ???
-	public Object readToken(Path file, Type typ) throws FileNotFoundException, IOException {
-		try (InputStreamReader read = new InputStreamReader(new FileInputStream(file.toFile()),charset)) {
-			return gson.fromJson(read, typ);
 		}
 	}
 }

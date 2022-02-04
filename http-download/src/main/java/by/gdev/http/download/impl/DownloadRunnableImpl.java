@@ -1,4 +1,4 @@
-package by.gdev.http.upload.impl;
+package by.gdev.http.download.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,9 +20,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.upload.exeption.UploadFileException;
-import by.gdev.http.upload.model.downloader.DownloadElement;
-import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.download.exeption.UploadFileException;
+import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +77,6 @@ public class DownloadRunnableImpl implements Runnable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	
 	
 	private void download(DownloadElement element) throws IOException, InterruptedException {
 		processedElements.add(element);

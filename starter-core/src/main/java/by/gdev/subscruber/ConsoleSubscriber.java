@@ -8,9 +8,9 @@ import org.apache.http.client.methods.HttpGet;
 
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.upload.model.downloader.DownloadElement;
-import by.gdev.http.upload.model.downloader.DownloaderStatus;
-import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloaderStatus;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppProcess;
 import lombok.AllArgsConstructor;

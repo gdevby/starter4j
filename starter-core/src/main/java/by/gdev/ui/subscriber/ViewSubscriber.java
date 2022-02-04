@@ -10,10 +10,10 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.upload.exeption.HashSumAndSizeError;
-import by.gdev.http.upload.exeption.UploadFileException;
-import by.gdev.http.upload.model.downloader.DownloaderStatus;
-import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
+import by.gdev.http.download.exeption.HashSumAndSizeError;
+import by.gdev.http.download.exeption.UploadFileException;
+import by.gdev.http.upload.download.downloader.DownloaderStatus;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppProcess;
 import by.gdev.ui.JLabelHtmlWrapper;

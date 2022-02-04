@@ -1,12 +1,12 @@
 /**
  * 
  */
-package by.gdev.http.upload.model.downloader;
+package by.gdev.http.upload.download.downloader;
 
 import java.time.LocalTime;
 import java.util.List;
 
-import by.gdev.http.upload.handler.PostHandler;
+import by.gdev.http.download.handler.PostHandler;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
 import lombok.Data;
