@@ -1,4 +1,4 @@
-package by.gdev.http.upload.exeption;
+package by.gdev.http.download.exeption;
 
 /**
  * This exception is thrown when the uploaded file does not match the size or hash amount specified in the config file

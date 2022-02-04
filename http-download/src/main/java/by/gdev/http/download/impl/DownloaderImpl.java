@@ -1,7 +1,7 @@
 /**
  * 
  */
-package by.gdev.http.upload.impl;
+package by.gdev.http.download.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,12 +22,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.upload.exeption.StatusExeption;
-import by.gdev.http.upload.model.downloader.DownloadElement;
-import by.gdev.http.upload.model.downloader.DownloaderContainer;
-import by.gdev.http.upload.model.downloader.DownloaderStatus;
-import by.gdev.http.upload.model.downloader.DownloaderStatusEnum;
-import by.gdev.http.upload.service.Downloader;
+import by.gdev.http.download.exeption.StatusExeption;
+import by.gdev.http.download.service.Downloader;
+import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
+import by.gdev.http.upload.download.downloader.DownloaderStatus;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +97,7 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
 		fullDownloadSize = totalDownloadSize(allConteinerSize);
-		//TODO Only with status IDLE should start to download
-		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
+		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
 			allCountElement = downloadElements.size();

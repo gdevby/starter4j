@@ -1,4 +1,4 @@
-package by.gdev.http.upload.handler;
+package by.gdev.http.download.handler;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,9 +6,9 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import by.gdev.http.upload.exeption.HashSumAndSizeError;
-import by.gdev.http.upload.model.Headers;
-import by.gdev.http.upload.model.downloader.DownloadElement;
+import by.gdev.http.download.exeption.HashSumAndSizeError;
+import by.gdev.http.download.model.Headers;
+import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

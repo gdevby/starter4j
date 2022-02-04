@@ -9,7 +9,10 @@ import com.beust.jcommander.Parameter;
 import java.util.Arrays;
 import java.util.List;
 
-//TODO ???
+/**
+ * The class contains parameters for loading files needed to create config files
+ * @author Robert Makrytski
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,9 +46,7 @@ public class AppConfigModel{
     @Parameter(names = "-help", help = true)
     public boolean help = false;
     
-	public static final AppConfigModel DEFAULT_APP_CONFIG_MODEL;
-	//TODO WITHOUT STATTIC
-	static {		
+	public static final AppConfigModel 
     	DEFAULT_APP_CONFIG_MODEL = new AppConfigModel(
     			"starter-app",
     			"1.0", 
@@ -59,9 +60,6 @@ public class AppConfigModel{
     			"../../starter-app/example-compiled-app/target/dependencies", 
     			"../../starter-app/example-compiled-app/target", 
     			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
-    			//TODO REMOVE
-//    			Arrays.asList("http://127.0.0.1:81/"),
     			false, 
     			false);
-    }
 }

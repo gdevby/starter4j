@@ -16,8 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ValidatedPartionSize implements ValidateEnvironment {
 	private long minMemorySize;
 	private File workDir;
-	//TODO private
-	ResourceBundle bundle;
+	private ResourceBundle bundle;
 
 	@Override
 	public boolean validate() {

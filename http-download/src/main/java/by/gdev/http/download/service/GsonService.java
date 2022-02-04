@@ -1,4 +1,4 @@
-package by.gdev.http.upload.service;
+package by.gdev.http.download.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * Converted json file content of the file to java object
  */
-//TODO change url to uri
+
 public interface GsonService {
 	/**
 	 * @param <T> type return object
-	 * @param url - url address 
+	 * @param uri - uri address 
 	 * @param class1 java object
 	 * @param cache If cache true file exists and hashsum is valid it should
 	 *              return content without head request. 
@@ -22,7 +22,7 @@ public interface GsonService {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	<T> T getObject(String url, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+	<T> T getObject(String uri, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 	
 	/**
 	 * @param <T> type return object

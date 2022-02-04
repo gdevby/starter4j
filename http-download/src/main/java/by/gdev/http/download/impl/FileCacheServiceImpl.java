@@ -1,4 +1,4 @@
-package by.gdev.http.upload.impl;
+package by.gdev.http.download.impl;
 
 
 import java.io.FileNotFoundException;
@@ -13,10 +13,10 @@ import java.security.NoSuchAlgorithmException;
 
 import com.google.gson.Gson;
 
-import by.gdev.http.upload.model.Headers;
-import by.gdev.http.upload.model.RequestMetadata;
-import by.gdev.http.upload.service.FileCacheService;
-import by.gdev.http.upload.service.HttpService;
+import by.gdev.http.download.model.Headers;
+import by.gdev.http.download.model.RequestMetadata;
+import by.gdev.http.download.service.FileCacheService;
+import by.gdev.http.download.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
@@ -65,7 +65,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			} else {
 				log.trace("not proper hashsum HTTP GET -> " + url);
 				RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
-				createSha(serverMetadata, urlPath, metaFile);
+				createSha1(serverMetadata, urlPath, metaFile);
 				return urlPath;
 			}
 		} else {
@@ -93,7 +93,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			}
 		} else {
 			RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
-			createSha(serverMetadata, urlPath, metaFile);
+			createSha1(serverMetadata, urlPath, metaFile);
 			return urlPath;
 		}
 	}
@@ -105,8 +105,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 			gson.toJson(create, out);
 		}
 	}
-	//TODO changed name of the method sha1
-	private void createSha(RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
+
+	private void createSha1(RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		write(metadata, metaFile);
 	}
