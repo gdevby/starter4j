@@ -9,13 +9,14 @@ import com.beust.jcommander.Parameter;
 import java.util.Arrays;
 import java.util.List;
 
+//TODO ???
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppConfigModel{
 	@Parameter(names = "-name", description = "Application Name")
     private String appName;	
-	@Parameter(names = "-version", description = "Application version")
+	@Parameter(names = "-version", description = "Application version, example 1.2.4 or 0.9.0.1")
     private String appVersion;	
 	@Parameter(names = "-mainClass", description = "The main class for running the application")
     private String mainClass;  
@@ -33,16 +34,17 @@ public class AppConfigModel{
     private String appResources;   
     @Parameter(names = "-dependencies", description = "Directory with the necessary dependencies to run the application")
     private String appDependencies;   
-    @Parameter(names = "-appFolder", description = "Direcotory with your desktop app. It tries to find in target/appName-version.jar")
+    @Parameter(names = "-appFolder", description = "Directory with your desktop app. It tries to find in target/appName-version.jar")
     private String appFolder;   
-    @Parameter(names = "-url", description = "used url(example.com) to generate configurations for all resources to download from this in future")
+    @Parameter(names = "-url", description = "used url(https://example.com) to generate configurations for all resources to download from this in future")
     private List<String> url;  
-    @Parameter(names = "-skinJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs")
+    @Parameter(names = "-skinJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs, because you do it once")
     private boolean skinJVMGeneration;   
     @Parameter(names = "-help", help = true)
     public boolean help = false;
     
-	public static final AppConfigModel DEFAULT_APP_CONFIG_MODEL;	
+	public static final AppConfigModel DEFAULT_APP_CONFIG_MODEL;
+	//TODO WITHOUT STATTIC
 	static {		
     	DEFAULT_APP_CONFIG_MODEL = new AppConfigModel(
     			"starter-app",
@@ -57,6 +59,7 @@ public class AppConfigModel{
     			"../../starter-app/example-compiled-app/target/dependencies", 
     			"../../starter-app/example-compiled-app/target", 
     			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
+    			//TODO REMOVE
 //    			Arrays.asList("http://127.0.0.1:81/"),
     			false, 
     			false);

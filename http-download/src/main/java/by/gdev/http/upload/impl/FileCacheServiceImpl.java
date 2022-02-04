@@ -97,7 +97,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return urlPath;
 		}
 	}
-
+	//TODO can we use hour service to save?
 	private void write(Object create, Path config) throws FileNotFoundException, IOException {
 		if (Files.notExists(config.getParent()))
 			Files.createDirectories(config.getParent());
@@ -105,7 +105,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			gson.toJson(create, out);
 		}
 	}
-
+	//TODO changed name of the method sha1
 	private void createSha(RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		write(metadata, metaFile);

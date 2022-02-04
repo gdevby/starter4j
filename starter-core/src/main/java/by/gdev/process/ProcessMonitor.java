@@ -11,7 +11,7 @@ import com.google.common.eventbus.EventBus;
 
 import by.gdev.model.StarterAppProcess;
 import by.gdev.util.DesktopUtil;
-import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
  * @author Robert Makrytski
  *
  */
-@Data
 @Slf4j
 public class ProcessMonitor extends Thread {
-	private final Process process;
+	@Getter
+	private Process process;
 	private EventBus listener;
 
 	public ProcessMonitor(Process process, EventBus listener) {
@@ -51,7 +51,7 @@ public class ProcessMonitor extends Thread {
 				status.setProcess(this.process);
 				status.setErrorCode(process.exitValue());
 				status.setExeption(t);
-            	listener.post(status);
+				listener.post(status);
 			} finally {
 				try {
 					IOUtils.close(buf);

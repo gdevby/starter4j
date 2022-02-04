@@ -87,7 +87,9 @@ public class Starter {
 		httpConfig = new HttpClientConfig();
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
+		//TODO add max attempts to log
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
+		//TODO set this param with app config
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService);
 	}

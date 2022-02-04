@@ -7,8 +7,8 @@ import by.gdev.http.upload.service.Downloader;
 
 /**
  * Transfer of the state
- * 1)idle->work->done-idle
- * 2)idle->work->cancel-idle
+ * 1)idle->work->done->idle
+ * 2)idle->work->cancel->idle
  * Status of the {@link Downloader}.
  * @author Robert Makrytski
  *

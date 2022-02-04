@@ -56,6 +56,7 @@ public class StarterAppConfig {
 	private boolean stop;
 
 	public static final StarterAppConfig DEFAULT_CONFIG;
+	//TODO static???
 	static {
 		DEFAULT_CONFIG = new StarterAppConfig(500,
 				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", 

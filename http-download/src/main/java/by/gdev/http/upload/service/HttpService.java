@@ -9,6 +9,7 @@ import by.gdev.http.upload.model.RequestMetadata;
  * This service sent http get, http head request and saved response to file
  *
  */
+//TODO change url to uri
 public interface HttpService {
 	/**
 	 * GET request

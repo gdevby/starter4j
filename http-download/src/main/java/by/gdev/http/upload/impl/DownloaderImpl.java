@@ -65,6 +65,7 @@ public class DownloaderImpl implements Downloader {
 	private volatile Integer allCountElement;
 	private long fullDownloadSize;
 	private long downloadBytesNow1;
+	//TODO if we download once and after download in one hour. Does it show correct speed? remove it
 	private LocalTime start;
 
 
@@ -96,6 +97,7 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
 		fullDownloadSize = totalDownloadSize(allConteinerSize);
+		//TODO Only with status IDLE should start to download
 		if (status.equals(DownloaderStatusEnum.IDLE) || status.equals(DownloaderStatusEnum.CANCEL)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
@@ -121,13 +123,14 @@ public class DownloaderImpl implements Downloader {
 	/**
 	 * After stop it should be IDLE 
 	 */
+	//TODO try cancel and download it should download old files
 	@Override
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
 
-	private DownloaderStatus buildDownuladerStatus() throws IOException {
+	private DownloaderStatus buildDownloaderStatus() throws IOException {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
@@ -159,12 +162,13 @@ public class DownloaderImpl implements Downloader {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
 					if (start.getSecond() != start.plusSeconds(1).getSecond())
-							eventBus.post(buildDownuladerStatus());
+							eventBus.post(buildDownloaderStatus());
 				}
 			}
 		}
 		status = DownloaderStatusEnum.DONE;
-		eventBus.post(buildDownuladerStatus());
+		eventBus.post(buildDownloaderStatus());
+		//TODO it should alert with status idle
 	}
 	
 	private long totalDownloadSize(List<Long> containerSize) {

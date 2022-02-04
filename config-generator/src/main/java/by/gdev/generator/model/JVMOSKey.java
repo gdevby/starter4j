@@ -4,7 +4,7 @@ import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
+//TODO ???
 @Data
 @EqualsAndHashCode
 public class JVMOSKey {

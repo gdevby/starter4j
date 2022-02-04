@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
-
+//TODO change url to uri
 /**
  * Saved files in cache and got from it
  */
@@ -18,5 +18,6 @@ public interface FileCacheService {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
+
 	Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException;
 }

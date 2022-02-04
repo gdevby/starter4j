@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class HttpServiceImpl implements HttpService {
+	//TODO description with example
 	private String proxy;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
@@ -59,6 +60,7 @@ public class HttpServiceImpl implements HttpService {
 					throw new SocketTimeoutException();
 			}
 		}
+		//TODO empty why runtim again?
 		throw new RuntimeException();
 	}
 
@@ -77,6 +79,7 @@ public class HttpServiceImpl implements HttpService {
 						throw new SocketTimeoutException();
 				}
 			}
+			//TODO why null??
 			return null;
 		}
 	
@@ -87,7 +90,9 @@ public class HttpServiceImpl implements HttpService {
 		if (response.containsHeader(Headers.ETAG.getValue()))
 			request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
 		else
+			//TODO null
 			request.setETag("");
+
 		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
 			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
 		else
@@ -126,6 +131,7 @@ public class HttpServiceImpl implements HttpService {
 					out.write(buffer, 0, curread);
 					curread = in.read(buffer);
 				}
+				//TODO create one code for upper method
 				if (response.containsHeader(Headers.ETAG.getValue()))
 					request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
 				else

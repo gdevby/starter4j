@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Converted json file content of the file to java object
  */
-
+//TODO change url to uri
 public interface GsonService {
 	/**
 	 * @param <T> type return object
