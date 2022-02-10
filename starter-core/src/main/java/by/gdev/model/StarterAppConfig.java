@@ -52,6 +52,8 @@ public class StarterAppConfig {
 	private int connectTimeout;
 	@Parameter(names = "-socketTimeout", description = "Set socket timeout")
 	private int socketTimeout;
+	@Parameter(names = "-timeToLife", description = "The time that the file is up-to-date")
+	private int timeToLife;
 	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
 	private boolean stop;
 
@@ -59,7 +61,7 @@ public class StarterAppConfig {
 		DEFAULT_CONFIG = new StarterAppConfig(500,
 				"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app", 
 				"starter/", Paths.get("starter/cache"), "1.0",
-				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, false);
+				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000,false);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		if (Objects.isNull(version))

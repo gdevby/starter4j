@@ -1,9 +1,10 @@
 package by.gdev.http.download.impl;
 
-import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -31,8 +32,7 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getObject(String url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(url, cache);
-		//TODO where is encoding?
-		try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
+		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),StandardCharsets.UTF_8)) {
 			return gson.fromJson(read, class1);
 		}
 	}
@@ -41,20 +41,18 @@ public class GsonServiceImpl implements GsonService {
 	  * {@inheritDoc}
 	  */
 		@Override
-		public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
-				throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-			Path pathFile = null;
+		public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			T returnValue = null;
 			for (String url : urls) {
 				try {
-					pathFile = fileService.getRawObject(url + urn, cache);
-					try (BufferedReader read = new BufferedReader(new FileReader(pathFile.toFile()))) {
-						return gson.fromJson(read, class1);
+					Path pathFile = fileService.getRawObject(url + urn, cache);
+					try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),StandardCharsets.UTF_8)) {
+						returnValue = gson.fromJson(read, class1);
 					}
 				} catch (IOException e) {
 					log.error("Error = "+e.getMessage());
 				}
 			}
-			//TODO why runtime?
-			throw new RuntimeException("RuntimeException in getObjectByUrls");
+			return returnValue;
 		}
 }

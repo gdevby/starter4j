@@ -55,7 +55,7 @@ public class JavaProcessHelper {
         result.add(0, jvmPath);
         return result;
     }    
-    //TODO some problem with jvm
+
     private static String findJavaOptionAndGetName() {
         for (Map.Entry<String, String> e : System.getenv().entrySet())
             if (e.getKey().equalsIgnoreCase("_java_options"))

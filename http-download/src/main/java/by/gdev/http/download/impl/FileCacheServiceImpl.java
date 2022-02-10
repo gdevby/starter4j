@@ -1,15 +1,14 @@
 package by.gdev.http.download.impl;
 
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 
@@ -82,13 +81,13 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (fileExists) {
 			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(), RequestMetadata.class);
-			if (serverMetadata.getETag().equals(localMetadata.getETag())
-					& serverMetadata.getContentLength().equals(localMetadata.getContentLength())
-					& serverMetadata.getLastModified().equals(localMetadata.getLastModified())) {
+			if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
+					& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
+					& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
 				return urlPath;
 			} else {
 				httpService.getRequestByUrlAndSave(url, urlPath);
-				write(serverMetadata, metaFile);
+				new FileMapperService(gson, charset, "").write(serverMetadata, metaFile.toString());
 				return urlPath;
 			}
 		} else {
@@ -97,24 +96,16 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return urlPath;
 		}
 	}
-	//TODO can we use hour service to save?
-	private void write(Object create, Path config) throws FileNotFoundException, IOException {
-		if (Files.notExists(config.getParent()))
-			Files.createDirectories(config.getParent());
-		try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(config.toFile()), charset)) {
-			gson.toJson(create, out);
-		}
-	}
 
 	private void createSha1(RequestMetadata metadata, Path urlPath, Path metaFile) throws IOException, NoSuchAlgorithmException {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
-		write(metadata, metaFile);
+		new FileMapperService(gson, charset, "").write(metadata, metaFile.toString());
 	}
 	
 	private void checkMetadataFile(Path metaFile, String url) throws IOException {
 	    if (!metaFile.toFile().exists()) {
 	      RequestMetadata metadata = httpService.getMetaByUrl(url);
-	      write(metadata, metaFile);
+	      new FileMapperService(gson, charset, "").write(metadata, metaFile.toString());
 	    }
 	  }
 }
