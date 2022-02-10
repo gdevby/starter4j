@@ -66,7 +66,8 @@ public class DownloadRunnableImpl implements Runnable {
 								element.getMetadata().getPath(), e1.getLocalizedMessage()));
 					}
 				} else {
-					DesktopUtil.sleep(1000);
+//					DesktopUtil.sleep(1000);
+					break;
 				}
 			}
 		}
@@ -108,7 +109,8 @@ public class DownloadRunnableImpl implements Runnable {
 						int curread = in.read(buffer);
 						while (curread != -1) {
 							if (status.equals(DownloaderStatusEnum.CANCEL)) {
-								DesktopUtil.sleep(1000);
+//								DesktopUtil.sleep(1000);
+								break;
 							} else {
 								out.write(buffer, 0, curread);
 								curread = in.read(buffer);
