@@ -2,7 +2,12 @@ package by.gdev.http.download.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-//TODO ???
+
+/**
+ * Class for describing request response headers
+ * @author Robert Makrytski 
+ */
+
 @Getter
 @RequiredArgsConstructor
 public enum Headers {

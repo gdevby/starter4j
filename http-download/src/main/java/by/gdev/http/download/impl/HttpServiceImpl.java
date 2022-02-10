@@ -32,7 +32,9 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class HttpServiceImpl implements HttpService {
-	//TODO description with example
+	/**
+	 *If proxy value is not empty it will be used on connection error
+	 */
 	private String proxy;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
@@ -44,13 +46,14 @@ public class HttpServiceImpl implements HttpService {
 	  */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
+		RequestMetadata request = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
 				try {
-					return getResourseByUrl(url, path);
+					request = getResourseByUrl(url, path);
 				} catch (IOException e) {
 					if (Objects.nonNull(proxy))
-						return getResourseByUrl(proxy + url, path);
+						request = getResourseByUrl(proxy + url, path);
 					 else 
 						throw e;
 				}
@@ -60,8 +63,7 @@ public class HttpServiceImpl implements HttpService {
 					throw new SocketTimeoutException();
 			}
 		}
-		//TODO empty why runtim again?
-		throw new RuntimeException();
+		return request;
 	}
 
 	 /**
@@ -70,17 +72,17 @@ public class HttpServiceImpl implements HttpService {
 	  */
 		@Override
 		public RequestMetadata getMetaByUrl(String url) throws IOException {
+			RequestMetadata request = null;
 			for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 				try {
-					return getMetadata(url);
+					request = getMetadata(url);
 				} catch (SocketTimeoutException e) {
 					attepmts++;
 					if (attepmts == maxAttepmts)
 						throw new SocketTimeoutException();
 				}
 			}
-			//TODO why null??
-			return null;
+			return request;
 		}
 	
 	private RequestMetadata getMetadata(String url) throws IOException {
@@ -90,22 +92,19 @@ public class HttpServiceImpl implements HttpService {
 		if (response.containsHeader(Headers.ETAG.getValue()))
 			request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
 		else
-			//TODO null
-			request.setETag("");
-
+			request.setETag(null);
 		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
 			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
 		else
-			request.setLastModified("");
+			request.setLastModified(null);
 		if(response.containsHeader(Headers.CONTENTLENGTH.getValue()))
 			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
 		else
-			request.setContentLength("");
+			request.setContentLength(null);
 		return request;
 	}
 	
 	private RequestMetadata getResourseByUrl(String url, Path path) throws IOException, SocketTimeoutException {
-		RequestMetadata request = new RequestMetadata();
 		HttpGet httpGet = new HttpGet(url);
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
@@ -131,26 +130,13 @@ public class HttpServiceImpl implements HttpService {
 					out.write(buffer, 0, curread);
 					curread = in.read(buffer);
 				}
-				//TODO create one code for upper method
-				if (response.containsHeader(Headers.ETAG.getValue()))
-					request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
-				else
-					request.setETag("");
-				if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
-					request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
-				else
-					request.setLastModified("");
-				if(response.containsHeader(Headers.CONTENTLENGTH.getValue()))
-					request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
-				else
-					request.setContentLength("");
 			} finally {
 				httpGet.abort();
 				IOUtils.closeQuietly(in);
 				IOUtils.closeQuietly(out);
 			}
 			Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-			return request;
+			return getMetadata(url);
 	}
 	
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {

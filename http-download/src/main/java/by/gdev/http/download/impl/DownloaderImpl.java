@@ -28,6 +28,7 @@ import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -65,17 +66,16 @@ public class DownloaderImpl implements Downloader {
 	private volatile Integer allCountElement;
 	private long fullDownloadSize;
 	private long downloadBytesNow1;
-	//TODO if we download once and after download in one hour. Does it show correct speed? remove it
 	private LocalTime start;
-
+	private LocalTime stopTime;
 
 	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
-		start = LocalTime.now();
 		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus);
+		stopTime = LocalTime.now().plusSeconds(10);
 	}
 
 	@Override
@@ -97,6 +97,7 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
 		fullDownloadSize = totalDownloadSize(allConteinerSize);
+		start = LocalTime.now();
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;
 			runnable.setStatus(status);
@@ -122,7 +123,7 @@ public class DownloaderImpl implements Downloader {
 	/**
 	 * After stop it should be IDLE 
 	 */
-	//TODO try cancel and download it should download old files
+
 	@Override
 	public void cancelDownload() {
 		status = DownloaderStatusEnum.CANCEL;
@@ -151,12 +152,23 @@ public class DownloaderImpl implements Downloader {
 	}
 
 	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException, IOException {
+		System.out.println(stopTime);
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
 			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());
+			
+			if(start.getSecond() == stopTime.getSecond()) {
+				System.out.println("сработал");
+				cancelDownload();
+				DesktopUtil.sleep(5000);
+				status = DownloaderStatusEnum.WORK;
+				runnable.setStatus(DownloaderStatusEnum.WORK);
+				System.out.println("прошел");
+			} 
+			
 			if (start.isBefore(LocalTime.now())) {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
@@ -167,7 +179,6 @@ public class DownloaderImpl implements Downloader {
 		}
 		status = DownloaderStatusEnum.DONE;
 		eventBus.post(buildDownloaderStatus());
-		//TODO it should alert with status idle
 	}
 	
 	private long totalDownloadSize(List<Long> containerSize) {

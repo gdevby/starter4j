@@ -23,6 +23,7 @@ import com.google.common.eventbus.EventBus;
 import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.util.DesktopUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,7 +66,7 @@ public class DownloadRunnableImpl implements Runnable {
 								element.getMetadata().getPath(), e1.getLocalizedMessage()));
 					}
 				} else {
-					break;
+					DesktopUtil.sleep(1000);
 				}
 			}
 		}
@@ -107,12 +108,11 @@ public class DownloadRunnableImpl implements Runnable {
 						int curread = in.read(buffer);
 						while (curread != -1) {
 							if (status.equals(DownloaderStatusEnum.CANCEL)) {
-								break;
+								DesktopUtil.sleep(1000);
 							} else {
 								out.write(buffer, 0, curread);
 								curread = in.read(buffer);
 								element.setDownloadBytes(element.getDownloadBytes() + curread);
-								
 							}
 						}
 						eventBus.post(element);

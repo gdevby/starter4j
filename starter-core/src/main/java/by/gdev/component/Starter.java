@@ -89,8 +89,7 @@ public class Starter {
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
 		log.trace("Max attempts from download = " + maxAttepmts);
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
-		//TODO set this param with app config
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), 600000);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService);
 	}
 
