@@ -21,25 +21,24 @@
 | -name| starter-app |Название приложения|  
 | -version| 1.0 |Версия приложения|  
 | -mainClass| by.gdev.app.Main |Главный класс для запуска приложения|  
-| -app|  |Aргументы приложения|  
-| -jvm|   |Aргументы для java виртуальной машины|
-| -file| starter-app-1.0.jar |запускаемый jar файл |  
+| -appArguments|  |Aргументы приложения|  
+| -jvmArguments| "-Xmx512m","-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true" |Aргументы для java виртуальной машины|
+| -appJar| starter-app-1.0.jar |запускаемый jar файл |  
 | -javaFolder| ../../starter-app/jvms |Каталог, в котором хранится jvm для создания конфигурации java |  
 | -javaConfig| src/test/resources |Сохраненный результат jvm конфигурации, можно переиспользовать без генерации каждый раз указав -flag=true|  
 | -resources| ../../starter-app/src/main/resources/resources |Дирректория с необходимыми ресурсами для запуска приложения|  
 | -dependencies| ../../starter-app/dep |Дирректория с необходимыми зависимостями для запуска приложения|  
-| -appFolder| ../../starter-app |Каталог для сохраненной сгенерированной конфигурации нового приложения|  
-| -domain| http://localhost:81/ |Домен по которому будут доступны конфиги для скачивания|  
-| -flag| false |флаг позволяющий пропустить генерацию java|  
+| -appFolder| ../../starter-app |Каталог с вашим приложением. Он будет искать в target/appName-version.jar|  
+| -url| https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/ |Домен по которому будут доступны конфиги для скачивания|  
+| -skinJVMGeneration| false |флаг позволяющий пропустить генерацию java|  
 | -help| false |указав флаг true можно вызвать помощь с описание всех команд|  
 
 Для дальнейшей корректной вашего приложения вам рекомендуеться изменить следующие аргументы:
 <ol>
-	<li>-javafolder</li>
-	<li>-file</li>
-	<li>-config</li>
+	<li>-javaFolder</li>
+	<li>-appJar</li>
 	<li>-resources</li>
 	<li>-dependencies</li>
-	<li>-appfolder</li>
-	<li>-domain</li>
+	<li>-appFolder</li>
+	<li>-url</li>
 </ol>

@@ -54,7 +54,7 @@ public class StarterAppConfig {
 	private int socketTimeout;
 	@Parameter(names = "-timeToLife", description = "The time that the file is up-to-date")
 	private int timeToLife;
-	@Parameter(names = "-stop", description = "List of sites for checking Internet connection access")
+	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 
 	public static final StarterAppConfig 
