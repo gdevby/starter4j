@@ -25,7 +25,7 @@
 | -jvmArguments| "-Xmx512m","-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true" |Aргументы для java виртуальной машины|
 | -appJar| starter-app-1.0.jar |запускаемый jar файл |  
 | -javaFolder| ../../starter-app/jvms |Каталог, в котором хранится jvm для создания конфигурации java |  
-| -javaConfig| src/test/resources |Сохраненный результат jvm конфигурации, можно переиспользовать без генерации каждый раз указав -flag=true|  
+| -javaConfig| src/test/resources |Сохраненный результат jvm конфигурации, можно переиспользовать без генерации каждый раз указав -skinJVMGeneration=true|  
 | -resources| ../../starter-app/src/main/resources/resources |Дирректория с необходимыми ресурсами для запуска приложения|  
 | -dependencies| ../../starter-app/dep |Дирректория с необходимыми зависимостями для запуска приложения|  
 | -appFolder| ../../starter-app |Каталог с вашим приложением. Он будет искать в target/appName-version.jar|  
