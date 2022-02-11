@@ -67,7 +67,6 @@ public class DownloaderImpl implements Downloader {
 	private long fullDownloadSize;
 	private long downloadBytesNow1;
 	private LocalTime start;
-	private LocalTime stopTime;
 
 	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
 		this.eventBus = eventBus;
@@ -75,7 +74,6 @@ public class DownloaderImpl implements Downloader {
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
 		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus);
-		stopTime = LocalTime.now().plusSeconds(10);
 	}
 
 	@Override
@@ -152,23 +150,12 @@ public class DownloaderImpl implements Downloader {
 	}
 
 	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException, IOException {
-		System.out.println(stopTime);
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
-			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());
-			
-			if(start.getSecond() == stopTime.getSecond()) {
-				System.out.println("сработал");
-				cancelDownload();
-				DesktopUtil.sleep(5000);
-				status = DownloaderStatusEnum.WORK;
-				runnable.setStatus(DownloaderStatusEnum.WORK);
-				System.out.println("прошел");
-			} 
-			
+			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());	
 			if (start.isBefore(LocalTime.now())) {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
