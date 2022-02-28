@@ -6,9 +6,9 @@
 Вы можете попробовать создать конфиги для тестового desktop java Hello World проекта.</br>
 Для проверки работоспособности вам необходимо выполнить следующий команды:<br>
 <ol>
-<li>Создать тестовую дирректорию</li>
-<li>Клонировать в тестовую дирректорию тестовый проет при помощи команды: git clone https://github.com/gdevby/starter-app.git</li>
-<li>Клонировать в тестовую дирректорию основной проет при помощи команды: git clone https://github.com/gdevby/desktop-starter-launch-update-bootstrap.git<br></li>
+<li>Создать тестовую директорию</li>
+<li>Клонировать в тестовую директорию тестовый проет при помощи команды: git clone https://github.com/gdevby/starter-app.git</li>
+<li>Клонировать в тестовую директорию основной проет при помощи команды: git clone https://github.com/gdevby/desktop-starter-launch-update-bootstrap.git<br></li>
 <li>В директории проекта desktop-starter-launch-update-bootstrap выполнить команду mvn clean install</li>
 <li>Перейти в директорию desktop-starter-launch-update-bootstrap/config-generator</li>
 <li>Выполнить команду java -jar target/config-generator-*.jar, где вместо * заменить на версию</li>
@@ -22,16 +22,16 @@
 | -version| 1.0 |Версия приложения|  
 | -mainClass| by.gdev.app.Main |Главный класс для запуска приложения|  
 | -appArguments|  |Aргументы приложения|  
-| -jvmArguments| -Xmx512m, -Dfile.encoding=UTF8, -Djava.net.preferIPv4Stack=true |Aргументы для java виртуальной машины|
-| -appJar| starter-app-1.0.jar |запускаемый jar файл |  
-| -javaFolder| ../../starter-app/jvms |Каталог, в котором хранится jvm для создания конфигурации java |  
-| -javaConfig| src/test/resources |Сохраненный результат jvm конфигурации, можно переиспользовать без генерации каждый раз указав -skinJVMGeneration=true|  
-| -resources| ../../starter-app/src/main/resources/resources |Дирректория с необходимыми ресурсами для запуска приложения|  
-| -dependencies| ../../starter-app/dep |Дирректория с необходимыми зависимостями для запуска приложения|  
-| -appFolder| ../../starter-app |Каталог с вашим приложением. Он будет искать в target/appName-version.jar|  
+| -jvmArguments| -Xmx512m,-Dfile.encoding=UTF8,-Djava.net.preferIPv4Stack=true |Aргументы для java виртуальной машины|
+| -appJar| starter-app-1.0.jar | Название запускаемого jar файла |  
+| -javaFolder| ../../starter-app/example-compiled-app/jres_default |Каталог, в котором хранится jvm для создания конфигурации java |  
+| -javaConfig| src/test/resources |Директория, где храниться результат jvm конфигурации, можно переиспользовать без генерации каждый раз указав -skinJVMGeneration=true|  
+| -resources| ../../starter-app/src/main/resources |Директория с необходимыми ресурсами для запуска приложения|  
+| -dependencies| ../../starter-app/example-compiled-app/target/dependencies |Директория с необходимыми зависимостями для запуска приложения|  
+| -appFolder| ../../starter-app/example-compiled-app/target |Директория, где хранится jar файл запускаемого приложения|  
 | -url| https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/ |Домен по которому будут доступны конфиги для скачивания|  
-| -skinJVMGeneration| false |флаг позволяющий пропустить генерацию java|  
-| -help| false |указав флаг true можно вызвать помощь с описание всех команд|  
+| -skipJVMGeneration| false |флаг позволяющий пропустить генерацию java|  
+| -help|  |указав флаг true можно вызвать помощь с описание всех команд|  
 
 Для дальнейшей корректной вашего приложения вам рекомендуеться изменить следующие аргументы:
 <ol>
