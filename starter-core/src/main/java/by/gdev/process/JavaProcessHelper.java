@@ -76,14 +76,14 @@ public class JavaProcessHelper {
         for (String c : list)
             this.commands.add(c);
     }
-    
+
     public List<Path> librariesForRunning(String workDirectory, Repo fileRepo, Repo dependencis) {
     	List<Path> list = new ArrayList<Path>();
     	dependencis.getResources().forEach(dep->{
-    		list.add(Paths.get(workDirectory, dep.getPath()).toAbsolutePath());
+			list.add(Paths.get(workDirectory, dep.getPath()));
     	});
     	fileRepo.getResources().forEach(core->{
-    		list.add(Paths.get(workDirectory, core.getPath()).toAbsolutePath());
+			list.add(Paths.get(workDirectory, core.getPath()));
     	});
     	return list;
     }

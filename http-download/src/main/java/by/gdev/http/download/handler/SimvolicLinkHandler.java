@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.lang3.StringUtils;
+
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import lombok.extern.slf4j.Slf4j;
 /**
@@ -17,7 +19,7 @@ public class SimvolicLinkHandler implements PostHandler {
 
 	@Override
 	public void postProcessDownloadElement(DownloadElement e) {
-		if (!e.getMetadata().getLink().equals("")) {
+		if (!StringUtils.isEmpty(e.getMetadata().getLink())) {
 			try {
 			Path target = Paths.get(e.getPathToDownload(), e.getMetadata().getLink());
 			Path link = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());

@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.eventbus.Subscribe;
 
 import by.gdev.http.download.exeption.HashSumAndSizeError;
@@ -31,7 +33,10 @@ public class ViewSubscriber {
 
 	@Subscribe
 	private void procces(StarterAppProcess status) {
-		if (Objects.nonNull(status.getErrorCode())) {
+		
+		if (!StringUtils.isEmpty(status.getLine()) && status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path"))
+			message(new ExceptionMessage(bundle.getString("unsatisfied.link.error")));
+		else if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791) {
 				message(new ExceptionMessage(bundle.getString("driver.error"),"https://gdev.by/help/java/closed-minecraft-1073740791.html"));
 			}

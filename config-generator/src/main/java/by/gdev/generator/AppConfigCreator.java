@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ public class AppConfigCreator {
 
 	public AppConfig createConfig(AppConfigModel configFile)
 			throws IOException, NoSuchAlgorithmException {
-		
+		AppConfig appConfig = new AppConfig();
 		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();
 		Path appFolder = Paths.get(configFile.getAppFolder());
 		Path dependencies = Paths.get(configFile.getAppDependencies());
@@ -63,21 +64,20 @@ public class AppConfigCreator {
 		FileUtils.copyFile(Paths.get(appFolder.toString(), configFile.getAppJar().toString()).toFile(), 
 				Paths.get(TARGET_OUT_FOLDER, version, configFile.getAppJar().toString()).toFile());
 		fileMapperService.write(createJreConfig(configFile), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG).toString());
-		fileMapperService.write(createRepo(dependencies.getParent(), dependencies, Paths.get(version).toString(), configFile), dependenciesConfig.toString());
-		fileMapperService.write(createRepo(resources, resources, Paths.get(version).toString(), configFile), resourcesConfig.toString());
-		
-		AppConfig appConfig = new AppConfig();
+		fileMapperService.write(createRepo(dependencies.getParent(), dependencies, String.valueOf(configFile.getAppVersion()), configFile), dependenciesConfig.toString());
+		fileMapperService.write(createRepo(resources, resources, String.valueOf(configFile.getAppVersion()), configFile), resourcesConfig.toString());
 		appConfig.setAppName(configFile.getAppName());
 		appConfig.setAppVersion(configFile.getAppVersion());
 		appConfig.setAppArguments(configFile.getAppArguments());
 		appConfig.setJvmArguments(configFile.getJvmArguments());	
 		appConfig.setMainClass(configFile.getMainClass());
-		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppJar()),version, configFile));
-		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, version, configFile));
-		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, version, configFile));
+		appConfig.setAppFileRepo(createRepo(appFolder, Paths.get(configFile.getAppFolder(), configFile.getAppJar()),String.valueOf(configFile.getAppVersion()), configFile));
+		appConfig.setAppDependencies(createRepo(Paths.get(TARGET_OUT_FOLDER, version), dependenciesConfig, String.valueOf(configFile.getAppVersion()), configFile));
+		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig, String.valueOf(configFile.getAppVersion()), configFile));
 		if (!configFile.isSkinJVMGeneration()) {
 			createJreConfig(configFile);
-			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER), Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(),JAVA_CONFIG), null, configFile));
+			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER, configFile.getAppName()), Paths.get(TARGET_OUT_FOLDER, 
+					configFile.getAppName(),JAVA_CONFIG), null, configFile));
 		}else {
 			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), APP_CONFIG).toString(), AppConfig.class);
 			appConfig.setJavaRepo(app.getJavaRepo());
@@ -113,18 +113,18 @@ public class AppConfigCreator {
 			if (Objects.nonNull(str))
 				s = Paths.get(str, s.toString());
 			m.setRelativeUrl(UrlEscapers.urlFragmentEscaper().escape(s.toString()));
-//			m.setRelativeUrl(s.toString());
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();
 		r.setResources(metadataList);
-		r.setRepositories(configFile.getUrl());
+		r.setRepositories(createUrl(configFile));
 		return r;
 	}
 
 	private List<Path> listPath(Path p) throws IOException {
 		return Files.walk(p, 1).filter(entry -> !entry.equals(p)).collect(Collectors.toList());
 	}
+
 
 	JVMConfig createJreConfig(AppConfigModel configFile)
 			throws IOException, NoSuchAlgorithmException {
@@ -140,19 +140,28 @@ public class AppConfigCreator {
 					String key = String.valueOf(pathKey.getFileName().toString().toLowerCase(Locale.ROOT));
 					Repo repo = new Repo();
 					for (Path pathJre : listPath(pathKey)) {
+						String javaFolder = Paths.get(configFile.getJavaFolder()).getFileName().toString();
+						String str = Paths.get(javaFolder,type.toString().toLowerCase(), arch.toString()).toString();
 						// Create json from all jvm
-						Repo createdJson = createRepo(pathKey.getParent(), pathJre, 
-							configFile.getAppName(), configFile);
-						Path jvmConfig = Paths.get("jvms", type.toString().toLowerCase(Locale.ROOT), arch.toString(),
+						Repo createdJson = createRepo(pathKey.getParent(), pathJre, str, configFile);
+						Path jvmConfig = Paths.get("jres_configuration_default", type.toString().toLowerCase(Locale.ROOT), arch.toString(),
 								key, pathJre.getFileName() + ".json");
 						fileMapperService.write(createdJson, jvmConfig.toString());
 						repo.setResources(Arrays.asList(Metadata.createMetadata(jvmConfig)));
-						repo.setRepositories(configFile.getUrl());
+						repo.setRepositories(createUrl(configFile));
 					}
 					jvm.getJvms().get(type).get(arch).put(key, repo);
 				}
 			}
 		}
 		return jvm;
+	}
+	
+	private List<String> createUrl(AppConfigModel configFile) {
+		List<String> newUrlList = new ArrayList<String>();
+		configFile.getUrl().forEach(newUrl->{
+			newUrlList.add(newUrl + configFile.getAppName().concat("/"));
+		});
+		return newUrlList;
 	}
 }
