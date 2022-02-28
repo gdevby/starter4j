@@ -54,7 +54,7 @@ public class AppConfigModel{
     			Arrays.asList("",""),
     			Arrays.asList("-Xmx512m","-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true"),
     			"starter-app-1.0.jar", 
-    			"../../starter-app/example-compiled-app/jvms",
+    			"../../starter-app/example-compiled-app/jres_default",
     			"src/test/resources", 
     			"../../starter-app/src/main/resources", 
     			"../../starter-app/example-compiled-app/target/dependencies", 

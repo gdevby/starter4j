@@ -79,6 +79,8 @@ public class Starter {
 	private GsonService gsonService;
 	private RequestConfig requestConfig;
 	private HttpClientConfig httpConfig;
+	private FileMapperService fileMapperService;
+	private String workDir;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
 		this.eventBus = eventBus;
@@ -86,6 +88,7 @@ public class Starter {
 		this.starterConfig = starterConfig;
 		httpConfig = new HttpClientConfig();
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout()).setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),requestConfig, httpConfig.getInstanceHttpClient());
 		log.trace("Max attempts from download = " + maxAttepmts);
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
@@ -104,7 +107,7 @@ public class Starter {
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
 			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType));
-			eventBus.register(new ConsoleSubscriber(bundle));
+			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService));
 			starterStatusFrame.setVisible(true);
 		}
 	}
@@ -113,10 +116,12 @@ public class Starter {
 	 * Validate files,java and return what we need to download
 	 */
 	public void validateEnvironmentAndAppRequirements() throws Exception {
+		workDir = starterConfig.workDir(starterConfig.getWorkDirectory(), osType).concat("/");
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
 		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
-				new File(starterConfig.workDir(starterConfig.getWorkDirectory(), osType)), bundle));
-		validateEnvironment.add(new ValidateWorkDir(starterConfig.workDir(starterConfig.getWorkDirectory(), osType), bundle));
+//				new File(starterConfig.workDir(starterConfig.getWorkDirectory(), osType)), bundle));
+				new File(workDir), bundle));
+		validateEnvironment.add(new ValidateWorkDir(workDir, bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
 		validateEnvironment.add(new ValidateFont(bundle));
@@ -140,18 +145,18 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
+		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,true);
-		FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,starterConfig.getWorkDirectory());
+		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,false);
 		updateApp(gsonService, fileMapperService);
 		fileRepo = remoteAppConfig.getAppFileRepo();
-		dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(), remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, true);
-		Repo resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(), remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, true);
-		JVMConfig jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(), remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, true);
+		dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(), remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		Repo resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(), remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+		JVMConfig jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(), remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
 		List<String> jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories();
-		java = gsonService.getObjectByUrls(jvmDomain, jvmPath, Repo.class, true);
+		java = gsonService.getObjectByUrls(jvmDomain, jvmPath, Repo.class, false);
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(fileRepo);
 		list.add(dependencis);
@@ -162,8 +167,8 @@ public class Starter {
 		SimvolicLinkHandler linkHandler = new SimvolicLinkHandler();
 		for (Repo repo : list) {
 			container.conteinerAllSize(repo);
-			container.filterNotExistResoursesAndSetRepo(repo, starterConfig.getWorkDirectory());
-			container.setDestinationRepositories(starterConfig.getWorkDirectory());
+			container.filterNotExistResoursesAndSetRepo(repo, workDir);
+			container.setDestinationRepositories(workDir);
 			container.setHandlers(Arrays.asList(postHandler, accesHandler, linkHandler));
 			downloader.addContainer(container);
 		}
@@ -183,7 +188,7 @@ public class Starter {
 			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 		}
 		StringVersionComparator versionComparator = new StringVersionComparator();
-		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == 1) {
+		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == -1) {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
@@ -217,11 +222,9 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
-		Path jre = Paths.get(starterConfig.getWorkDirectory() + DesktopUtil.getJavaRun(java)).toAbsolutePath();
-		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),
-				new File(starterConfig.getWorkDirectory()), eventBus);
-		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
-				javaProcess.librariesForRunning(starterConfig.getWorkDirectory(), fileRepo, dependencis));
+		Path jre = Paths.get(workDir + DesktopUtil.getJavaRun(java));
+		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),new File(workDir), eventBus);
+		String classPath = DesktopUtil.convertListToString(File.pathSeparator,javaProcess.librariesForRunning(workDir, fileRepo, dependencis));
 		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(remoteAppConfig.getMainClass());

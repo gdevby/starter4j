@@ -1,7 +1,7 @@
 /.flattened-pom.xml
 /.classpath
 /.project
-jvms/
+jres_configuration_default/
 json/
 .settings/
 /logs/

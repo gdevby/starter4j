@@ -1,9 +1,11 @@
 package by.gdev.subscruber;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 
 import com.google.common.eventbus.Subscribe;
@@ -11,8 +13,11 @@ import com.google.common.eventbus.Subscribe;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.model.AppLocalConfig;
 import by.gdev.model.ExceptionMessage;
+import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterAppProcess;
+import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
+	private FileMapperService fileMapperService;
 
 	@Subscribe
 	public void downloadStatusMessage(DownloaderStatus status) {
@@ -35,12 +41,24 @@ public class ConsoleSubscriber {
 
 	@Subscribe
 	private void procces(StarterAppProcess status) {
-		if (Objects.nonNull(status.getErrorCode())) {
+		if (!StringUtils.isEmpty(status.getLine()) && status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path")) {
+			log.error(bundle.getString("unsatisfied.link.error"));
+			try {
+				AppLocalConfig appLocalConfig = new AppLocalConfig();
+				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+				appLocalConfig.setDir("C:\\bootstrap");
+				log.info(appLocalConfig.toString());
+				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+			} catch (IOException e) {
+				log.error("Error ",e);
+			}
+		}
+		else if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791)
 				log.error(bundle.getString("driver.error"));
 			else if (status.getErrorCode() == -1073740771)
 				log.error(bundle.getString("msi.afterburner.error"));
-			else if (status.getErrorCode() != 0)
+			else if (status.getErrorCode() != 0) 
 				log.error(bundle.getString("unidentified.error"));
 		} else if (status.getLine().equals("starter can be closed"))
 			System.exit(0);
