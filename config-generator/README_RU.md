@@ -31,7 +31,7 @@
 | -appFolder| ../../starter-app/example-compiled-app/target |Директория, где хранится jar файл запускаемого приложения|  
 | -url| https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/ |Домен по которому будут доступны конфиги для скачивания|  
 | -skipJVMGeneration| false |флаг позволяющий пропустить генерацию java|  
-| -help|  |указав флаг true можно вызвать помощь с описание всех команд|  
+| -help|  |указав флаг можно вызвать помощь с описание всех команд|  
 
 Для дальнейшей корректной вашего приложения вам рекомендуеться изменить следующие аргументы:
 <ol>
