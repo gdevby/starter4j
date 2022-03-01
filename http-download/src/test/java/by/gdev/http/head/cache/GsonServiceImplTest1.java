@@ -60,6 +60,12 @@ public class GsonServiceImplTest1 {
 	                      new Header("Cache-Control", "public, max-age=86400"))
 	                    .withBody("{ message: 'incorrect username and password combination' }")
 	                    .withDelay(TimeUnit.SECONDS,10));
+		initialization(testFolder);
+		
+	}
+	
+	
+	private static void initialization(Path testFolder) {
 		Gson gson = new Gson();
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();

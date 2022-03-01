@@ -80,8 +80,10 @@ public class DownloadTest {
             new Header("Content-Type", "application/json; charset=utf-8"),
             new Header("Cache-Control", "public, max-age=86400"))
           .withDelay(TimeUnit.SECONDS,1));
-		
-		
+		initialization(testFolder, gson);
+	}
+
+	private static void initialization(Path testFolder, Gson gson) {
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		EventBus eventBus = new EventBus();
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
@@ -92,7 +94,10 @@ public class DownloadTest {
 		gsonService = new GsonServiceImpl(gson, fileService);
 		downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 	}
-
+	
+	
+	
+	
 	@AfterClass
 	public static void stop() {
 		mockServer.stop();
