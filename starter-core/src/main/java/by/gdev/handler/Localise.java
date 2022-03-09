@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,13 +22,10 @@ public class Localise {
 			property.load(inputStream);
 			String language = property.getProperty("language");
 			String[] parts = language.split(",");
-			for (String string : parts) {
-				if (string.equals(Locale.getDefault().toString())) {
-					locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
-				}else {
-					locale = new Locale.Builder().setLanguage("en").build();
-				}
-			}
+			if (ArrayUtils.contains(parts, Locale.getDefault().getLanguage()))
+				locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
+			else
+				locale = new Locale.Builder().setLanguage("en").build();
 		} catch (IOException e) {
 			log.error("Error", e);
 		}

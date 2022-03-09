@@ -2,6 +2,7 @@ package by.gdev.ui.subscriber;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -17,6 +18,7 @@ import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
+import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterAppProcess;
 import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.ui.StarterStatusFrame;
@@ -30,13 +32,15 @@ public class ViewSubscriber {
 	private StarterStatusFrame frame;
 	private ResourceBundle bundle;
 	private OSType osType;
+	private StarterAppConfig starterConfig;
 
 	@Subscribe
 	private void procces(StarterAppProcess status) {
-		
-		if (!StringUtils.isEmpty(status.getLine()) && status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path"))
-			message(new ExceptionMessage(bundle.getString("unsatisfied.link.error")));
-		else if (Objects.nonNull(status.getErrorCode())) {
+		if (!StringUtils.isEmpty(status.getLine()) && status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path")) {
+			message(new ExceptionMessage(String.format(bundle.getString("unsatisfied.link.error"), 
+					Paths.get(starterConfig.getWorkDirectory()).toAbsolutePath().toString(), "C:\\"+starterConfig.getWorkDirectory())));
+		}
+		if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791) {
 				message(new ExceptionMessage(bundle.getString("driver.error"),"https://gdev.by/help/java/closed-minecraft-1073740791.html"));
 			}
