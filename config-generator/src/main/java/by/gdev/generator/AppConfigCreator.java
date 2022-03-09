@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.net.UrlEscapers;
-
 import by.gdev.generator.model.AppConfigModel;
 import by.gdev.model.AppConfig;
 import by.gdev.model.JVMConfig;
@@ -93,7 +91,7 @@ public class AppConfigCreator {
 			if (s.endsWith("java") | s.endsWith("java.exe")) 
 				m.setExecutable(true);
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
-			m.setPath(s.toString());
+			m.setPath(s.toString().replace("\\", "/"));
 			m.setSize(e.toFile().length());
 			BasicFileAttributes attr = Files.readAttributes(e, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 			if (attr.isSymbolicLink()) {
@@ -112,7 +110,7 @@ public class AppConfigCreator {
 			m.setLink(simvLink.toString());
 			if (Objects.nonNull(str))
 				s = Paths.get(str, s.toString());
-			m.setRelativeUrl(UrlEscapers.urlFragmentEscaper().escape(s.toString()));
+			m.setRelativeUrl(s.toString().replace("\\", "/"));
 			return m;
 		})).collect(Collectors.toList());
 		Repo r = new Repo();

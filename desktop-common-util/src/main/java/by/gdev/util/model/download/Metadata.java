@@ -46,8 +46,8 @@ public class Metadata {
 
     public static Metadata createMetadata (Path config) throws NoSuchAlgorithmException, IOException {
 		Metadata metadata = new Metadata();
-		metadata.setPath(config.toString());
-		metadata.setRelativeUrl(config.toString());
+		metadata.setPath(config.toString().replace("\\", "/"));
+		metadata.setRelativeUrl(config.toString().replace("\\", "/"));
 		metadata.setSha1(DesktopUtil.getChecksum(config.toFile(), "sha-1"));
 		return metadata;
     }

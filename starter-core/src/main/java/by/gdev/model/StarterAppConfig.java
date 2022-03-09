@@ -66,7 +66,7 @@ public class StarterAppConfig {
 	public static final StarterAppConfig 
 		DEFAULT_CONFIG = new StarterAppConfig(500,
 				"http://127.0.0.1:81/starter-app/",
-				"starter/", Paths.get("starter/cache"), "1.0",
+				"starter", Paths.get("starter/cache"), "1.0",
 				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000,false);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
