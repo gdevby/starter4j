@@ -41,7 +41,7 @@ curl --remote-name https://raw.githubusercontent.com/gdevby/starter-app/master/e
 
 Эти модули могут помочь вам в разработке дэсктоп приложение:
 1) Пути к джава, определение ОС, директории пользователя, подробно [desktop-common-util]()
-2) Многопоточно загружать файлы и кэшировать конфиги на старое дэсктоп приложение подробно [http-download](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-download/README.md)
+2) Многопоточно загружать файлы и кэшировать конфиги дэсктоп приложения, подробно [http-download](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-download/README.md)
 3) Получить информацию по гпу, простои и активность системы, подробно [desktop-common-util-additional]()
 
 Этот проект решает аналогичные проблемы как launch4j, но он решает по другому: 
