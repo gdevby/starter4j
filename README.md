@@ -1,6 +1,6 @@
 # desktop-desktop.starter
 Status: beta<br>
-We want to create java desktop.starter which can help to run java app faster and better. There is functionality to update your default application with low traffic and check the environment (memory amount, correct temp directory, etc.). We have detailed instructions to create installers for Windows, Linux, MacOS that will let you install java if your computer doesn't have it.<br>
+We want to create java desktop starter which can help to run java app faster and better. There is functionality to update your default application with low traffic and check the environment (memory amount, correct temp directory, etc.). We have detailed instructions to create installers for Windows, Linux, MacOS that will let you install java if your computer doesn't have it.<br>
 Allows you to easily change your application configs on the server side.<br>
 This solution is created on our 6-year experience in this area.<br>
 <br>
@@ -13,15 +13,15 @@ You need to prepare files from your desktop application:
 <li>Uploading files to your server</li>
 </ol>
 
-Launching your application using the launcher:
+To run your desktop app will have next steps:
 <ol>
 <li>Collects environment data</li>
 <li>Performs checks (availability of free space, correctness of the temp directory, access rights to the working directory, problems with display fonts)</li>
 <li>Downloads files (images, .jar, .zip, dependencies)</li>
-<li>Checks the correctness of files by hash (for example, java)</li>
+<li>Checks the correctness of files by hash (for example, java files)</li>
 <li>If necessary, updates your application to the user's choice (a selection window appears)</li>
 <img align="middle" width="500" src="https://user-images.githubusercontent.com/48221408/155071002-1ffdd120-b8f0-4865-8401-75ccf3440cc2.jpg" alt="fork this repository" />
-<li>Launches your application</li>
+<li>Launch your application</li>
 </ol>
 
 Additional features of the starter:<br>
@@ -35,14 +35,14 @@ Installation is done through the terminal, to do this, open the terminal and run
 wget https://github.com/gdevby/starter-app/blob/master/example-compiled-app/os_installer/installDebPackage.sh -O - | sh
 ```
 3) **MacOs**<br>
-Installation is carried out through the terminal and from the browser. To run from a browser, the signature of the developer is required. In this example, we'll show you how to run it from the terminal. Open a terminal and run the command
+Installation is carried out through the terminal and from the browser. To run from a browser, you need to sign code signing your installer. In this example, we'll show you how to run it from the terminal. Open a terminal and run the command
 ```
 curl --remote-name https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/os_installer/starter-1.0.dmg && chmod +x ./starter-1.0.dmg && open -W ./starter-1.0.dmg 
 ```
 
 These modules can help you develop desktop applications:
-1) Java paths, OS identification, user directories, details [desktop-common-util]()
-2) Multi-threaded download files and cache configs on the old desktop application in detail [http-download](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-download/README.md )
+1) Java paths, OS identification, user directories, in details [desktop-common-util]()
+2) Multi-threaded download files and cache configs for desktop application, in detail [http-download](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/http-download/README.md )
 3) Get information on GPU, downtime and system activity, in detail [desktop-common-util-additional]()
 
 This project solves similar problems as launch4j, but it solves differently:
