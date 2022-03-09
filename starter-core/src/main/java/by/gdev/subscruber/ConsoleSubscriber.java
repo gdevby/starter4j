@@ -2,6 +2,7 @@ package by.gdev.subscruber;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
 	private FileMapperService fileMapperService;
+	private StarterAppConfig starterConfig;
 
 	@Subscribe
 	public void downloadStatusMessage(DownloaderStatus status) {
@@ -41,24 +43,13 @@ public class ConsoleSubscriber {
 
 	@Subscribe
 	private void procces(StarterAppProcess status) {
-		if (!StringUtils.isEmpty(status.getLine()) && status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path")) {
-			log.error(bundle.getString("unsatisfied.link.error"));
-			try {
-				AppLocalConfig appLocalConfig = new AppLocalConfig();
-				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
-				appLocalConfig.setDir("C:\\bootstrap");
-				log.info(appLocalConfig.toString());
-				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-			} catch (IOException e) {
-				log.error("Error ",e);
-			}
-		}
-		else if (Objects.nonNull(status.getErrorCode())) {
+		checkUnsatisfiedLinkError(status);
+		if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791)
 				log.error(bundle.getString("driver.error"));
 			else if (status.getErrorCode() == -1073740771)
 				log.error(bundle.getString("msi.afterburner.error"));
-			else if (status.getErrorCode() != 0) 
+			else if (status.getErrorCode() != 0)
 				log.error(bundle.getString("unidentified.error"));
 		} else if (status.getLine().equals("starter can be closed"))
 			System.exit(0);
@@ -77,5 +68,24 @@ public class ConsoleSubscriber {
 		HttpGet httpGet = new HttpGet(
 				element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
 		log.trace("downloaded file: " + httpGet.getURI() + " -> " + file);
+	}
+
+	private void checkUnsatisfiedLinkError(StarterAppProcess status) {
+		if (!StringUtils.isEmpty(status.getLine())
+				&& status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path")) {
+			String newWorkDir = "C:\\" + starterConfig.getWorkDirectory();
+			log.error(String.format(bundle.getString("unsatisfied.link.error"),
+					Paths.get(starterConfig.getWorkDirectory()).toAbsolutePath().toString(), newWorkDir));
+			try {
+				AppLocalConfig appLocalConfig = new AppLocalConfig();
+				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
+						AppLocalConfig.class);
+				appLocalConfig.setDir(newWorkDir);
+				log.info(appLocalConfig.toString());
+				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+			} catch (IOException e) {
+				log.error("Error ", e);
+			}
+		}
 	}
 }

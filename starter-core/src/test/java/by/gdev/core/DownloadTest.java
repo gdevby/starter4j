@@ -87,7 +87,7 @@ public class DownloadTest {
 		HttpClientConfig httpConfig = new HttpClientConfig();
 		EventBus eventBus = new EventBus();
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
-		eventBus.register(new ConsoleSubscriber(bundle, null));
+		eventBus.register(new ConsoleSubscriber(bundle, null, null));
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);

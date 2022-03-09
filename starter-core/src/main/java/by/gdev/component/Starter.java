@@ -106,8 +106,8 @@ public class Starter {
 			starterStatusFrame = new StarterStatusFrame(osType, "get installed app name", true,
 					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
-			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType));
-			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService));
+			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType, starterConfig));
+			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService, starterConfig));
 			starterStatusFrame.setVisible(true);
 		}
 	}
@@ -119,7 +119,6 @@ public class Starter {
 		workDir = starterConfig.workDir(starterConfig.getWorkDirectory(), osType).concat("/");
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
 		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(),
-//				new File(starterConfig.workDir(starterConfig.getWorkDirectory(), osType)), bundle));
 				new File(workDir), bundle));
 		validateEnvironment.add(new ValidateWorkDir(workDir, bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
@@ -144,7 +143,6 @@ public class Starter {
 		log.info("Start loading");
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
-		DesktopUtil.activeDoubleDownloadingResourcesLock(starterConfig.getWorkDirectory());
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
 		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
@@ -222,7 +220,7 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
-		Path jre = Paths.get(workDir + DesktopUtil.getJavaRun(java));
+		Path jre = Paths.get(workDir, DesktopUtil.getJavaRun(java));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre),new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,javaProcess.librariesForRunning(workDir, fileRepo, dependencis));
 		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
