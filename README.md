@@ -1,4 +1,5 @@
 # desktop-desktop.starter
+[Russian version](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/README_RU.md)<br>
 Status: beta<br>
 We want to create java desktop starter which can help to run java app faster and better. There is functionality to update your default application with low traffic and check the environment (memory amount, correct temp directory, etc.). We have detailed instructions to create installers for Windows, Linux, MacOS that will let you install java if your computer doesn't have it.<br>
 Allows you to easily change your application configs on the server side.<br>
@@ -51,3 +52,4 @@ This project solves similar problems as launch4j, but it solves differently:
 3) It also provides ready-made functionality for desktop applications (validation)
 4) Solves some bugs with java
 
+link to the next [instruction](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/wiki/Create-config-file)
