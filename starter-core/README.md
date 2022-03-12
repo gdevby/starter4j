@@ -27,5 +27,5 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 |-attempts| 3 | Number of attempts to restore the connection|
 |-connectTimeout| 60000  |setting a value setConnectTimeout|
 |-socketTimeout| 60000  |setting a value setSocketTimeout|
-|-timeToLife| 600000 | File update time. After the expiration of this time, the file is not relevant|
-|-stop|false| Argument to automatically close the application after installation|
+|-timeToLife| 600000 | File update time in seconds. After the expiration of this time, the file is not relevant|
+|-stop|false| Argument to automatically close the application after installation. Used for tests|
