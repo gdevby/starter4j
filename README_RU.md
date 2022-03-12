@@ -50,5 +50,6 @@ curl --remote-name https://raw.githubusercontent.com/gdevby/starter-app/master/e
 3) Так же предостовляет готовый функционал для дэсктоп приложений(валидация)
 4) Решает некоторые баги с java 
 
+Ссылка на следующую [инструкцию](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/wiki/%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D1%84%D0%B0%D0%B9%D0%BB-%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D0%B8)
 
 
