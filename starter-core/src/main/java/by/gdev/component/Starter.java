@@ -177,10 +177,8 @@ public class Starter {
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		AppLocalConfig appLocalConfig;
-		try {
-			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
-		} catch (Exception e) {
+		AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		if (appLocalConfig == null) {
 			appLocalConfig = new AppLocalConfig();
 			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
 			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
