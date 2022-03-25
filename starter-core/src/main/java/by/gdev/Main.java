@@ -44,6 +44,9 @@ public class Main {
 						"https://gdev.by/help/java/check-disk.html"));
 			}
 		} catch (Throwable t) {
+			String message = t.getMessage();
+			if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
+				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
 			log.error("Error", t);
 			System.exit(-1);
 		}
