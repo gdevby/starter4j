@@ -12,9 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.google.gson.Gson;
+
+import lombok.extern.slf4j.Slf4j;
 /**
  * This class is intended for reading json to get object and writing json files to working directory.
  */
+@Slf4j
 public class FileMapperService {
 	private Gson gson;
 	private Charset charset;
@@ -35,9 +38,12 @@ public class FileMapperService {
 		}
 	}
 
-	public <T> T read(String file, Class<T> cl) throws FileNotFoundException, IOException {
+	public <T> T read(String file, Class<T> cl) {
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(Paths.get(workingDirectory, file).toFile()),charset)) {
 			return gson.fromJson(read, cl);
+		}catch(Throwable t) {
+			log.warn("error read json "+ file, t);
+			return null;
 		}
 	}
 }
