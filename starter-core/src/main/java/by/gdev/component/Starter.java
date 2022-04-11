@@ -227,7 +227,7 @@ public class Starter {
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
-			starterStatusFrame.setVisible(false);
 		}
+		starterStatusFrame.setVisible(false);
 	}
 }
