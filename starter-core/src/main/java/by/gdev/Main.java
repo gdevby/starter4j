@@ -41,7 +41,7 @@ public class Main {
 			log.error("error", ex);
 			if (Objects.nonNull(bundle)) {
 				eventBus.post(new ExceptionMessage(String.format(bundle.getString("file.delete.problem"),ex.getLocalizedMessage()),
-						"https://gdev.by/help/java/check-disk.html"));
+						"https://gdev.by/help/java/check-disk"));
 			}
 		} catch (Throwable t) {
 			String message = t.getMessage();
