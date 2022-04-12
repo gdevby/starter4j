@@ -93,7 +93,7 @@ public class Starter {
 		log.trace("Max attempts from download = " + maxAttepmts);
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset, starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
-		gsonService = new GsonServiceImpl(Main.GSON, fileService);
+		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
 	}
 
 	/**

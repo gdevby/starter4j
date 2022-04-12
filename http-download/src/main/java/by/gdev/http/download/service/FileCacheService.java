@@ -1,7 +1,6 @@
 package by.gdev.http.download.service;
 
 import java.io.IOException;
-
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 

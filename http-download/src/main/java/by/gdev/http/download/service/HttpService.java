@@ -1,6 +1,7 @@
 package by.gdev.http.download.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 import by.gdev.http.download.model.RequestMetadata;
@@ -26,4 +27,12 @@ public interface HttpService {
 	 * @throws IOException
 	 */
 	RequestMetadata getMetaByUrl(String uri) throws IOException;
+	
+	/**
+	 * Returns the contents of a file without saving it
+	 * @param url uri address
+	 * @return
+	 * @throws IOException
+	 */
+	InputStream getRequestByUrl(String url) throws IOException;
 }

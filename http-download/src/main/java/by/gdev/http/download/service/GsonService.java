@@ -39,4 +39,12 @@ public interface GsonService {
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache) throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 	
+	/**
+	 * @param <T> type return object
+	 * @param url Information about the location of the resource being loaded. Left side of the URI
+	 * @param classs1 java object
+	 * @return T
+	 * @throws IOException
+	 */
+	<T> T getObjectWithoutSaving(String url, Class<T> classs1) throws IOException;
 }
