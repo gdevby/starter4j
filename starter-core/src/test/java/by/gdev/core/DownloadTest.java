@@ -91,19 +91,15 @@ public class DownloadTest {
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
-		gsonService = new GsonServiceImpl(gson, fileService);
+		gsonService = new GsonServiceImpl(gson, fileService, httpService);
 		downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
 	}
-	
-	
-	
 	
 	@AfterClass
 	public static void stop() {
 		mockServer.stop();
 	}
 
-	
 	@Test
 	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException, ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);

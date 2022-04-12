@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,6 +86,22 @@ public class HttpServiceImpl implements HttpService {
 			return request;
 		}
 	
+	public InputStream getRequestByUrl(String url) throws IOException {
+		InputStream in = null;
+		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+			try {
+				HttpGet httpGet = new HttpGet(url);
+				CloseableHttpResponse response = getResponse(httpGet);
+				in = response.getEntity().getContent();
+			} catch (SocketTimeoutException e) {
+				attepmts++;
+				if (attepmts == maxAttepmts)
+					throw new SocketTimeoutException();
+			}
+		}
+		return in;
+	}
+		
 	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);

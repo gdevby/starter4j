@@ -71,7 +71,7 @@ public class GsonServiceImplTest1 {
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
 		HttpService httpService = new HttpServiceImpl(null ,httpConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
-		gsonService = new GsonServiceImpl(gson, fileService);
+		gsonService = new GsonServiceImpl(gson, fileService, httpService);
 	}
 
 	@After
@@ -120,4 +120,11 @@ public class GsonServiceImplTest1 {
 		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false); 
 		System.out.println(test);
 	}
+	
+	@Test
+	public void test8() throws IOException {
+		MyTestType test = gsonService.getObjectWithoutSaving("https://gdev.by/repo/test.json", MyTestType.class);
+		System.out.println(test);
+	}
+	
 }
