@@ -13,7 +13,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
  */
 public class HttpClientConfig {
 
-	public CloseableHttpClient getInstanceHttpClient() {
+	public static CloseableHttpClient getInstanceHttpClient() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setDefaultMaxPerRoute(5);
 		cm.setMaxTotal(20);
