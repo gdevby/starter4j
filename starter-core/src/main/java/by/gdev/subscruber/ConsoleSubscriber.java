@@ -51,7 +51,7 @@ public class ConsoleSubscriber {
 				log.error(bundle.getString("msi.afterburner.error"));
 			else if (status.getErrorCode() != 0)
 				log.error(bundle.getString("unidentified.error"));
-		} else if (status.getLine().equals("starter can be closed"))
+		} else if (status.getLine().contains("starter can be closed"))
 			System.exit(0);
 		else
 			log.info(String.valueOf(status.getLine()));
