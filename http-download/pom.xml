@@ -55,11 +55,6 @@
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.sonatype.plugins</groupId>
 			<artifactId>nexus-staging-maven-plugin</artifactId>
 			<version>1.6.8</version>
