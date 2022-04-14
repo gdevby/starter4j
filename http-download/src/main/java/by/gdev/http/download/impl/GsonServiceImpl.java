@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -61,5 +62,10 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getObjectWithoutSaving(String url, Class<T> class1) throws IOException {
 		return gson.fromJson(httpService.getRequestByUrl(url), class1);
+	}
+
+	@Override
+	public <T> T getObjectWithoutSaving(String url, Type type) throws IOException {
+		return gson.fromJson(httpService.getRequestByUrl(url), type);
 	}
 }
