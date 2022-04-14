@@ -3,14 +3,11 @@ package by.gdev.http.download.impl;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
@@ -62,9 +59,7 @@ public class GsonServiceImpl implements GsonService {
 		}
 
 	@Override
-	public <T> T getObjectWithoutSaving(String url, Class<T> classs1) throws IOException {
-		InputStream in = httpService.getRequestByUrl(url);
-		String s = IOUtils.toString(in, StandardCharsets.UTF_8);
-		return gson.fromJson(s, classs1);
+	public <T> T getObjectWithoutSaving(String url, Class<T> class1) throws IOException {
+		return gson.fromJson(httpService.getRequestByUrl(url), class1);
 	}
 }

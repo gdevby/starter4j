@@ -1,7 +1,6 @@
 package by.gdev.http.download.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 
 import by.gdev.http.download.model.RequestMetadata;
@@ -34,5 +33,5 @@ public interface HttpService {
 	 * @return
 	 * @throws IOException
 	 */
-	InputStream getRequestByUrl(String url) throws IOException;
+	String getRequestByUrl(String url) throws IOException;
 }
