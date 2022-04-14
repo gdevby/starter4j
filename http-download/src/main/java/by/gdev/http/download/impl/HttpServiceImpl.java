@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -86,22 +87,39 @@ public class HttpServiceImpl implements HttpService {
 			return request;
 		}
 	
-	public InputStream getRequestByUrl(String url) throws IOException {
-		InputStream in = null;
+		//
+	public String getRequestByUrl(String url) throws IOException {
+		String s = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
-				HttpGet httpGet = new HttpGet(url);
-				CloseableHttpResponse response = getResponse(httpGet);
-				in = response.getEntity().getContent();
+				s = getStringByUrl(url);
 			} catch (SocketTimeoutException e) {
 				attepmts++;
 				if (attepmts == maxAttepmts)
 					throw new SocketTimeoutException();
 			}
 		}
-		return in;
+		return s;
 	}
 		
+	
+	
+	private String getStringByUrl(String url) throws IOException {
+		InputStream in = null;
+		HttpGet httpGet = null;
+		try {
+			httpGet = new HttpGet(url);
+			CloseableHttpResponse response = getResponse(httpGet);
+			in = response.getEntity().getContent();
+		} finally {
+			httpGet.abort();
+			IOUtils.closeQuietly(in);
+		}
+		return IOUtils.toString(in, StandardCharsets.UTF_8);
+	}
+	
+	
+	
 	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
