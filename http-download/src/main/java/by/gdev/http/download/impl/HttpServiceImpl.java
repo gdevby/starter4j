@@ -35,31 +35,50 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class HttpServiceImpl implements HttpService {
 	/**
-	 *If proxy value is not empty it will be used on connection error
+	 * If proxy value is not empty it will be used on connection error
 	 */
 	private String proxy;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 	private int maxAttepmts;
 
-	
-	 /**
-	  * {@inheritDoc}
-	  */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
 		RequestMetadata request = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
-				try {
-					request = getResourseByUrl(url, path);
-				} catch (IOException e) {
-					if (Objects.nonNull(proxy))
-						request = getResourseByUrl(proxy + url, path);
-					 else 
-						throw e;
-				}
+				request = getResourseByUrl(url, path);
+				break;
 			} catch (SocketTimeoutException e1) {
+				attepmts++;
+				if (attepmts == maxAttepmts)
+					throw new SocketTimeoutException();
+			} catch (IOException e) {
+				if (Objects.nonNull(proxy))
+					request = getResourseByUrl(proxy + url, path);
+				else
+					throw e;
+			}
+		}
+		return request;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @throws IOException
+	 */
+	@Override
+	public RequestMetadata getMetaByUrl(String url) throws IOException {
+		RequestMetadata request = null;
+		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+			try {
+				request = getMetadata(url);
+				break;
+			} catch (SocketTimeoutException e) {
 				attepmts++;
 				if (attepmts == maxAttepmts)
 					throw new SocketTimeoutException();
@@ -68,31 +87,12 @@ public class HttpServiceImpl implements HttpService {
 		return request;
 	}
 
-	 /**
-	  * {@inheritDoc}
-	 * @throws IOException 
-	  */
-		@Override
-		public RequestMetadata getMetaByUrl(String url) throws IOException {
-			RequestMetadata request = null;
-			for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
-				try {
-					request = getMetadata(url);
-				} catch (SocketTimeoutException e) {
-					attepmts++;
-					if (attepmts == maxAttepmts)
-						throw new SocketTimeoutException();
-				}
-			}
-			return request;
-		}
-	
-		//
 	public String getRequestByUrl(String url) throws IOException {
 		String s = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
 				s = getStringByUrl(url);
+				break;
 			} catch (SocketTimeoutException e) {
 				attepmts++;
 				if (attepmts == maxAttepmts)
@@ -101,9 +101,7 @@ public class HttpServiceImpl implements HttpService {
 		}
 		return s;
 	}
-		
-	
-	
+
 	private String getStringByUrl(String url) throws IOException {
 		InputStream in = null;
 		HttpGet httpGet = null;
@@ -116,11 +114,8 @@ public class HttpServiceImpl implements HttpService {
 			httpGet.abort();
 			IOUtils.closeQuietly(in);
 		}
-		
 	}
-	
-	
-	
+
 	private RequestMetadata getMetadata(String url) throws IOException {
 		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
@@ -130,16 +125,17 @@ public class HttpServiceImpl implements HttpService {
 		else
 			request.setETag(null);
 		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
-			request.setLastModified(response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
+			request.setLastModified(
+					response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
 		else
 			request.setLastModified(null);
-		if(response.containsHeader(Headers.CONTENTLENGTH.getValue()))
+		if (response.containsHeader(Headers.CONTENTLENGTH.getValue()))
 			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
 		else
 			request.setContentLength(null);
 		return request;
 	}
-	
+
 	private RequestMetadata getResourseByUrl(String url, Path path) throws IOException, SocketTimeoutException {
 		HttpGet httpGet = new HttpGet(url);
 		BufferedInputStream in = null;
@@ -147,34 +143,34 @@ public class HttpServiceImpl implements HttpService {
 		if (!path.toFile().getParentFile().exists())
 			path.toFile().getParentFile().mkdirs();
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
-			try {
-				CloseableHttpResponse response = getResponse(httpGet);
-				HttpEntity entity = response.getEntity();
-				if (response.getStatusLine().getStatusCode() == 404) {
-	                EntityUtils.consume(entity);
-	                throw new FileNotFoundException(String.valueOf(response.getStatusLine() +" " + url));
-	            }		
-				if (response.getStatusLine().getStatusCode() > 500) {
-	                EntityUtils.consume(entity);
-	                throw new IOException(String.valueOf(response.getStatusLine()));
-	            }
-				in = new BufferedInputStream(entity.getContent());
-				out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
-				byte[] buffer = new byte[65536];
-				int curread = in.read(buffer);
-				while (curread != -1) {
-					out.write(buffer, 0, curread);
-					curread = in.read(buffer);
-				}
-			} finally {
-				httpGet.abort();
-				IOUtils.closeQuietly(in);
-				IOUtils.closeQuietly(out);
+		try {
+			CloseableHttpResponse response = getResponse(httpGet);
+			HttpEntity entity = response.getEntity();
+			if (response.getStatusLine().getStatusCode() == 404) {
+				EntityUtils.consume(entity);
+				throw new FileNotFoundException(String.valueOf(response.getStatusLine() + " " + url));
 			}
-			Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-			return getMetadata(url);
+			if (response.getStatusLine().getStatusCode() > 500) {
+				EntityUtils.consume(entity);
+				throw new IOException(String.valueOf(response.getStatusLine()));
+			}
+			in = new BufferedInputStream(entity.getContent());
+			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
+			byte[] buffer = new byte[65536];
+			int curread = in.read(buffer);
+			while (curread != -1) {
+				out.write(buffer, 0, curread);
+				curread = in.read(buffer);
+			}
+		} finally {
+			httpGet.abort();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
+		}
+		Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+		return getMetadata(url);
 	}
-	
+
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
 		http.setConfig(requestConfig);
 		return httpclient.execute(http);
