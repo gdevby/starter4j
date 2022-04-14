@@ -111,11 +111,12 @@ public class HttpServiceImpl implements HttpService {
 			httpGet = new HttpGet(url);
 			CloseableHttpResponse response = getResponse(httpGet);
 			in = response.getEntity().getContent();
+			return IOUtils.toString(in, StandardCharsets.UTF_8);
 		} finally {
 			httpGet.abort();
 			IOUtils.closeQuietly(in);
 		}
-		return IOUtils.toString(in, StandardCharsets.UTF_8);
+		
 	}
 	
 	
