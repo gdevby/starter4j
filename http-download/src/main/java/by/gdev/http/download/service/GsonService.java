@@ -2,6 +2,7 @@ package by.gdev.http.download.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -47,4 +48,9 @@ public interface GsonService {
 	 * @throws IOException
 	 */
 	<T> T getObjectWithoutSaving(String url, Class<T> classs1) throws IOException;
+	
+	/**
+	 * @see GsonService#getObjectWithoutSaving(String, Class)
+	 */
+	<T> T getObjectWithoutSaving(String url, Type type) throws IOException;
 }
