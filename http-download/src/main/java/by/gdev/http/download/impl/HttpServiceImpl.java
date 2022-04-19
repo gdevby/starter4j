@@ -2,7 +2,6 @@ package by.gdev.http.download.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +15,14 @@ import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import by.gdev.http.download.model.Headers;
 import by.gdev.http.download.model.RequestMetadata;
@@ -108,8 +108,13 @@ public class HttpServiceImpl implements HttpService {
 		try {
 			httpGet = new HttpGet(url);
 			CloseableHttpResponse response = getResponse(httpGet);
-			in = response.getEntity().getContent();
-			return IOUtils.toString(in, StandardCharsets.UTF_8);
+			StatusLine st = response.getStatusLine();
+			if( HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+				in = response.getEntity().getContent();
+				return IOUtils.toString(in, StandardCharsets.UTF_8);
+			}else {
+				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(),st.getReasonPhrase()));
+			}
 		} finally {
 			httpGet.abort();
 			IOUtils.closeQuietly(in);
@@ -145,14 +150,10 @@ public class HttpServiceImpl implements HttpService {
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
 		try {
 			CloseableHttpResponse response = getResponse(httpGet);
+			StatusLine st = response.getStatusLine();
 			HttpEntity entity = response.getEntity();
-			if (response.getStatusLine().getStatusCode() == 404) {
-				EntityUtils.consume(entity);
-				throw new FileNotFoundException(String.valueOf(response.getStatusLine() + " " + url));
-			}
-			if (response.getStatusLine().getStatusCode() > 500) {
-				EntityUtils.consume(entity);
-				throw new IOException(String.valueOf(response.getStatusLine()));
+			if( HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
+				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(),st.getReasonPhrase()));
 			}
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
