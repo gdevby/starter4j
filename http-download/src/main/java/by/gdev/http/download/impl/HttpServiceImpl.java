@@ -88,18 +88,15 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	public String getRequestByUrl(String url) throws IOException {
-		String s = null;
+		SocketTimeoutException ste = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
-				s = getStringByUrl(url);
-				break;
+				return getStringByUrl(url);
 			} catch (SocketTimeoutException e) {
-				attepmts++;
-				if (attepmts == maxAttepmts)
-					throw new SocketTimeoutException();
+				ste = e;
 			}
 		}
-		return s;
+		throw ste;
 	}
 
 	private String getStringByUrl(String url) throws IOException {
