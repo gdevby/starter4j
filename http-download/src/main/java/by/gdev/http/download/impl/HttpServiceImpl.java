@@ -110,7 +110,7 @@ public class HttpServiceImpl implements HttpService {
 				in = response.getEntity().getContent();
 				return IOUtils.toString(in, StandardCharsets.UTF_8);
 			}else {
-				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(),st.getReasonPhrase()));
+				throw new IOException(String.format("code %s phrase %s %s", st.getStatusCode(),st.getReasonPhrase(),url));
 			}
 		} finally {
 			httpGet.abort();
