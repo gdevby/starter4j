@@ -26,7 +26,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
@@ -176,7 +176,7 @@ public class DesktopUtil {
 
 		for (String url : urls) {
 			try {
-				HttpGet http = new HttpGet(url);
+				HttpHead http = new HttpHead(url);
 				http.setConfig(requestConfig);
 				httpclient.execute(http);
 				return maxAttepmts;
