@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
@@ -88,29 +89,26 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	public String getRequestByUrl(String url) throws IOException {
-		SocketTimeoutException ste = null;
-		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
-			try {
-				return getStringByUrl(url);
-			} catch (SocketTimeoutException e) {
-				ste = e;
-			}
-		}
-		throw ste;
+		return getRequestByUrl(url, null);
 	}
 
-	private String getStringByUrl(String url) throws IOException {
+	private String getStringByUrl(String url, Map<String, String> headers) throws IOException {
 		InputStream in = null;
 		HttpGet httpGet = null;
 		try {
 			httpGet = new HttpGet(url);
+			if (Objects.nonNull(headers)) {
+				for (Map.Entry<String, String> e : headers.entrySet())
+					httpGet.addHeader(e.getKey(), e.getValue());
+			}
 			CloseableHttpResponse response = getResponse(httpGet);
 			StatusLine st = response.getStatusLine();
-			if( HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+			if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
 				in = response.getEntity().getContent();
 				return IOUtils.toString(in, StandardCharsets.UTF_8);
-			}else {
-				throw new IOException(String.format("code %s phrase %s %s", st.getStatusCode(),st.getReasonPhrase(),url));
+			} else {
+				throw new IOException(
+						String.format("code %s phrase %s %s", st.getStatusCode(), st.getReasonPhrase(), url));
 			}
 		} finally {
 			httpGet.abort();
@@ -149,8 +147,8 @@ public class HttpServiceImpl implements HttpService {
 			CloseableHttpResponse response = getResponse(httpGet);
 			StatusLine st = response.getStatusLine();
 			HttpEntity entity = response.getEntity();
-			if( HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
-				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(),st.getReasonPhrase()));
+			if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
+				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(), st.getReasonPhrase()));
 			}
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
@@ -172,5 +170,18 @@ public class HttpServiceImpl implements HttpService {
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
 		http.setConfig(requestConfig);
 		return httpclient.execute(http);
+	}
+
+	@Override
+	public String getRequestByUrl(String url, Map<String, String> map) throws IOException {
+		SocketTimeoutException ste = null;
+		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+			try {
+				return getStringByUrl(url, map);
+			} catch (SocketTimeoutException e) {
+				ste = e;
+			}
+		}
+		throw ste;
 	}
 }
