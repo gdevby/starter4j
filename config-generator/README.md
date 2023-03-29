@@ -41,4 +41,5 @@ To further correct your application, you are advised to change the following arg
 	<li>-dependencies</li>
 	<li>-appFolder</li>
 	<li>-url</li>
+	<li>-mainClass</li>
 </ol>

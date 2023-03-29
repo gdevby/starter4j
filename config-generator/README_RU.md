@@ -41,4 +41,5 @@
 	<li>-dependencies</li>
 	<li>-appFolder</li>
 	<li>-url</li>
+	<li>-mainClass</li>
 </ol>
