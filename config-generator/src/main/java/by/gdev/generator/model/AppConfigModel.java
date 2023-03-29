@@ -29,7 +29,7 @@ public class AppConfigModel{
 	 private List<String> jvmArguments;
     @Parameter(names = "-appJar", description = "Jar app file to run the application")
     private String appJar;    
-    @Parameter(names = "-javafolder", description = "Input directory where jvm are stored to create configuration for java, lets you skip java generation if the argument is -skinJVMGeneration=true")
+    @Parameter(names = "-javaFolder", description = "Input directory where jvm are stored to create configuration for java, lets you skip java generation if the argument is -skinJVMGeneration=true")
     private String javaFolder;   
     @Parameter(names = "-javaConfig", description = "Directory where saved the result of the jvm configuration. We can create once the config and using all times.")
     private String javaConfig;    
