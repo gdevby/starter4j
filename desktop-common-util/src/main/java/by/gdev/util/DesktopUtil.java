@@ -1,14 +1,13 @@
 package by.gdev.util;
 
 import java.awt.Desktop;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
@@ -92,28 +91,22 @@ public class DesktopUtil {
 		return file;
 	}
 
+	public static String getChecksum(byte[] array, String algorithm) throws IOException, NoSuchAlgorithmException {
+		return createChecksum(array, algorithm);
+	}
+
 	public static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
-		byte[] b = createChecksum(file, algorithm);
+		return createChecksum(Files.readAllBytes(file.toPath()), algorithm);
+	}
+
+	private static String createChecksum(byte[] array, String algorithm) throws NoSuchAlgorithmException {
+		MessageDigest complete = MessageDigest.getInstance(algorithm);
+		complete.update(array);
+		byte[] b = complete.digest();
 		StringBuilder result = new StringBuilder();
 		for (byte cb : b)
 			result.append(Integer.toString((cb & 0xff) + 0x100, 16).substring(1));
 		return result.toString();
-	}
-
-	private static byte[] createChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
-		try (BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file))) {
-			byte[] buffer = new byte[8192];
-			MessageDigest complete = MessageDigest.getInstance(algorithm);
-			int numRead;
-
-			do {
-				numRead = fis.read(buffer);
-				if (numRead > 0) {
-					complete.update(buffer, 0, numRead);
-				}
-			} while (numRead != -1);
-			return complete.digest();
-		}
 	}
 
 	public static String getJavaPathByHome(boolean appendBinFolder) {
