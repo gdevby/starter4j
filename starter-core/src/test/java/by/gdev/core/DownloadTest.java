@@ -29,8 +29,6 @@ import com.google.gson.Gson;
 
 import by.gdev.handler.Localise;
 import by.gdev.http.download.config.HttpClientConfig;
-import by.gdev.http.download.downloader.DownloaderContainer;
-import by.gdev.http.download.downloader.DownloaderStatusEnum;
 import by.gdev.http.download.exeption.StatusExeption;
 import by.gdev.http.download.handler.AccessHandler;
 import by.gdev.http.download.impl.DownloaderImpl;
@@ -40,6 +38,8 @@ import by.gdev.http.download.impl.HttpServiceImpl;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
+import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;

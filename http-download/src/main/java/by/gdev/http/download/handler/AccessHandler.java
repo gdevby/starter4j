@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import by.gdev.http.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.OSType;
