@@ -81,7 +81,6 @@ public class Starter {
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private RequestConfig requestConfig;
-	private HttpClientConfig httpConfig;
 	private FileMapperService fileMapperService;
 	private String workDir;
 
@@ -89,14 +88,13 @@ public class Starter {
 		this.eventBus = eventBus;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		httpConfig = new HttpClientConfig();
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				requestConfig, httpConfig.getInstanceHttpClient());
+				requestConfig, HttpClientConfig.getInstanceHttpClient());
 		log.trace("Max attempts from download = " + maxAttepmts);
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig,
+		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig,
 				maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
@@ -150,7 +148,7 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
+		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,
 				false);

@@ -47,30 +47,24 @@ public class GsonServiceImplTest1 {
 			FileUtils.deleteDirectory(testFolder.toFile());
 		}
 		testFolder.toFile().mkdirs();
-		mockServer = ClientAndServer.startClientAndServer("127.0.0.1",12346);
+		mockServer = ClientAndServer.startClientAndServer("127.0.0.1", 12346);
 		ConfigurationProperties.disableSystemOut(true);
-		mockServer.when( request()
-	              .withMethod("GET")
-	              .withPath("/validate"))
-	                .respond(
-	                		HttpResponse.response()
-	                    .withStatusCode(201)
-	                    .withHeaders(
-	                      new Header("Content-Type", "application/json; charset=utf-8"),
-	                      new Header("Cache-Control", "public, max-age=86400"))
-	                    .withBody("{ message: 'incorrect username and password combination' }")
-	                    .withDelay(TimeUnit.SECONDS,10));
+		mockServer.when(request().withMethod("GET").withPath("/validate"))
+				.respond(HttpResponse.response().withStatusCode(201)
+						.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+								new Header("Cache-Control", "public, max-age=86400"))
+						.withBody("{ message: 'incorrect username and password combination' }")
+						.withDelay(TimeUnit.SECONDS, 10));
 		initialization(testFolder);
-		
+
 	}
-	
-	
+
 	private static void initialization(Path testFolder) {
 		Gson gson = new Gson();
-		HttpClientConfig httpConfig = new HttpClientConfig();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
-		HttpService httpService = new HttpServiceImpl(null ,httpConfig.getInstanceHttpClient(), requestConfig, 3);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder, 600000);
+		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig, 3);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
+				600000);
 		gsonService = new GsonServiceImpl(gson, fileService, httpService);
 	}
 
@@ -81,31 +75,31 @@ public class GsonServiceImplTest1 {
 
 	@Test
 	public void test1() throws NoSuchAlgorithmException, IOException {
-		MyTestType type1 =  gsonService.getObject("https://gdev.by/repo/test.json", MyTestType.class, false);
+		MyTestType type1 = gsonService.getObject("https://gdev.by/repo/test.json", MyTestType.class, false);
 		MyTestType type2 = new MyTestType();
 		type2.setS("string");
 		assertEquals(type1, type2);
 	}
-	
+
 	@Test
 	public void test2() throws NoSuchAlgorithmException, IOException {
-		MyTestType type1 =  gsonService.getObject("https://gdev.by/repo/test.json", MyTestType.class, true);
+		MyTestType type1 = gsonService.getObject("https://gdev.by/repo/test.json", MyTestType.class, true);
 		MyTestType type2 = new MyTestType();
 		type2.setS("string");
 		assertEquals(type1, type2);
 	}
-	
+
 	@Test(expected = FileNotFoundException.class)
-	public void test3() throws NoSuchAlgorithmException, IOException  {
+	public void test3() throws NoSuchAlgorithmException, IOException {
 		gsonService.getObject("https://gdev.by/repo/testnotwxisrt.json", MyTestType.class, true);
 	}
-	
+
 	@Test(expected = UnknownHostException.class)
-	public void test4() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
+	public void test4() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
 		gsonService.getObject("https://domennotexistgdev.by/repo/testnotwxisrt.json", MyTestType.class, false);
 	}
-	
-	@Test (expected = HttpHostConnectException.class) 
+
+	@Test(expected = HttpHostConnectException.class)
 	public void test5Timeout() throws NoSuchAlgorithmException, IOException {
 		gsonService.getObject("http://127.0.0.1:12346/repo/test78.json", MyTestType.class, true);
 	}
@@ -114,17 +108,19 @@ public class GsonServiceImplTest1 {
 	public void test6Timeout() throws IOException, NoSuchAlgorithmException {
 		gsonService.getObject("http://127.0.0.1:12346/repo/test77.json", MyTestType.class, false);
 	}
-	
+
 	@Test
-	public void test7() throws FileNotFoundException, NoSuchAlgorithmException, IOException  {
-		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class, false); 
+	public void test7() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
+		MyTestType test = gsonService.getObjectByUrls(
+				Arrays.asList("https://domennotexistgdev.by/", "https://gdev.by/"), "repo/test.json", MyTestType.class,
+				false);
 		System.out.println(test);
 	}
-	
+
 	@Test
 	public void test8() throws IOException {
 		MyTestType test = gsonService.getObjectWithoutSaving("https://gdev.by/repo/test.json", MyTestType.class);
 		System.out.println(test);
 	}
-	
+
 }
