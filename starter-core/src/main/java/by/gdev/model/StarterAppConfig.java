@@ -22,8 +22,11 @@ import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 /**
- * The class contains parameters for loading the application, which can be changed using arguments.
+ * The class contains parameters for loading the application, which can be
+ * changed using arguments.
+ * 
  * @author Robert Makrytski
  *
  */
@@ -34,8 +37,9 @@ import lombok.NoArgsConstructor;
 public class StarterAppConfig {
 
 	private static final String APP_CONFIG = "appConfig.json";
-	public static final String APP_CHANGES_LOG= "changes.log";
+	public static final String APP_CHANGES_LOG = "changes.log";
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
+	public static final String JRE_CONFIG = "jreConfig.json";
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
@@ -63,11 +67,9 @@ public class StarterAppConfig {
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 
-	public static final StarterAppConfig 
-		DEFAULT_CONFIG = new StarterAppConfig(500,
-				"http://127.0.0.1:81/starter-app/",
-				"starter", Paths.get("starter/cache"), "1.0",
-				Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000,false);
+	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, "http://127.0.0.1:81/starter-app/",
+			"starter", Paths.get("starter/cache"), "1.0",
+			Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		if (Objects.isNull(version))
@@ -78,15 +80,17 @@ public class StarterAppConfig {
 	}
 
 	/**
-	 * This method returns the working directory. 
+	 * This method returns the working directory.
 	 */
 
 	public String workDir(String workDirectory, OSType osType) throws IOException {
-		File starterFile = new File(String.join("/", Paths.get(workDirectory).toAbsolutePath().toString(), APP_STARTER_LOCAL_CONFIG));
+		File starterFile = new File(
+				String.join("/", Paths.get(workDirectory).toAbsolutePath().toString(), APP_STARTER_LOCAL_CONFIG));
 		if (starterFile.exists()) {
-			AppLocalConfig app = new FileMapperService(Main.GSON, Main.charset, "").read(starterFile.toString(), AppLocalConfig.class);
-				if (!StringUtils.isEmpty(app.getDir()))
-					return Paths.get(app.getDir()).toAbsolutePath().toString();
+			AppLocalConfig app = new FileMapperService(Main.GSON, Main.charset, "").read(starterFile.toString(),
+					AppLocalConfig.class);
+			if (!StringUtils.isEmpty(app.getDir()))
+				return Paths.get(app.getDir()).toAbsolutePath().toString();
 		}
 		Path installer = Paths.get("installer.properties").toAbsolutePath();
 		String dir = "";
@@ -98,8 +102,7 @@ public class StarterAppConfig {
 		}
 		if (!StringUtils.isEmpty(workDirectory)) {
 			return Paths.get(workDirectory).toAbsolutePath().toString();
-		}
-		else if (!StringUtils.isEmpty(dir))
+		} else if (!StringUtils.isEmpty(dir))
 			return Paths.get(dir).toAbsolutePath().toString();
 		else
 			return DesktopUtil.getSystemPath(osType, "starter").getAbsolutePath().toString();

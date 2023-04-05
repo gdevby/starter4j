@@ -26,10 +26,8 @@ import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
 import by.gdev.http.download.config.HttpClientConfig;
-import by.gdev.http.upload.download.downloader.DownloaderContainer;
-import by.gdev.http.download.handler.AccessHandler;
+import by.gdev.http.download.handler.ArchiveHandler;
 import by.gdev.http.download.handler.PostHandlerImpl;
-import by.gdev.http.download.handler.SimvolicLinkHandler;
 import by.gdev.http.download.impl.DownloaderImpl;
 import by.gdev.http.download.impl.FileCacheServiceImpl;
 import by.gdev.http.download.impl.GsonServiceImpl;
@@ -38,6 +36,8 @@ import by.gdev.http.download.service.Downloader;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
+import by.gdev.http.upload.download.downloader.DownloaderJavaContainer;
 import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
@@ -68,6 +68,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Starter {
+
 	private EventBus eventBus;
 	private StarterAppConfig starterConfig;
 	private OSType osType;
@@ -161,24 +162,28 @@ public class Starter {
 				remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
 		JVMConfig jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
 				remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
-		String jvmPath = jvm.getJvms().get(osType).get(osArc).get("jre_default").getResources().get(0).getRelativeUrl();
-		List<String> jvmDomain = jvm.getJvms().get(osType).get(osArc).get("jre_default").getRepositories();
-		java = gsonService.getObjectByUrls(jvmDomain, jvmPath, Repo.class, false);
+		java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
+
 		List<Repo> list = new ArrayList<Repo>();
 		list.add(fileRepo);
 		list.add(dependencis);
 		list.add(resources);
-		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
-		AccessHandler accesHandler = new AccessHandler();
-		SimvolicLinkHandler linkHandler = new SimvolicLinkHandler();
 		for (Repo repo : list) {
 			container.conteinerAllSize(repo);
 			container.filterNotExistResoursesAndSetRepo(repo, workDir);
 			container.setDestinationRepositories(workDir);
-			container.setHandlers(Arrays.asList(postHandler, accesHandler, linkHandler));
+			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
+		DownloaderContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
+				StarterAppConfig.JRE_CONFIG);
+		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, StarterAppConfig.JRE_CONFIG);
+		jreContainer.conteinerAllSize(java);
+		jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
+		jreContainer.setDestinationRepositories(workDir);
+		jreContainer.setHandlers(Arrays.asList(postHandler, archiveHandler));
+		downloader.addContainer(jreContainer);
 		downloader.startDownload(true);
 		DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
@@ -198,7 +203,6 @@ public class Starter {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
-
 					remoteAppConfig = gsonService.getObject(
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
@@ -228,7 +232,7 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
-		Path jre = Paths.get(workDir, DesktopUtil.getJavaRun(java));
+		Path jre = DesktopUtil.getJavaRun(Paths.get(workDir, "jre_default"));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
 				javaProcess.librariesForRunning(workDir, fileRepo, dependencis));

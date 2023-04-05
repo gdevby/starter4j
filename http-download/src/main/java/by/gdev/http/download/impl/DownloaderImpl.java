@@ -33,8 +33,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * This class is responsible for preparing files for download, displaying information about download status and errors.
- * @author Robert Makrytski 
+ * This class is responsible for preparing files for download, displaying
+ * information about download status and errors.
+ * 
+ * @author Robert Makrytski
  */
 
 @Slf4j
@@ -64,8 +66,9 @@ public class DownloaderImpl implements Downloader {
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
 	private long fullDownloadSize;
-	private long downloadBytesNow1;
+	private long downloadBytesNow;
 	private LocalTime start;
+	private long sizeDownloadNow;
 
 	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
 		this.eventBus = eventBus;
@@ -92,8 +95,10 @@ public class DownloaderImpl implements Downloader {
 	}
 
 	@Override
-	public void startDownload(boolean sync) throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		fullDownloadSize = totalDownloadSize(allConteinerSize);
+	public void startDownload(boolean sync)
+			throws InterruptedException, ExecutionException, StatusExeption, IOException {
+		fullDownloadSize = allConteinerSize.stream().reduce(Long::sum).orElse(0L);
+		sizeDownloadNow = sizeDownload();
 		start = LocalTime.now();
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;
@@ -109,7 +114,7 @@ public class DownloaderImpl implements Downloader {
 				CompletableFuture.runAsync(() -> {
 					try {
 						waitThreadDone(listThread);
-					} catch (IOException|InterruptedException e) {
+					} catch (IOException | InterruptedException e) {
 						log.error("Error", e);
 					}
 				}).get();
@@ -117,8 +122,9 @@ public class DownloaderImpl implements Downloader {
 		} else
 			throw new StatusExeption(status.toString());
 	}
+
 	/**
-	 * After stop it should be IDLE 
+	 * After stop it should be IDLE
 	 */
 
 	@Override
@@ -139,7 +145,7 @@ public class DownloaderImpl implements Downloader {
 				errorList.add(elem.getError());
 		}
 		statusDownload.setThrowables(errorList);
-		statusDownload.setDownloadSize(sizeDownloadNow());
+		statusDownload.setDownloadSize(sizeDownloadNow + downloadBytesNow);
 		statusDownload.setSpeed((downloadBytesNow / 1048576) / thirty);
 		statusDownload.setDownloaderStatusEnum(status);
 		statusDownload.setAllDownloadSize(fullDownloadSize);
@@ -154,27 +160,22 @@ public class DownloaderImpl implements Downloader {
 		while (workedAnyThread) {
 			workedAnyThread = false;
 			Thread.sleep(50);
-			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());	
+			workedAnyThread = listThread.stream().anyMatch(e -> !e.isDone());
 			if (start.isBefore(LocalTime.now())) {
 				start = start.plusSeconds(1);
 				if (allCountElement != 0) {
 					if (start.getSecond() != start.plusSeconds(1).getSecond())
-							eventBus.post(buildDownloaderStatus());
+						eventBus.post(buildDownloaderStatus());
 				}
 			}
 		}
 		status = DownloaderStatusEnum.DONE;
 		eventBus.post(buildDownloaderStatus());
 	}
-	
-	private long totalDownloadSize(List<Long> containerSize) {
-		long sum = 0;
-		for (long l : containerSize)
-			sum += l;
-		return sum;
-	}
-	
-	private long sizeDownloadNow() throws IOException {
-		return Files.walk(Paths.get(pathToDownload)).filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
+
+	private long sizeDownload() throws IOException {
+		return Files.walk(Paths.get(pathToDownload))
+				.filter(p -> !p.toString().contains("jre_default") || (p.endsWith(".json")))
+				.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
 	}
 }
