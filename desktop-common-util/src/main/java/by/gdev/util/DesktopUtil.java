@@ -29,8 +29,6 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
-import by.gdev.util.model.download.Metadata;
-import by.gdev.util.model.download.Repo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -228,15 +226,10 @@ public class DesktopUtil {
 	 * @param java
 	 * @return
 	 */
-	public static String getJavaRun(Repo java) {
-		String javaRun = null;
-		for (Metadata s : java.getResources()) {
-//			 if (s.isExecutable() && s.getPath().endsWith(appendBootstrapperJvm2(s.getPath()))) {
-			if (s.isExecutable()) {
-				javaRun = s.getPath();
-			}
-		}
-		return javaRun;
+
+	public static Path getJavaRun(Path java) throws IOException {
+		return Files.walk(java).filter(e -> Files.isRegularFile(e) && (e.endsWith("java") || e.endsWith("java.exe")))
+				.findAny().orElseThrow(() -> new RuntimeException("java executable not found "));
 	}
 
 	public static String appendBootstrapperJvm2(String path) {

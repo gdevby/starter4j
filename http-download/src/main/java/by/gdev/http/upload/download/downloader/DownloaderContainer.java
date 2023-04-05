@@ -30,10 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class DownloaderContainer {
-	private String destinationRepositories;
-	private long containerSize;
-	private Repo repo;
-	private List<PostHandler> handlers;
+	String destinationRepositories;
+	long containerSize;
+	Repo repo;
+	List<PostHandler> handlers;
 
 	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory)
 			throws NoSuchAlgorithmException, IOException {
@@ -60,14 +60,6 @@ public class DownloaderContainer {
 	}
 
 	public void conteinerAllSize(Repo repo) {
-		List<Long> sizeList = new ArrayList<Long>();
-		repo.getResources().forEach(size -> {
-			sizeList.add(size.getSize());
-		});
-		long sum = 0;
-		for (long l : sizeList) {
-			sum += l;
-		}
-		this.containerSize = sum;
+		containerSize = repo.getResources().stream().map(Metadata::getSize).reduce(Long::sum).orElse(0L);
 	}
 }
