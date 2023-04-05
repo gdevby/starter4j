@@ -26,7 +26,8 @@ import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
 import by.gdev.http.download.config.HttpClientConfig;
-import by.gdev.http.download.handler.AccesHandler;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
+import by.gdev.http.download.handler.AccessHandler;
 import by.gdev.http.download.handler.PostHandlerImpl;
 import by.gdev.http.download.handler.SimvolicLinkHandler;
 import by.gdev.http.download.impl.DownloaderImpl;
@@ -37,7 +38,6 @@ import by.gdev.http.download.service.Downloader;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
-import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
@@ -170,7 +170,7 @@ public class Starter {
 		list.add(resources);
 		list.add(java);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
-		AccesHandler accesHandler = new AccesHandler();
+		AccessHandler accesHandler = new AccessHandler();
 		SimvolicLinkHandler linkHandler = new SimvolicLinkHandler();
 		for (Repo repo : list) {
 			container.conteinerAllSize(repo);
