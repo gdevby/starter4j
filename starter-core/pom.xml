@@ -80,7 +80,7 @@
 				<version>5.11.2</version>
 				<configuration>
 				<!-- 1080 -->
-					<serverPort>6794</serverPort>
+				<!--	<serverPort>6794</serverPort>-->
 				</configuration>
 				<executions>
 					<execution>

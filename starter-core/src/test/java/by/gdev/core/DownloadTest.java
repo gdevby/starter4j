@@ -78,16 +78,15 @@ public class DownloadTest {
 	}
 
 	private static void initialization(Path testFolder, Gson gson) {
-		HttpClientConfig httpConfig = new HttpClientConfig();
 		EventBus eventBus = new EventBus();
 		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 		eventBus.register(new ConsoleSubscriber(bundle, null, null));
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		HttpService httpService = new HttpServiceImpl(null, httpConfig.getInstanceHttpClient(), requestConfig, 3);
+		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000);
 		gsonService = new GsonServiceImpl(gson, fileService, httpService);
-		downloader = new DownloaderImpl(eventBus, httpConfig.getInstanceHttpClient(), requestConfig);
+		downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 	}
 
 	@AfterClass
@@ -117,7 +116,7 @@ public class DownloadTest {
 		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
 		AccessHandler accesHandler = new AccessHandler();
 		DownloaderContainer container = new DownloaderContainer();
-		container.setDestinationRepositories("target/test_folder/containerTest/");
+		container.setDestinationRepositories("target/test_folder/");
 		container.setRepo(repo);
 		container.setHandlers(Arrays.asList(accesHandler));
 		downloader.addContainer(container);
