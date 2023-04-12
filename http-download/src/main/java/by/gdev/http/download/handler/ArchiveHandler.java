@@ -48,7 +48,7 @@ public class ArchiveHandler implements PostHandler {
 	public void postProcessDownloadElement(DownloadElement e) {
 		try {
 			Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
-			if (p.getFileName().endsWith(".zip"))
+			if (String.valueOf(p).endsWith(".zip"))
 				unZip(p.toFile(), new File(e.getPathToDownload()), false, false);
 			else
 				unTarGz(p.toFile(), new File(e.getPathToDownload()), false, false);
