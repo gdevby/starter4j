@@ -86,6 +86,6 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 
 	private void removeJava(Path path) throws IOException {
 		FileUtils.deleteDirectory(Paths.get(workDir, "jre_default").toFile());
-		FileUtils.delete(path.toAbsolutePath().toFile());
+		FileUtils.deleteQuietly(path.toAbsolutePath().toFile());
 	}
 }
