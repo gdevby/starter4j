@@ -22,7 +22,6 @@ public class Main {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 
-
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
@@ -32,6 +31,12 @@ public class Main {
 		ResourceBundle bundle = null;
 		try {
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
+				String errorMessage = String.format(
+						"The prod parameter is true. You don't need to change the value of the field. Current: %s, should be: %s",
+						starterConfig.getServerFile(), StarterAppConfig.URI_APP_CONFIG);
+				throw new RuntimeException(errorMessage);
+			}
 			Starter s = new Starter(eventBus, starterConfig, bundle);
 			s.collectOSInfoAndRegisterSubscriber();
 			s.validateEnvironmentAndAppRequirements();
@@ -40,7 +45,8 @@ public class Main {
 		} catch (FileSystemException ex) {
 			log.error("error", ex);
 			if (Objects.nonNull(bundle)) {
-				eventBus.post(new ExceptionMessage(String.format(bundle.getString("file.delete.problem"),ex.getLocalizedMessage()),
+				eventBus.post(new ExceptionMessage(
+						String.format(bundle.getString("file.delete.problem"), ex.getLocalizedMessage()),
 						"https://gdev.by/help/java/check-disk"));
 			}
 		} catch (Throwable t) {
