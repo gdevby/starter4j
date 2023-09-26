@@ -45,7 +45,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 	public Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException {
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
-		if (cache == true) {
+		if (cache) {
 			return getResourceWithoutHttpHead(url, metaFile, urlPath);
 		} else {
 			return getResourceWithHttpHead(url, urlPath, metaFile);
@@ -53,7 +53,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	@Override
-	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache) throws IOException, NoSuchAlgorithmException {
+	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
 		for (String url : urls) {
 			return getRawObject(url + metadata.getRelativeUrl(), cache);
 		}
@@ -90,23 +91,28 @@ public class FileCacheServiceImpl implements FileCacheService {
 			throws IOException, NoSuchAlgorithmException {
 		boolean fileExists = urlPath.toFile().exists();
 		checkMetadataFile(metaFile, url);
-		if (fileExists) {
-			RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
-			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
-					RequestMetadata.class);
-			if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
-					& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
-					& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
-				return urlPath;
+		try {
+			if (fileExists) {
+				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
+				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
+						RequestMetadata.class);
+				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
+						& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
+						& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
+					return urlPath;
+				} else {
+					httpService.getRequestByUrlAndSave(url, urlPath);
+					new FileMapperService(gson, charset, "").write(serverMetadata, metaFile.toString());
+					return urlPath;
+				}
 			} else {
-				httpService.getRequestByUrlAndSave(url, urlPath);
-				new FileMapperService(gson, charset, "").write(serverMetadata, metaFile.toString());
+				RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
+				createSha1(serverMetadata, urlPath, metaFile);
 				return urlPath;
 			}
-		} else {
-			RequestMetadata serverMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
-			createSha1(serverMetadata, urlPath, metaFile);
-			return urlPath;
+		} catch (Exception e) {
+			log.error("error with url " + url);
+			throw e;
 		}
 	}
 

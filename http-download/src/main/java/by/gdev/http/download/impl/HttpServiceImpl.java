@@ -29,11 +29,13 @@ import by.gdev.http.download.model.Headers;
 import by.gdev.http.download.model.RequestMetadata;
 import by.gdev.http.download.service.HttpService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@inheritDoc}
  */
 @AllArgsConstructor
+@Slf4j
 public class HttpServiceImpl implements HttpService {
 	/**
 	 * If proxy value is not empty it will be used on connection error
@@ -48,6 +50,7 @@ public class HttpServiceImpl implements HttpService {
 	 */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
+		log.debug("do request {}, saved to ", url, path.toAbsolutePath().toString());
 		RequestMetadata request = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
