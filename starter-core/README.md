@@ -1,4 +1,4 @@
-# statter-core
+# starter-core
 
 [Russian version](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/starter-core/README_RU.md)<br>
 
@@ -29,3 +29,5 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 |-socketTimeout| 60000  |setting a value setSocketTimeout|
 |-timeToLife| 600000 | File update time in seconds. After the expiration of this time, the file is not relevant|
 |-stop|false| Argument to automatically close the application after installation. Used for tests|
+
+There is a field in StarterAppConfig.prod, the purpose of which is to prevent the use of a signed starter application to launch a virus by changing the -uriAppConfig parameter in the starter-core module. It must be changed to true for production.
