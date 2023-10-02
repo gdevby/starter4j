@@ -18,15 +18,27 @@ public interface GsonService {
 	 * @param class1 java object
 	 * @param cache  If cache true file exists and hashsum is valid it should return
 	 *               content without head request. If cache false we need to do http
-	 *               head request to check version in the cache with ETag
+	 *               head request to check version in the cache with ETag.
 	 * @return T
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
+	 * 
+	 * If we dont't have internet it should return old value.
 	 */
 	<T> T getObject(String uri, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 
+	/**
+	 * @param <T>
+	 * @param uris
+	 * @param class1
+	 * @return
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
+	<T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException ;
+	
 	/**
 	 * @param <T>    type return object
 	 * @param urls   Information about the location of the resource being loaded.
@@ -41,6 +53,8 @@ public interface GsonService {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
+	 * 
+	 * 	 * If we dont't have internet it should return old value.
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;

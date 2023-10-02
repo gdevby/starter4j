@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 import org.apache.http.client.config.RequestConfig;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.Main;
@@ -74,8 +75,6 @@ public class Starter {
 	private OSType osType;
 	private Arch osArc;
 	private AppConfig remoteAppConfig;
-	private Repo java;
-	private Repo fileRepo;
 	private Repo dependencis;
 	private StarterStatusFrame starterStatusFrame;
 	private ResourceBundle bundle;
@@ -83,6 +82,7 @@ public class Starter {
 	private RequestConfig requestConfig;
 	private FileMapperService fileMapperService;
 	private String workDir;
+	private boolean hasInternet;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
 		this.eventBus = eventBus;
@@ -93,6 +93,7 @@ public class Starter {
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
 				requestConfig, HttpClientConfig.getInstanceHttpClient());
+		hasInternet = maxAttepmts == 1 ? false : true;
 		log.trace("Max attempts from download = " + maxAttepmts);
 		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig,
 				maxAttepmts);
@@ -150,22 +151,33 @@ public class Starter {
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
 		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		remoteAppConfig = gsonService.getObject(starterConfig.getServerFileConfig(starterConfig, null), AppConfig.class,
-				false);
+		String serverFile = starterConfig.getServerFileConfig(starterConfig, null);
+		Repo resources;
+		JVMConfig jvm;
+		if (hasInternet) {
+			remoteAppConfig = gsonService.getObject(serverFile, AppConfig.class, false);
+			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
+					remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+			resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
+					remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+			jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
+					remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+		} else {
+			remoteAppConfig = gsonService.getLocalObject(Lists.newArrayList(serverFile), AppConfig.class);
+			Repo dep = remoteAppConfig.getAppDependencies();
+			List<String> d = DesktopUtil.generatePath(dep.getRepositories(), dep.getResources());
+			dependencis = gsonService.getLocalObject(d, Repo.class);
+			Repo res = remoteAppConfig.getAppResources();
+			List<String> r = DesktopUtil.generatePath(res.getRepositories(), res.getResources());
+			resources = gsonService.getLocalObject(r, Repo.class);
+			Repo javaRepo = remoteAppConfig.getJavaRepo();
+			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
+			jvm = gsonService.getLocalObject(j, JVMConfig.class);
+		}
+		Repo fileRepo = remoteAppConfig.getAppFileRepo();
 		updateApp(gsonService, fileMapperService);
-		fileRepo = remoteAppConfig.getAppFileRepo();
-		dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
-				remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		Repo resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
-				remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-		JVMConfig jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
-				remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
-		java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
-
-		List<Repo> list = new ArrayList<Repo>();
-		list.add(fileRepo);
-		list.add(dependencis);
-		list.add(resources);
+		Repo java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
+		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
 			container.conteinerAllSize(repo);
@@ -233,7 +245,7 @@ public class Starter {
 		Path jre = DesktopUtil.getJavaRun(Paths.get(workDir, "jre_default"));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
-				javaProcess.librariesForRunning(workDir, fileRepo, dependencis));
+				javaProcess.librariesForRunning(workDir, remoteAppConfig.getAppFileRepo(), dependencis));
 		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(remoteAppConfig.getMainClass());

@@ -33,4 +33,13 @@ public interface FileCacheService {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	Path getRawObject(List<String> urls, Metadata metadata, boolean cache)throws IOException, NoSuchAlgorithmException;
+	
+	/**
+	 * 
+	 * @param urls Got array url from {@link Repo}
+	 * @return local files from this repo
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 */
+	Path getRawObject(List<String> urls)throws IOException, NoSuchAlgorithmException;
 }

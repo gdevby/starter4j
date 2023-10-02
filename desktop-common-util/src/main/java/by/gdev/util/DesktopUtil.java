@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
 import javax.swing.LookAndFeel;
@@ -29,6 +30,7 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.model.download.Metadata;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -279,5 +281,11 @@ public class DesktopUtil {
 					log.warn("coudn't set defualt look and feel", e);
 				}
 		}
+	}
+	
+	public static List<String> generatePath(List<String> repositories, List<Metadata> resources) {
+		return repositories.stream().map(repo -> {
+			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl())).toList();
+		}).flatMap(List::stream).collect(Collectors.toList());
 	}
 }

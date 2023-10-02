@@ -82,4 +82,13 @@ public class GsonServiceImpl implements GsonService {
 	public <T> T getObjectWithoutSaving(String url, Type type, Map<String, String> headers) throws IOException {
 		return gson.fromJson(httpService.getRequestByUrl(url, headers), type);
 	}
+
+	@Override
+	public <T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(uris);
+		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
+				StandardCharsets.UTF_8)) {
+			return gson.fromJson(read, class1);
+		}
+	}
 }

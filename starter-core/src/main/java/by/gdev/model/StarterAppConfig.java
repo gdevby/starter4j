@@ -40,7 +40,7 @@ public class StarterAppConfig {
 	public static final String APP_CHANGES_LOG = "changes.log";
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
 	public static final String JRE_CONFIG = "jreConfig.json";
-	public static final String URI_APP_CONFIG = "http://127.0.0.1:81/starter-app/";
+	public static final String URI_APP_CONFIG = "https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app";
 	private final boolean prod = false;
 	
 
@@ -70,19 +70,14 @@ public class StarterAppConfig {
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 
-	
-	
-	
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG,
 			"starter", Paths.get("starter/cache"), "1.0",
 			Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false);
 
+	
 	public String getServerFileConfig(StarterAppConfig config, String version) {
-		if (Objects.isNull(version))
-			return String.join("/", config.getServerFile(), APP_CONFIG);
-		else {
-			return String.join("/", config.getServerFile(), version, APP_CONFIG);
-		}
+		return Objects.isNull(version) ? String.join("/", config.getServerFile(), APP_CONFIG)
+				: String.join("/", config.getServerFile(), version, APP_CONFIG);
 	}
 
 	/**
