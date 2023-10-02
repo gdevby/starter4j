@@ -45,7 +45,6 @@ public class UpdateFrame extends JFrame {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
-
 		setSize(new Dimension(width / 4, height / 5));
 		this.setLocation(width / 2 - this.getSize().width / 2, height / 2 - this.getSize().height / 2);
 		progressFrame.setVisible(false);
