@@ -60,6 +60,23 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 		throw new NullPointerException("metadata is empty");
 	}
+	
+	@Override
+	public Path getRawObject(List<String> urls) throws NoSuchAlgorithmException, IOException {
+		for (String url : urls) {
+			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_")).toAbsolutePath();
+			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
+			if (urlPath.toFile().exists() && Files.exists(metaFile)) {
+				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
+						RequestMetadata.class);
+				String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
+				if (!sha.equals(localMetadata.getSha1()))
+					throw new IOException("sha not equals");
+				return urlPath;
+			}
+		}
+		throw new IOException("file dont exists");
+	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
 			throws IOException, NoSuchAlgorithmException {
@@ -97,8 +114,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
 						RequestMetadata.class);
 				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
-						& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
-						& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
+						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
+						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
 					return urlPath;
 				} else {
 					httpService.getRequestByUrlAndSave(url, urlPath);
