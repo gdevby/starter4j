@@ -249,6 +249,7 @@ public class Starter {
 		javaProcess.addCommands(remoteAppConfig.getJvmArguments());
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(remoteAppConfig.getMainClass());
+		javaProcess.addCommands(remoteAppConfig.getAppArguments());
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
