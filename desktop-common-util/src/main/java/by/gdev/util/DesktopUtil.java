@@ -286,7 +286,7 @@ public class DesktopUtil {
 
 	public static List<String> generatePath(List<String> repositories, List<Metadata> resources) {
 		return repositories.stream().map(repo -> {
-			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl())).toList();
+			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl())).collect(Collectors.toList());
 		}).flatMap(List::stream).collect(Collectors.toList());
 	}
 }
