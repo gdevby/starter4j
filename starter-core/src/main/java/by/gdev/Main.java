@@ -39,6 +39,7 @@ public class Main {
 			}
 			Starter s = new Starter(eventBus, starterConfig, bundle);
 			s.collectOSInfoAndRegisterSubscriber();
+			s.updateApplication();
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();
 			s.runApp();
