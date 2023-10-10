@@ -31,3 +31,21 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 |-stop|false| Argument to automatically close the application after installation. Used for tests|
 
 There is a field in StarterAppConfig.prod, the purpose of which is to prevent the use of a signed starter application to launch a virus by changing the -uriAppConfig parameter in the starter-core module. It must be changed to true for production.
+
+Starter-core supports self-updating. To do this, you need to create a starterUpdate.json file. Example file contents:
+```
+{
+  "LINUX":{
+	"sha1":"e5b5bbce5daf4b8f016bec661122f48e1bd03292",
+	"uri":"http://127.0.0.1:81/starter-core-1.1.jar"
+  },
+  "WINDOWS":{
+	"sha1":"574f3fc6667dc31d94d2167ab904aac27edadd09 ",
+	"uri":"http://127.0.0.1:81/starter-core-1.1.jar"
+  }
+}
+```
+where:<br>
+LINUX - operating system<br>
+sha1 - hash sum of the file being updated<br>
+uri - uri to download file<br>
