@@ -35,11 +35,11 @@ Starter-core поддерживает возможность самообнов�
 {
   "LINUX":{
 	"sha1":"e5b5bbce5daf4b8f016bec661122f48e1bd03292",
-	"path":"http://127.0.0.1:81/starter-core-1.1.jar"
+	"uri":"http://127.0.0.1:81/starter-core-1.1.jar"
   },
   "WINDOWS":{
 	"sha1":"574f3fc6667dc31d94d2167ab904aac27edadd09 ",
-	"path":"http://127.0.0.1:81/starter-core-1.1.jar"
+	"uri":"http://127.0.0.1:81/starter-core-1.1.jar"
   }
 }
 ```
