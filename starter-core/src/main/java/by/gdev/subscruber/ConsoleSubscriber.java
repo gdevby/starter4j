@@ -60,6 +60,7 @@ public class ConsoleSubscriber {
 	@Subscribe
 	public void validateMessage(ExceptionMessage message) {
 		log.error(message.printValidationMessage());
+		System.exit(-1);
 	}
 
 	@Subscribe
