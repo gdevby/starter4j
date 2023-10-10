@@ -19,6 +19,7 @@ import com.google.common.eventbus.EventBus;
 
 import by.gdev.Main;
 import by.gdev.handler.Localise;
+import by.gdev.handler.UpdateCore;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
 import by.gdev.handler.ValidateTempDir;
@@ -83,6 +84,7 @@ public class Starter {
 	private FileMapperService fileMapperService;
 	private String workDir;
 	private boolean hasInternet;
+	private UpdateCore updateCore;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
 		this.eventBus = eventBus;
@@ -100,6 +102,8 @@ public class Starter {
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
+		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(),
+				requestConfig);
 	}
 
 	/**
@@ -253,6 +257,14 @@ public class Starter {
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
+		}
+	}
+
+	public void updateApplication() {
+		try {
+			updateCore.checkUpdates(osType, starterConfig.getStarterUpdateConfig());
+		} catch (Exception e) {
+			log.error("promlem with update application ", e);
 		}
 	}
 }
