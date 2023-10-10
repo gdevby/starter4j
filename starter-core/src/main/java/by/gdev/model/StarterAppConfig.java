@@ -39,7 +39,7 @@ public class StarterAppConfig {
 	private static final String APP_CONFIG = "appConfig.json";
 	public static final String APP_CHANGES_LOG = "changes.log";
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
-	public static final String APP_STARTER_UPDATE_CONFIG = "starter-update.json";
+	public static final String APP_STARTER_UPDATE_CONFIG = "starterUpdate.json";
 	public static final String JRE_CONFIG = "jreConfig.json";
 	public static final String URI_APP_CONFIG = "https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app";
 	private final boolean prod = false;

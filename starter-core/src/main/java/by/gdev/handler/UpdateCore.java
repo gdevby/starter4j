@@ -58,7 +58,7 @@ public class UpdateCore {
 			JOptionPane.showMessageDialog(new JFrame(), label);
 			BufferedInputStream in = null;
 			BufferedOutputStream out = null;
-			HttpGet httpGet = new HttpGet(update.getPath());
+			HttpGet httpGet = new HttpGet(update.getUri());
 			try {
 				httpGet.setConfig(requestConfig);
 				CloseableHttpResponse response = httpclient.execute(httpGet);
