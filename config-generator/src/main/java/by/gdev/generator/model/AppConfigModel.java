@@ -41,8 +41,8 @@ public class AppConfigModel{
     private String appFolder;   
     @Parameter(names = "-url", description = "used url(https://example.com) to generate configurations for all resources to download from this in future")
     private List<String> url;  
-    @Parameter(names = "-skinJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs, because you do it once")
-    private boolean skinJVMGeneration;   
+    @Parameter(names = "-skipJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs, because you do it once", arity = 1)
+    private boolean skipJVMGeneration = false;   
     @Parameter(names = "-help", help = true)
     public boolean help = false;
     

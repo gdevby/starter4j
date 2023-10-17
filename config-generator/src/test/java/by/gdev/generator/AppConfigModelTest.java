@@ -18,6 +18,6 @@ public class AppConfigModelTest {
 		Assert.assertEquals(acm.getAppName(), "new-name");
 		Assert.assertEquals(acm.getAppVersion(), "1.1");
 		Assert.assertEquals(acm.getJvmArguments(), Arrays.asList("first", "second"));
-		Assert.assertTrue(acm.isSkinJVMGeneration());
+		Assert.assertTrue(acm.isSkipJVMGeneration());
 	}
 }
