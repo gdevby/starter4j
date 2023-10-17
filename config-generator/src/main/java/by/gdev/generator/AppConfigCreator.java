@@ -78,7 +78,7 @@ public class AppConfigCreator {
 				String.valueOf(configFile.getAppVersion()), configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig,
 				String.valueOf(configFile.getAppVersion()), configFile));
-		if (!configFile.isSkinJVMGeneration()) {
+		if (!configFile.isSkipJVMGeneration()) {
 			createJreConfig(configFile);
 			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER, configFile.getAppName()),
 					Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG), null, configFile));
