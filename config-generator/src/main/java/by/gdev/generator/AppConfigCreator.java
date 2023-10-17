@@ -78,14 +78,14 @@ public class AppConfigCreator {
 				String.valueOf(configFile.getAppVersion()), configFile));
 		appConfig.setAppResources(createRepo(Paths.get(TARGET_OUT_FOLDER, version), resourcesConfig,
 				String.valueOf(configFile.getAppVersion()), configFile));
-		if (!configFile.isSkipJVMGeneration()) {
-			createJreConfig(configFile);
-			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER, configFile.getAppName()),
-					Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG), null, configFile));
-		} else {
+		if (configFile.isSkipJVMGeneration()) {
 			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), APP_CONFIG).toString(),
 					AppConfig.class);
 			appConfig.setJavaRepo(app.getJavaRepo());
+		}else {
+			createJreConfig(configFile);
+			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER, configFile.getAppName()),
+					Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG), null, configFile));
 		}
 		return appConfig;
 	}
