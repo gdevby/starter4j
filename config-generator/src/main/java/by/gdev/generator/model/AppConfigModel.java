@@ -1,13 +1,13 @@
 package by.gdev.generator.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Arrays;
+import java.util.List;
 
 import com.beust.jcommander.Parameter;
 
-import java.util.Arrays;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The class contains parameters for loading files needed to create config files
@@ -40,7 +40,9 @@ public class AppConfigModel{
     @Parameter(names = "-appFolder", description = "Directory with your desktop app. It tries to find in target/appName-version.jar")
     private String appFolder;   
     @Parameter(names = "-url", description = "used url(https://example.com) to generate configurations for all resources to download from this in future")
-    private List<String> url;  
+    private List<String> url;
+    @Parameter(names = "-ignoreResourcesFolders", description = "Directories that should be excluded when creating the configuration from resources")
+    private List<String> ignoreFolders;
     @Parameter(names = "-skipJVMGeneration", description = "Flag to skip java generation. Skipping java configuration will speed up the creation of application configs, because you do it once", arity = 1)
     private boolean skipJVMGeneration = false;   
     @Parameter(names = "-help", help = true)
@@ -60,6 +62,7 @@ public class AppConfigModel{
     			"../../starter-app/example-compiled-app/target/dependencies", 
     			"../../starter-app/example-compiled-app/target", 
     			Arrays.asList("https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/"),
+    			Arrays.asList(),
     			false, 
     			false);
 }
