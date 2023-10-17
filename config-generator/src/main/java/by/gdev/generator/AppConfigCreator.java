@@ -42,10 +42,11 @@ public class AppConfigCreator {
 	public static final String APP_RESOURCES_CONFIG = "resources.json";
 	public static final String JAVA_CONFIG = "javaConfig.json";
 
-	FileMapperService fileMapperService;
+	private final FileMapperService fileMapperService;
 
 	public AppConfigCreator(FileMapperService fileMapperService) {
 		this.fileMapperService = fileMapperService;
+
 	}
 
 	public AppConfig createConfig(AppConfigModel configFile) throws IOException, NoSuchAlgorithmException {
@@ -82,7 +83,7 @@ public class AppConfigCreator {
 			AppConfig app = fileMapperService.read(Paths.get(configFile.getJavaConfig(), APP_CONFIG).toString(),
 					AppConfig.class);
 			appConfig.setJavaRepo(app.getJavaRepo());
-		}else {
+		} else {
 			createJreConfig(configFile);
 			appConfig.setJavaRepo(createRepo(Paths.get(TARGET_OUT_FOLDER, configFile.getAppName()),
 					Paths.get(TARGET_OUT_FOLDER, configFile.getAppName(), JAVA_CONFIG), null, configFile));
@@ -91,7 +92,9 @@ public class AppConfigCreator {
 	}
 
 	private Repo createRepo(Path jvms, Path folder, String str, AppConfigModel configFile) throws IOException {
-		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).map(DesktopUtil.wrap(e -> {
+		List<Metadata> metadataList = Files.walk(folder).filter(Files::isRegularFile).filter(filter -> {
+			return configFile.getIgnoreFolders().stream().noneMatch(ex -> filter.startsWith(ex));
+		}).map(DesktopUtil.wrap(e -> {
 			Path s = jvms.relativize(e);
 			String simvLink = "";
 			Metadata m = new Metadata();
