@@ -34,13 +34,15 @@ public class Main {
 		jc.parse(args);
 		if (acm.help) {
 			jc.usage();
+		}else {
+			AppConfigCreator appConfigCreator = new AppConfigCreator(fileMapperService);
+			AppConfig appConfig = appConfigCreator.createConfig(acm);
+			log.info("save config before uploading {}", new File(TARGET_OUT_FOLDER,APP_CONFIG).getAbsolutePath());	
+			fileMapperService.write(appConfig, Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), String.valueOf(acm.getAppVersion()), APP_CONFIG).toString());
+			FileUtils.copyFile(Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), acm.getAppVersion(), APP_CONFIG).toFile(), 
+					Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), APP_CONFIG).toFile());
+			log.info("DONE");
 		}
-		AppConfigCreator appConfigCreator = new AppConfigCreator(fileMapperService);
-		AppConfig appConfig = appConfigCreator.createConfig(acm);
-		log.info("save config before uploading {}", new File(TARGET_OUT_FOLDER,APP_CONFIG).getAbsolutePath());	
-		fileMapperService.write(appConfig, Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), String.valueOf(acm.getAppVersion()), APP_CONFIG).toString());
-		FileUtils.copyFile(Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), acm.getAppVersion(), APP_CONFIG).toFile(), 
-				Paths.get(TARGET_OUT_FOLDER, acm.getAppName(), APP_CONFIG).toFile());
-		log.info("DONE");
+
 	}
 }
