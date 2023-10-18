@@ -59,13 +59,15 @@ public class DownloadRunnableImpl implements Runnable {
 			} else {
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
-					try {
-						download(element);
-						element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
-					} catch (Throwable e1) {
-						element.setError(new UploadFileException(
-								element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
-								element.getMetadata().getPath(), e1.getLocalizedMessage()));
+					for (String repo : element.getRepo().getRepositories()) {
+						try {
+							download(element, repo);
+							element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
+							break;
+						} catch (Throwable e1) {
+							element.setError(new UploadFileException(repo + element.getMetadata().getRelativeUrl(),
+									element.getMetadata().getPath(), e1.getLocalizedMessage()));
+						}
 					}
 				} else {
 //					DesktopUtil.sleep(1000);
@@ -83,7 +85,7 @@ public class DownloadRunnableImpl implements Runnable {
 	 * @throws InterruptedException
 	 */
 
-	private void download(DownloadElement element) throws IOException, InterruptedException {
+	private void download(DownloadElement element, String repo) throws IOException, InterruptedException {
 		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
@@ -91,7 +93,8 @@ public class DownloadRunnableImpl implements Runnable {
 				BufferedInputStream in = null;
 				BufferedOutputStream out = null;
 				boolean resume = false;
-				String url = element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl();
+				String url = repo + element.getMetadata().getRelativeUrl();
+				System.out.println("download " + url);
 				HttpGet httpGet = new HttpGet(url);
 				log.trace(String.valueOf(httpGet));
 				try {
