@@ -114,7 +114,7 @@ public class DownloaderImpl implements Downloader {
 				CompletableFuture.runAsync(() -> {
 					try {
 						waitThreadDone(listThread);
-					} catch (IOException | InterruptedException e) {
+					} catch (InterruptedException e) {
 						log.error("Error", e);
 					}
 				}).get();
@@ -133,7 +133,7 @@ public class DownloaderImpl implements Downloader {
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
 
-	private DownloaderStatus buildDownloaderStatus() throws IOException {
+	private DownloaderStatus buildDownloaderStatus(){
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);
@@ -154,7 +154,7 @@ public class DownloaderImpl implements Downloader {
 		return statusDownload;
 	}
 
-	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException, IOException {
+	private void waitThreadDone(List<CompletableFuture<Void>> listThread) throws InterruptedException {
 		LocalTime start = LocalTime.now();
 		boolean workedAnyThread = true;
 		while (workedAnyThread) {
