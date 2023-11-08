@@ -1,17 +1,15 @@
 package by.gdev.subscruber;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpGet;
 
 import com.google.common.eventbus.Subscribe;
 
-import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.model.AppLocalConfig;
@@ -64,11 +62,8 @@ public class ConsoleSubscriber {
 	}
 
 	@Subscribe
-	public void downloadedFile(DownloadElement element) {
-		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
-		HttpGet httpGet = new HttpGet(
-				element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl());
-		log.trace("downloaded file: " + httpGet.getURI() + " -> " + file);
+	public void downloadedFile(DownloadFile entity) {
+		log.info("downloaded file: {} -> {}", entity.getUri(), entity.getFile());
 	}
 
 	private void checkUnsatisfiedLinkError(StarterAppProcess status) {

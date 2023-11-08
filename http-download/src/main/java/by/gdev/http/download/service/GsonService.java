@@ -7,6 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
+import by.gdev.util.model.download.Metadata;
+
 /**
  * Converted json file content of the file to java object
  */
@@ -28,7 +30,11 @@ public interface GsonService {
 	 */
 	<T> T getObject(String uri, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
-
+	
+	
+	<T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache)
+			throws IOException, NoSuchAlgorithmException;
+	
 	/**
 	 * @param <T>
 	 * @param uris
@@ -57,6 +63,10 @@ public interface GsonService {
 	 * 	 * If we dont't have internet it should return old value.
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+	
+	
+	<T> T getObjectByUrls(List<String> urls, List<Metadata> urns, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 
 	/**

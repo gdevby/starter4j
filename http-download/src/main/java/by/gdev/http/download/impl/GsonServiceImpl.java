@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
+import by.gdev.util.model.download.Metadata;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -90,5 +91,33 @@ public class GsonServiceImpl implements GsonService {
 				StandardCharsets.UTF_8)) {
 			return gson.fromJson(read, class1);
 		}
+	}
+
+	@Override
+	public <T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(url, cache);
+		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
+				StandardCharsets.UTF_8)) {
+			return gson.fromJson(read, class1);
+		}
+	}
+
+	@Override
+	public <T> T getObjectByUrls(List<String> urls, List<Metadata> urns, Class<T> class1, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		for (String url : urls) {
+			for (Metadata urn : urns) {
+				try {
+					Path pathFile = fileService.getRawObject(url + urn.getRelativeUrl(), cache);
+					try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
+							StandardCharsets.UTF_8)) {
+						return gson.fromJson(read, class1);
+					}
+				} catch (IOException e) {
+					log.error("Error", e);
+				}
+			}
+		}
+		return null;
 	}
 }
