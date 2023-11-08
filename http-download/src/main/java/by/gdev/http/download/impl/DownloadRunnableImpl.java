@@ -23,6 +23,7 @@ import com.google.common.eventbus.EventBus;
 
 import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +95,6 @@ public class DownloadRunnableImpl implements Runnable {
 				BufferedOutputStream out = null;
 				boolean resume = false;
 				String url = repo + element.getMetadata().getRelativeUrl();
-				System.out.println("download " + url);
 				HttpGet httpGet = new HttpGet(url);
 				log.trace(String.valueOf(httpGet));
 				try {
@@ -127,7 +127,7 @@ public class DownloadRunnableImpl implements Runnable {
 							element.setDownloadBytes(element.getDownloadBytes() + curread);
 						}
 					}
-					eventBus.post(element);
+					eventBus.post(new DownloadFile(url, file.toString()));
 					LocalTime endTime = LocalTime.now();
 					element.setEnd(endTime);
 					DEFAULT_MAX_ATTEMPTS = 1;

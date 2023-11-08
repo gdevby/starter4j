@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -51,7 +53,7 @@ public class UpdateFrame extends JFrame {
 		JPanel p = new JPanel(new BorderLayout(0, 0));
 		p.setBackground(Color.WHITE);
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		String link = String.join("/", starterAppConfig.getServerFile(), StarterAppConfig.APP_CHANGES_LOG);
+		String link = String.join("/", starterAppConfig.getServerFile().get(0), StarterAppConfig.APP_CHANGES_LOG);
 		JLabel text = new JLabelHtmlWrapper(String.format(resourceBundle.getString("update.app"),
 				appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()));
 		text.setFont(text.getFont().deriveFont(Font.BOLD));

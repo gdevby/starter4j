@@ -155,17 +155,17 @@ public class Starter {
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
 		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		String serverFile = starterConfig.getServerFileConfig(starterConfig, null);
+		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, null);
 		Repo resources;
 		JVMConfig jvm;
 		if (hasInternet) {
-			remoteAppConfig = gsonService.getObject(serverFile, AppConfig.class, false);
+			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
 			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
-					remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+					remoteAppConfig.getAppDependencies().getResources(), Repo.class, false);
 			resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
-					remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+					remoteAppConfig.getAppResources().getResources(), Repo.class, false);
 			jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
-					remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+					remoteAppConfig.getJavaRepo().getResources(), JVMConfig.class, false);
 		} else {
 			remoteAppConfig = gsonService.getLocalObject(Lists.newArrayList(serverFile), AppConfig.class);
 			Repo dep = remoteAppConfig.getAppDependencies();
@@ -217,14 +217,14 @@ public class Starter {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
-					remoteAppConfig = gsonService.getObject(
+					remoteAppConfig = gsonService.getObjectByUrls(
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
 				} else {
 					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig,
 							starterConfig, fileMapperService, osType);
 					if (frame.getUserChoose() == 1) {
-						remoteAppConfig = gsonService.getObject(
+						remoteAppConfig = gsonService.getObjectByUrls(
 								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 								AppConfig.class, true);
 					} else {

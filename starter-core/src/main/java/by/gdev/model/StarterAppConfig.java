@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,12 +44,11 @@ public class StarterAppConfig {
 	public static final String JRE_CONFIG = "jreConfig.json";
 	public static final String URI_APP_CONFIG = "https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app";
 	private final boolean prod = false;
-	
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
 	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description")
-	private String serverFile;
+	private List<String> serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
 			+ "The second way is to put in file with installer.  The file name is installer.properties which contains work.dir=... This is for production. "
 			+ "The default method is DesktopUtil.getSystemPath defined with by.gdev.Main. The priority: StarterAppConfig.workDirectory, file installer.properties and default method")
@@ -71,20 +71,23 @@ public class StarterAppConfig {
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 
-	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG,
+	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, Arrays.asList(URI_APP_CONFIG),
 			"starter", Paths.get("starter/cache"), "1.0",
 			Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false);
 
-	
-	public String getServerFileConfig(StarterAppConfig config, String version) {
-		return Objects.isNull(version) ? String.join("/", config.getServerFile(), APP_CONFIG)
-				: String.join("/", config.getServerFile(), version, APP_CONFIG);
+	public List<String> getServerFileConfig(StarterAppConfig config, String version) {
+		return config.getServerFile().stream().map(file -> {
+			return Objects.isNull(version) ? String.join("/", file, APP_CONFIG)
+					: String.join("/", file, version, APP_CONFIG);
+		}).collect(Collectors.toList());
 	}
-	
-	public String getStarterUpdateConfig() {
-		return String.join("/", this.getServerFile(), APP_STARTER_UPDATE_CONFIG);
+
+	public List<String> getStarterUpdateConfig() {
+		return this.getServerFile().stream().map(file -> {
+			return String.join("/", file, APP_STARTER_UPDATE_CONFIG);
+		}).collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * This method returns the working directory.
 	 */

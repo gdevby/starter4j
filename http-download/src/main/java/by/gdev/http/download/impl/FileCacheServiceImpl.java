@@ -51,6 +51,17 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return getResourceWithHttpHead(url, urlPath, metaFile);
 		}
 	}
+	
+	@Override
+	public Path getRawObject(List<String> urls, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
+		for (String url : urls) {
+			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
+			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
+			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath) : getResourceWithHttpHead(url, urlPath, metaFile);
+		}
+		throw new NullPointerException("metadata is empty");
+	}
 
 	@Override
 	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)

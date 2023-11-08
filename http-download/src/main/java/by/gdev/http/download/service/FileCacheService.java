@@ -23,6 +23,11 @@ public interface FileCacheService {
 	 */
 
 	Path getRawObject(String uri, boolean cache) throws IOException, NoSuchAlgorithmException;
+	
+	
+	Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException;
+	
+	
 	/**
 	 * Allowed to download small files and used without GsonService 
 	 * @param cache - {@link FileCacheService#getRawObject(String, boolean)}
