@@ -42,7 +42,7 @@ public class ViewSubscriber {
 		}
 		if (Objects.nonNull(status.getErrorCode())) {
 			if (status.getErrorCode() == -1073740791) {
-				message(new ExceptionMessage(bundle.getString("driver.error"),"https://gdev.by/help/java/closed-minecraft-1073740791.html"));
+				message(new ExceptionMessage(bundle.getString("driver.error"),"https://gdev.by/help/java/closed-1073740791"));
 			}
 			else if (status.getErrorCode() == -1073740771)
 				message(new ExceptionMessage(bundle.getString("msi.afterburner.error")));
