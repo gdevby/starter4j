@@ -37,7 +37,7 @@ public class ProcessMonitor extends Thread {
 		BufferedReader buf = new BufferedReader(reader);
 		String line;
 		StarterAppProcess status = new StarterAppProcess();
-		while (isRunning()) {
+		while (process.isAlive()) {
 			try {
 				while (Objects.nonNull(line = buf.readLine())) {
 					status.setLine(line);
@@ -60,15 +60,5 @@ public class ProcessMonitor extends Thread {
 		}
 		status.setErrorCode(process.exitValue());
 		listener.post(status);
-	}
-
-	public boolean isRunning() {
-		try {
-			this.process.exitValue();
-		} catch (IllegalThreadStateException ex) {
-			return true;
-		}
-
-		return false;
 	}
 }
