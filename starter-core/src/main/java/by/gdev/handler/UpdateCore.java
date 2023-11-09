@@ -10,12 +10,14 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -30,7 +32,6 @@ import by.gdev.model.StarterUpdate;
 import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
-import ch.qos.logback.core.util.FileUtil;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -41,16 +42,13 @@ public class UpdateCore {
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 
-	public void checkUpdates(OSType osType, String updateConfigUri) throws IOException, NoSuchAlgorithmException {
-		Type mapType = new TypeToken<Map<OSType, StarterUpdate>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-		Map<OSType, StarterUpdate> map = gsonService.getObjectWithoutSaving(updateConfigUri, mapType);
-		if (!map.containsKey(osType))
+	public void checkUpdates(OSType osType, List<String> updateConfigUri) throws IOException, NoSuchAlgorithmException {
+		Map<OSType, StarterUpdate> map = getUpdateFile(updateConfigUri);
+		if (map == null || !map.containsKey(osType))
 			return;
 		StarterUpdate update = map.get(osType);
 		File jarFile = new File(URLDecoder
-				.decode(FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+				.decode(FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
 		String localeSha1 = DesktopUtil.getChecksum(jarFile, "SHA-1");
 		File temp = new File(jarFile.toString() + ".temp");
 		if (!update.getSha1().equals(localeSha1)) {
@@ -79,5 +77,15 @@ public class UpdateCore {
 			Files.move(temp.toPath(), jarFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			System.exit(0);
 		}
+	}
+
+	private Map<OSType, StarterUpdate> getUpdateFile(List<String> updateConfigUri) throws IOException {
+		Type mapType = new TypeToken<Map<OSType, StarterUpdate>>() {
+			private static final long serialVersionUID = 1L;
+		}.getType();
+		for (String uri : updateConfigUri) {
+			return gsonService.getObjectWithoutSaving(uri, mapType);
+		}
+		return null;
 	}
 }
