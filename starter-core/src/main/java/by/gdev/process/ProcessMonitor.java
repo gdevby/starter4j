@@ -46,10 +46,10 @@ public class ProcessMonitor extends Thread {
 				}
 			} catch (IOException t) {
 				DesktopUtil.sleep(1);
-				log.trace("Exit value = " + process.exitValue());
 				status.setProcess(this.process);
 				status.setExeption(t);
 				listener.post(status);
+				log.trace("Exit value = " + process.exitValue());
 			} finally {
 				try {
 					IOUtils.close(buf);
