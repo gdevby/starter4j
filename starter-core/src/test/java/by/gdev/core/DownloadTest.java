@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +26,6 @@ import org.mockserver.model.HttpResponse;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 
-import by.gdev.handler.Localise;
 import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.http.download.exeption.StatusExeption;
 import by.gdev.http.download.handler.AccessHandler;
@@ -40,7 +38,6 @@ import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
-import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 
@@ -79,8 +76,6 @@ public class DownloadTest {
 
 	private static void initialization(Path testFolder, Gson gson) {
 		EventBus eventBus = new EventBus();
-		ResourceBundle bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
-		eventBus.register(new ConsoleSubscriber(bundle, null, null));
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,

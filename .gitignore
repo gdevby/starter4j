@@ -16,5 +16,6 @@ tempAppConfig.json
 **/logs/*
 **/.classpath
 **/.project
+**/.factorypath
 /install.sh
 /.settings/

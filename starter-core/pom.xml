@@ -41,9 +41,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-netty</artifactId>
-			<version>5.11.2</version>
-			<scope>provided</scope>
+			<artifactId>mockserver-netty-no-dependencies</artifactId>
+			<version>5.14.0</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -77,25 +76,24 @@
 			<plugin>
 				<groupId>org.mock-server</groupId>
 				<artifactId>mockserver-maven-plugin</artifactId>
-				<version>5.11.2</version>
+				<version>5.14.0</version>
 				<configuration>
-				<!-- 1080 -->
-				<!--	<serverPort>6794</serverPort>-->
+					<serverPort>1080</serverPort>
+					<logLevel>DEBUG</logLevel>
 				</configuration>
 				<executions>
 					<execution>
-				<?m2e execute onConfiguration?> 
 						<id>process-test-classes</id>
 						<phase>process-test-classes</phase>
 						<goals>
-							<goal>start</goal>
+							<goal>runForked</goal>
 						</goals>
 					</execution>
 					<execution>
 						<id>verify</id>
 						<phase>verify</phase>
 						<goals>
-							<goal>stop</goal>
+							<goal>stopForked</goal>
 						</goals>
 					</execution>
 				</executions>
