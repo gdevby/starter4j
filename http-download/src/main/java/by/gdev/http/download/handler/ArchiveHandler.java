@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -32,7 +31,6 @@ import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,7 +42,6 @@ public class ArchiveHandler implements PostHandler {
 	private String jreConfig;
 
 	@Override
-	@SneakyThrows
 	public void postProcessDownloadElement(DownloadElement e) {
 		try {
 			Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
@@ -53,11 +50,16 @@ public class ArchiveHandler implements PostHandler {
 			else
 				unTarGz(p.toFile(), new File(e.getPathToDownload()), false, false);
 			if (OSInfo.getOSType() == OSType.LINUX | OSInfo.getOSType() == OSType.MACOSX) {
-				Optional<Path> javaFile = Files.walk(Paths.get(e.getPathToDownload(), "jre_default"))
-						.filter(f -> Files.isRegularFile(f) && (f.endsWith("java") || f.endsWith("java.exe")))
-						.findFirst();
-				if (javaFile.isPresent())
-					Files.setPosixFilePermissions(javaFile.get(), DesktopUtil.PERMISSIONS);
+				Files.walk(Paths.get(e.getPathToDownload(), "jre_default"))
+						.filter(f -> Files.isRegularFile(f) && (f.endsWith("java") || f.endsWith("java.exe")
+								|| f.endsWith("jspawnhelper") || f.endsWith("jspawnhelper.exe")))
+						.forEach(file -> {
+							try {
+								Files.setPosixFilePermissions(file, DesktopUtil.PERMISSIONS);
+							} catch (IOException e1) {
+								log.error("Error with set file permissions ", e1);
+							}
+						});
 			}
 		} catch (NoSuchAlgorithmException | IOException e2) {
 			log.info("Error with extracting archive ", e2);
