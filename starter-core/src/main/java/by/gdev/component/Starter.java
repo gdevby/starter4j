@@ -9,8 +9,11 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.apache.http.client.config.RequestConfig;
 
@@ -57,6 +60,7 @@ import by.gdev.util.StringVersionComparator;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
+import shaded_package.org.apache.commons.text.StringSubstitutor;
 
 /**
  * This class prepares information about the OS, validates the directories
@@ -102,8 +106,7 @@ public class Starter {
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
-		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(),
-				requestConfig);
+		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 	}
 
 	/**
@@ -254,6 +257,11 @@ public class Starter {
 		javaProcess.addCommand("-cp", classPath);
 		javaProcess.addCommand(remoteAppConfig.getMainClass());
 		javaProcess.addCommands(remoteAppConfig.getAppArguments());
+		Map<String, String> map = new HashMap<>();
+		map.put("currentAppVersion", remoteAppConfig.getAppVersion());
+		StringSubstitutor substitutor = new StringSubstitutor(map);
+		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
+				.collect(Collectors.toList()));
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
