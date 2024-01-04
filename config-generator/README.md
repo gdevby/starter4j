@@ -21,7 +21,7 @@ To test to functionality you need to run the following commands<br>
 | -name| starter-app |Application name|  
 | -version| 1.0 |Application version|  
 | -mainClass| by.gdev.app.Main |Main class for running the application|  
-| -appArguments|  |Application Arguments|  
+| -appArguments| currentAppVersion={currentAppVersion} |Application Arguments, it sends to running application version|  
 | -jvmArguments| -Xmx512m,-Dfile.encoding=UTF8,-Djava.net.preferIPv4Stack=true |Arguments for java virtual machine|
 | -appJar| starter-app-1.0.jar | The name of the jar file to run |  
 | -javaFolder| ../../starter-app/example-compiled-app/jres_default |Directory where jvm is stored to create java config |  

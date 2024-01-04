@@ -21,7 +21,7 @@
 | -name| starter-app |Название приложения|  
 | -version| 1.0 |Версия приложения|  
 | -mainClass| by.gdev.app.Main |Главный класс для запуска приложения|  
-| -appArguments|  |Aргументы приложения|  
+| -appArguments| currentAppVersion={currentAppVersion} |Aргументы приложения, эти аргументы передаются в запускаемое приложение|  
 | -jvmArguments| -Xmx512m,-Dfile.encoding=UTF8,-Djava.net.preferIPv4Stack=true |Aргументы для java виртуальной машины|
 | -appJar| starter-app-1.0.jar | Название запускаемого jar файла |  
 | -javaFolder| ../../starter-app/example-compiled-app/jres_default |Каталог, в котором хранится jvm для создания конфигурации java |  
