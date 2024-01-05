@@ -9,6 +9,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
@@ -288,5 +289,17 @@ public class DesktopUtil {
 		return repositories.stream().map(repo -> {
 			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl())).collect(Collectors.toList());
 		}).flatMap(List::stream).collect(Collectors.toList());
+	}
+	
+	public static List<Metadata> generateMetadataForJre(String path, String jrePath) throws IOException {
+		return Files.walk(Paths.get(path, "jre_default")).filter(Files::isRegularFile)
+				.filter(pr -> !(pr.getFileName().toString().endsWith(".json"))).map(DesktopUtil.wrap(p -> {
+					Metadata m = new Metadata();
+					m.setSha1(DesktopUtil.getChecksum(p.toFile(), "SHA-1"));
+					String relativize = Paths.get(path).relativize(p).toString();
+					m.setPath(relativize.replace("\\", "/"));
+					m.setSize(p.toFile().length());
+					return m;
+				})).collect(Collectors.toList());
 	}
 }

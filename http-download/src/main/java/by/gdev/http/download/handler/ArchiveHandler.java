@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -132,21 +131,12 @@ public class ArchiveHandler implements PostHandler {
 
 	private void generateJreConfig(String path) {
 		try {
-			List<Metadata> list = Files.walk(Paths.get(path, "jre_default")).filter(Files::isRegularFile)
-					.filter(pr -> !(pr.getFileName().toString().endsWith(".json"))).map(DesktopUtil.wrap(p -> {
-						Metadata m = new Metadata();
-						m.setSha1(DesktopUtil.getChecksum(p.toFile(), "SHA-1"));
-						m.setPath(p.toString().replace("\\", "/"));
-						m.setSize(p.toFile().length());
-						return m;
-					})).collect(Collectors.toList());
-
+			List<Metadata> list = DesktopUtil.generateMetadataForJre(path, "jre_default");
 			Repo r = new Repo();
 			r.setResources(list);
 			fileMapperService.write(r, "jre_default/" + jreConfig);
 		} catch (Exception e) {
 			log.error("error {}", e);
 		}
-
 	}
 }
