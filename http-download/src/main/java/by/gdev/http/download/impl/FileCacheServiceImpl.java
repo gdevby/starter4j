@@ -51,14 +51,14 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return getResourceWithHttpHead(url, urlPath, metaFile);
 		}
 	}
-	
+
 	@Override
-	public Path getRawObject(List<String> urls, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+	public Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException {
 		for (String url : urls) {
 			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
-			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath) : getResourceWithHttpHead(url, urlPath, metaFile);
+			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath)
+					: getResourceWithHttpHead(url, urlPath, metaFile);
 		}
 		throw new NullPointerException("metadata is empty");
 	}
@@ -71,11 +71,12 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 		throw new NullPointerException("metadata is empty");
 	}
-	
+
 	@Override
 	public Path getRawObject(List<String> urls) throws NoSuchAlgorithmException, IOException {
 		for (String url : urls) {
-			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_")).toAbsolutePath();
+			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"))
+					.toAbsolutePath();
 			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
 			if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
@@ -86,7 +87,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 				return urlPath;
 			}
 		}
-		throw new IOException("file dont exists");
+		throw new IOException("file doesn't exist");
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)

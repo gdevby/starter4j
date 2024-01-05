@@ -52,7 +52,9 @@ public class Main {
 			}
 		} catch (Throwable t) {
 			String message = t.getMessage();
-			if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
+			if ("file doesn't exist".equals(message)) {
+				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
+			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
 			log.error("Error", t);
 			System.exit(-1);
