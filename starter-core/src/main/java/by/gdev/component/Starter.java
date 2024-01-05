@@ -170,6 +170,7 @@ public class Starter {
 			jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
 					remoteAppConfig.getJavaRepo().getResources(), JVMConfig.class, false);
 		} else {
+			log.info("No Internet connection");
 			remoteAppConfig = gsonService.getLocalObject(Lists.newArrayList(serverFile), AppConfig.class);
 			Repo dep = remoteAppConfig.getAppDependencies();
 			List<String> d = DesktopUtil.generatePath(dep.getRepositories(), dep.getResources());
