@@ -8,13 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.util.model.download.Repo;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 public class JavaProcessHelper {
 	private final String jvmPath;
 	private final List<String> commands;
@@ -47,6 +50,8 @@ public class JavaProcessHelper {
         if (Objects.nonNull(javaOption)) {
             process.environment().put(javaOption, "");
         }
+        String runCommand = process.command().stream().collect(Collectors.joining(" "));
+        log.info("start command {}",runCommand);
         return process;
     }
     
