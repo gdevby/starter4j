@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.config.RequestConfig;
 
 import com.google.common.collect.Lists;
@@ -60,7 +61,6 @@ import by.gdev.util.StringVersionComparator;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
-import shaded_package.org.apache.commons.text.StringSubstitutor;
 
 /**
  * This class prepares information about the OS, validates the directories
