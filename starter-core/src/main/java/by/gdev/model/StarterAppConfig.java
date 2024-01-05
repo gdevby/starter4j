@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.internal.Lists;
 
 import by.gdev.Main;
 import by.gdev.util.DesktopUtil;
@@ -42,7 +43,8 @@ public class StarterAppConfig {
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
 	public static final String APP_STARTER_UPDATE_CONFIG = "starterUpdate.json";
 	public static final String JRE_CONFIG = "jreConfig.json";
-	public static final String URI_APP_CONFIG = "https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app";
+	public static final List<String> URI_APP_CONFIG = Lists.newArrayList(
+			"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app");
 	private final boolean prod = false;
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
@@ -71,9 +73,9 @@ public class StarterAppConfig {
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 
-	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, Arrays.asList(URI_APP_CONFIG),
-			"starter", Paths.get("starter/cache"), "1.0",
-			Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false);
+	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
+			Paths.get("starter/cache"), "1.0", Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
+			60000, 600000, false);
 
 	public List<String> getServerFileConfig(StarterAppConfig config, String version) {
 		return config.getServerFile().stream().map(file -> {
