@@ -250,6 +250,8 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
+		AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
+				AppLocalConfig.class);
 		Path jre = DesktopUtil.getJavaRun(Paths.get(workDir, "jre_default"));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
@@ -259,7 +261,7 @@ public class Starter {
 		javaProcess.addCommand(remoteAppConfig.getMainClass());
 		javaProcess.addCommands(remoteAppConfig.getAppArguments());
 		Map<String, String> map = new HashMap<>();
-		map.put("currentAppVersion", remoteAppConfig.getAppVersion());
+		map.put("currentAppVersion", appLocalConfig.getCurrentAppVersion());
 		StringSubstitutor substitutor = new StringSubstitutor(map);
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
 				.collect(Collectors.toList()));
