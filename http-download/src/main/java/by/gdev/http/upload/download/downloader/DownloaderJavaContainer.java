@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
@@ -63,7 +62,7 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 		if (!Files.exists(Paths.get(workDir, "jre_default")))
 			return;
 		List<Metadata> configMetadata = fileMapperService.read("jre_default/" + jreConfig, Repo.class).getResources();
-		List<Metadata> localeJreMetadata = generateMetadataForJre();
+		List<Metadata> localeJreMetadata = DesktopUtil.generateMetadataForJre(workDir, "jre_default");
 		configMetadata.removeAll(localeJreMetadata);
 		if (configMetadata.size() != 0) {
 			Metadata m = repo.getResources().get(0);
@@ -71,17 +70,6 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 			this.repo = repo;
 			log.warn("problem with jre");
 		}
-	}
-
-	private List<Metadata> generateMetadataForJre() throws IOException {
-		return Files.walk(Paths.get(workDir, "jre_default")).filter(Files::isRegularFile)
-				.filter(pr -> !(pr.getFileName().toString().endsWith(".json"))).map(DesktopUtil.wrap(path -> {
-					Metadata m = new Metadata();
-					m.setSha1(DesktopUtil.getChecksum(path.toFile(), "SHA-1"));
-					m.setPath(path.toString().replace("\\", "/"));
-					m.setSize(path.toFile().length());
-					return m;
-				})).collect(Collectors.toList());
 	}
 
 	private void removeJava(Path path) throws IOException {
