@@ -89,8 +89,10 @@ public class Starter {
 	private String workDir;
 	private boolean hasInternet;
 	private UpdateCore updateCore;
+	private AppLocalConfig appLocalConfig;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle)
+			throws UnsupportedOperationException, IOException {
 		this.eventBus = eventBus;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
@@ -182,6 +184,12 @@ public class Starter {
 			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
 			jvm = gsonService.getLocalObject(j, JVMConfig.class);
 		}
+		appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		if (appLocalConfig == null) {
+			appLocalConfig = new AppLocalConfig();
+			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
 
 		updateApp(gsonService, fileMapperService);
 		Repo fileRepo = remoteAppConfig.getAppFileRepo();
@@ -210,13 +218,6 @@ public class Starter {
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
-				AppLocalConfig.class);
-		if (appLocalConfig == null) {
-			appLocalConfig = new AppLocalConfig();
-			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-		}
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == -1) {
 			if (!GraphicsEnvironment.isHeadless()) {
@@ -251,8 +252,6 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
-		AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
-				AppLocalConfig.class);
 		Path jre = DesktopUtil.getJavaRun(Paths.get(workDir, "jre_default"));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
