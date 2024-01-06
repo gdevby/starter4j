@@ -182,8 +182,9 @@ public class Starter {
 			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
 			jvm = gsonService.getLocalObject(j, JVMConfig.class);
 		}
-		Repo fileRepo = remoteAppConfig.getAppFileRepo();
+
 		updateApp(gsonService, fileMapperService);
+		Repo fileRepo = remoteAppConfig.getAppFileRepo();
 		Repo java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
 		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
