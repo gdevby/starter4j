@@ -27,7 +27,7 @@ import com.google.common.eventbus.Subscribe;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.util.DesktopUtil;
-import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.OSInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,7 +38,7 @@ public class StarterStatusFrame extends JFrame {
 	private JLabel uploadStatus = new JLabel();
 	private ResourceBundle resourceBundle;
 
-	public StarterStatusFrame(OSType type, String appName, boolean indeterminate, ResourceBundle resourceBundle) {
+	public StarterStatusFrame(String appName, boolean indeterminate, ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		setResizable(false);
 		setUndecorated(true);
@@ -47,7 +47,7 @@ public class StarterStatusFrame extends JFrame {
 		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 		int width = gd.getDisplayMode().getWidth();
 		int height = gd.getDisplayMode().getHeight();
-		setSize(new Dimension(width/5 , height / 5));
+		setSize(new Dimension(width / 5, height / 5));
 		DesktopUtil.initLookAndFeel();
 
 		JPanel p = new JPanel(new BorderLayout(0, 0));
@@ -58,7 +58,7 @@ public class StarterStatusFrame extends JFrame {
 			@Override
 			public void paint(Graphics g) {
 				if (Objects.nonNull(image)) {
-					g.drawImage(image, 0, 0, getSize().width,getSize().height, null);
+					g.drawImage(image, 0, 0, getSize().width, getSize().height, null);
 				}
 				super.paint(g);
 			}
@@ -74,7 +74,7 @@ public class StarterStatusFrame extends JFrame {
 		f = nameLabel.getFont();
 		nameLabel.setFont(f.deriveFont((float) (f.getSize() + 5)));
 		nameLabel.setHorizontalAlignment(JLabel.CENTER);
-		nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, getSize().height/3, 0));
+		nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, getSize().height / 3, 0));
 
 		uploadStatus.setFont(uploadStatus.getFont().deriveFont(Font.BOLD));
 		uploadStatus.setHorizontalAlignment(JLabel.RIGHT);
@@ -101,7 +101,7 @@ public class StarterStatusFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					DesktopUtil.openLink(type, gdevBy);
+					DesktopUtil.openLink(OSInfo.getOSType(), gdevBy);
 				}
 			}
 

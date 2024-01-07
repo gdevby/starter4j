@@ -1,5 +1,6 @@
 package by.gdev;
 
+import java.awt.GraphicsEnvironment;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
@@ -15,6 +16,7 @@ import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.ui.StarterStatusFrame;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,13 +33,19 @@ public class Main {
 		ResourceBundle bundle = null;
 		try {
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+			StarterStatusFrame starterStatusFrame = null;
+			if (!GraphicsEnvironment.isHeadless()) {
+				starterStatusFrame = new StarterStatusFrame("get installed app name", true,
+						ResourceBundle.getBundle("application", new Localise().getLocal()));
+				starterStatusFrame.setVisible(true);
+			}
 			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
 				String errorMessage = String.format(
 						"The prod parameter is true. You don't need to change the value of the field. Current: %s, should be: %s",
 						starterConfig.getServerFile(), StarterAppConfig.URI_APP_CONFIG);
 				throw new RuntimeException(errorMessage);
 			}
-			Starter s = new Starter(eventBus, starterConfig, bundle);
+			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusFrame);
 			s.collectOSInfoAndRegisterSubscriber();
 			s.updateApplication();
 			s.validateEnvironmentAndAppRequirements();

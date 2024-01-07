@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.Main;
-import by.gdev.handler.Localise;
 import by.gdev.handler.UpdateCore;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
@@ -91,9 +90,10 @@ public class Starter {
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle)
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException {
 		this.eventBus = eventBus;
+		starterStatusFrame = frame;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
@@ -118,8 +118,6 @@ public class Starter {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {
-			starterStatusFrame = new StarterStatusFrame(osType, "get installed app name", true,
-					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
 			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType, starterConfig));
 			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService, starterConfig));
