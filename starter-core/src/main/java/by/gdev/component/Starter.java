@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.config.RequestConfig;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.Main;
-import by.gdev.handler.Localise;
 import by.gdev.handler.UpdateCore;
 import by.gdev.handler.ValidateEnvironment;
 import by.gdev.handler.ValidateFont;
@@ -60,7 +60,6 @@ import by.gdev.util.StringVersionComparator;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
-import shaded_package.org.apache.commons.text.StringSubstitutor;
 
 /**
  * This class prepares information about the OS, validates the directories
@@ -89,9 +88,12 @@ public class Starter {
 	private String workDir;
 	private boolean hasInternet;
 	private UpdateCore updateCore;
+	private AppLocalConfig appLocalConfig;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle) {
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
+			throws UnsupportedOperationException, IOException {
 		this.eventBus = eventBus;
+		starterStatusFrame = frame;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
@@ -116,8 +118,6 @@ public class Starter {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		if (!GraphicsEnvironment.isHeadless()) {
-			starterStatusFrame = new StarterStatusFrame(osType, "get installed app name", true,
-					ResourceBundle.getBundle("application", new Localise().getLocal()));
 			eventBus.register(starterStatusFrame);
 			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType, starterConfig));
 			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService, starterConfig));
@@ -182,8 +182,15 @@ public class Starter {
 			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
 			jvm = gsonService.getLocalObject(j, JVMConfig.class);
 		}
-		Repo fileRepo = remoteAppConfig.getAppFileRepo();
+		appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		if (appLocalConfig == null) {
+			appLocalConfig = new AppLocalConfig();
+			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
+
 		updateApp(gsonService, fileMapperService);
+		Repo fileRepo = remoteAppConfig.getAppFileRepo();
 		Repo java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
 		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
@@ -209,13 +216,6 @@ public class Starter {
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
-				AppLocalConfig.class);
-		if (appLocalConfig == null) {
-			appLocalConfig = new AppLocalConfig();
-			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-		}
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == -1) {
 			if (!GraphicsEnvironment.isHeadless()) {
@@ -259,7 +259,7 @@ public class Starter {
 		javaProcess.addCommand(remoteAppConfig.getMainClass());
 		javaProcess.addCommands(remoteAppConfig.getAppArguments());
 		Map<String, String> map = new HashMap<>();
-		map.put("currentAppVersion", remoteAppConfig.getAppVersion());
+		map.put("currentAppVersion", appLocalConfig.getCurrentAppVersion());
 		StringSubstitutor substitutor = new StringSubstitutor(map);
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
 				.collect(Collectors.toList()));

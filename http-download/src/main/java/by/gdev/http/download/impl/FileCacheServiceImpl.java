@@ -92,7 +92,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 				return urlPath;
 			}
 		}
-		throw new IOException("file dont exists");
+		throw new IOException("file doesn't exist");
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
@@ -132,7 +132,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 						RequestMetadata.class);
 				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
-						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())) {
+						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
+						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
+								localMetadata.getSha1())) {
 					return urlPath;
 				} else {
 					httpService.getRequestByUrlAndSave(url, urlPath);
