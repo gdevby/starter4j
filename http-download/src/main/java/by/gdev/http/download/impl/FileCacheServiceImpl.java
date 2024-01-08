@@ -19,15 +19,11 @@ import by.gdev.http.download.service.HttpService;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.utils.service.FileMapperService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@AllArgsConstructor
 public class FileCacheServiceImpl implements FileCacheService {
 	private HttpService httpService;
-	private Gson gson;
-	private Charset charset;
 	/**
 	 * Directory for storing files and metadata files downloaded from the server
 	 */
@@ -36,6 +32,15 @@ public class FileCacheServiceImpl implements FileCacheService {
 	 * The time that the file is up-to-date
 	 */
 	private int timeToLife;
+
+	private FileMapperService fileMapperService;
+
+	public FileCacheServiceImpl(HttpService httpService, Gson gson, Charset charset, Path directory, int timeToLife) {
+		this.httpService = httpService;
+		this.directory = directory;
+		this.timeToLife = timeToLife;
+		fileMapperService = new FileMapperService(gson, charset, "");
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -51,14 +56,14 @@ public class FileCacheServiceImpl implements FileCacheService {
 			return getResourceWithHttpHead(url, urlPath, metaFile);
 		}
 	}
-	
+
 	@Override
-	public Path getRawObject(List<String> urls, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+	public Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException {
 		for (String url : urls) {
 			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
-			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath) : getResourceWithHttpHead(url, urlPath, metaFile);
+			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath)
+					: getResourceWithHttpHead(url, urlPath, metaFile);
 		}
 		throw new NullPointerException("metadata is empty");
 	}
@@ -71,14 +76,15 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 		throw new NullPointerException("metadata is empty");
 	}
-	
+
 	@Override
 	public Path getRawObject(List<String> urls) throws NoSuchAlgorithmException, IOException {
 		for (String url : urls) {
-			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_")).toAbsolutePath();
+			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"))
+					.toAbsolutePath();
 			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
 			if (urlPath.toFile().exists() && Files.exists(metaFile)) {
-				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
+				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
 						RequestMetadata.class);
 				String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 				if (!sha.equals(localMetadata.getSha1()))
@@ -95,7 +101,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (urlPath.toFile().lastModified() < purgeTime)
 			Files.deleteIfExists(urlPath);
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
-			RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
+			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
 					RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
@@ -122,7 +128,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		try {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
-				RequestMetadata localMetadata = new FileMapperService(gson, charset, "").read(metaFile.toString(),
+				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
 						RequestMetadata.class);
 				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
@@ -130,7 +136,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 					return urlPath;
 				} else {
 					httpService.getRequestByUrlAndSave(url, urlPath);
-					new FileMapperService(gson, charset, "").write(serverMetadata, metaFile.toString());
+					fileMapperService.write(serverMetadata, metaFile.toString());
 					return urlPath;
 				}
 			} else {
@@ -147,13 +153,13 @@ public class FileCacheServiceImpl implements FileCacheService {
 	private void createSha1(RequestMetadata metadata, Path urlPath, Path metaFile)
 			throws IOException, NoSuchAlgorithmException {
 		metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
-		new FileMapperService(gson, charset, "").write(metadata, metaFile.toString());
+		fileMapperService.write(metadata, metaFile.toString());
 	}
 
 	private void checkMetadataFile(Path metaFile, String url) throws IOException {
 		if (!metaFile.toFile().exists()) {
 			RequestMetadata metadata = httpService.getMetaByUrl(url);
-			new FileMapperService(gson, charset, "").write(metadata, metaFile.toString());
+			fileMapperService.write(metadata, metaFile.toString());
 		}
 	}
 }
