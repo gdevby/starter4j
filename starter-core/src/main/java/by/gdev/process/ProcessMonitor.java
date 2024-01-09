@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.common.eventbus.EventBus;
 
+import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppProcess;
 import by.gdev.util.DesktopUtil;
 import lombok.Getter;
@@ -49,7 +50,13 @@ public class ProcessMonitor extends Thread {
 				status.setProcess(this.process);
 				status.setExeption(t);
 				listener.post(status);
-				log.trace("Exit value = " + process.exitValue());
+				try {
+					int exitValue = process.exitValue();
+					log.trace("Exit value = {}", exitValue);
+				} catch (IllegalThreadStateException s) {
+					listener.post(new ExceptionMessage(s.getMessage()));
+					log.warn("warn", s);
+				}
 			} finally {
 				try {
 					IOUtils.close(buf);
