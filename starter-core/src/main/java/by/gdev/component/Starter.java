@@ -195,8 +195,9 @@ public class Starter {
 		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
-			container.conteinerAllSize(repo);
+			container.containerAllSize(repo);
 			container.filterNotExistResoursesAndSetRepo(repo, workDir);
+			container.downloadSize(repo, workDir);
 			container.setDestinationRepositories(workDir);
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
@@ -204,8 +205,9 @@ public class Starter {
 		DownloaderContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
 				StarterAppConfig.JRE_CONFIG);
 		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, StarterAppConfig.JRE_CONFIG);
-		jreContainer.conteinerAllSize(java);
+		jreContainer.containerAllSize(java);
 		jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
+		jreContainer.downloadSize(java, workDir);
 		jreContainer.setDestinationRepositories(workDir);
 		jreContainer.setHandlers(Arrays.asList(postHandler, archiveHandler));
 		downloader.addContainer(jreContainer);
