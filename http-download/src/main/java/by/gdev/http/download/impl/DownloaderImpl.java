@@ -4,8 +4,6 @@
 package by.gdev.http.download.impl;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -61,7 +59,8 @@ public class DownloaderImpl implements Downloader {
 	/**
 	 * Shown status of the downloading
 	 */
-	private List<Long> allConteinerSize = new ArrayList<Long>();
+	private List<Long> allContainerSize = new ArrayList<Long>();
+	private List<Long> allReadyDownloadSize = new ArrayList<Long>();
 	private volatile DownloaderStatusEnum status;
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
@@ -91,14 +90,15 @@ public class DownloaderImpl implements Downloader {
 			});
 		}
 		pathToDownload = container.getDestinationRepositories();
-		allConteinerSize.add(container.getContainerSize());
+		allContainerSize.add(container.getContainerSize());
+		allReadyDownloadSize.add(container.getReadyDownloadSize());
 	}
 
 	@Override
 	public void startDownload(boolean sync)
 			throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		fullDownloadSize = allConteinerSize.stream().reduce(Long::sum).orElse(0L);
-		sizeDownloadNow = sizeDownload();
+		fullDownloadSize = allContainerSize.stream().reduce(Long::sum).orElse(0L);
+		sizeDownloadNow = allReadyDownloadSize.stream().reduce(Long::sum).orElse(0L);
 		start = LocalTime.now();
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;
@@ -171,11 +171,5 @@ public class DownloaderImpl implements Downloader {
 		}
 		status = DownloaderStatusEnum.DONE;
 		eventBus.post(buildDownloaderStatus());
-	}
-
-	private long sizeDownload() throws IOException {
-		return Files.walk(Paths.get(pathToDownload))
-				.filter(p -> !p.toString().contains("jre_default") || (p.endsWith(".json")))
-				.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
 	}
 }

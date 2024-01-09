@@ -76,4 +76,14 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 		FileUtils.deleteDirectory(Paths.get(workDir, "jre_default").toFile());
 		FileUtils.deleteQuietly(path.toAbsolutePath().toFile());
 	}
+
+	public void containerAllSize(Repo repo) {
+		containerSize = repo.getResources().stream().map(Metadata::getSize).reduce(Long::sum).orElse(0L);
+	}
+
+	public void downloadSize(Repo repo, String workDirectory) {
+		readyDownloadSize = repo.getResources().stream().map(e -> {
+			return Paths.get(workDirectory, e.getPath()).toFile().length();
+		}).reduce(Long::sum).orElse(0L);
+	}
 }
