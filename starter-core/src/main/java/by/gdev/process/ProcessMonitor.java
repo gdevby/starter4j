@@ -52,9 +52,10 @@ public class ProcessMonitor extends Thread {
 				listener.post(status);
 				try {
 					int exitValue = process.exitValue();
-					log.trace("Exit value = {}", exitValue);
+					status.setErrorCode(exitValue);
 				} catch (IllegalThreadStateException s) {
 					listener.post(new ExceptionMessage(s.getMessage()));
+					status.setErrorCode(-3);
 					log.warn("warn", s);
 				}
 			} finally {
@@ -65,7 +66,6 @@ public class ProcessMonitor extends Thread {
 				}
 			}
 		}
-		status.setErrorCode(process.exitValue());
 		listener.post(status);
 	}
 }
