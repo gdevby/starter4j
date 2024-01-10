@@ -47,8 +47,10 @@ public class ConsoleSubscriber {
 				log.error(bundle.getString("driver.error"));
 			else if (status.getErrorCode() == -1073740771)
 				log.error(bundle.getString("msi.afterburner.error"));
-			else if (status.getErrorCode() != 0)
+			else if (status.getErrorCode() != 0) {
 				log.error(bundle.getString("unidentified.error"));
+				System.exit(0);
+			}
 		} else if (status.getLine().contains("starter can be closed"))
 			System.exit(0);
 		else
