@@ -32,6 +32,7 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 	private String workDir;
 	private String jreConfig;
 
+	@Override
 	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory)
 			throws NoSuchAlgorithmException, IOException {
 		this.repo = new Repo();
@@ -40,7 +41,7 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 		this.repo.setResources(Lists.newArrayList());
 		for (Metadata meta : repo.getResources()) {
 			File localFile = Paths.get(workDirectory, meta.getPath()).toAbsolutePath().toFile();
-			if (localFile.exists()) {
+			if (localFile.exists() && Files.exists(Paths.get(workDirectory, "jre_default"))) {
 				String shaLocalFile = DesktopUtil.getChecksum(localFile, Headers.SHA1.getValue());
 				BasicFileAttributes attr = Files.readAttributes(localFile.toPath(), BasicFileAttributes.class,
 						LinkOption.NOFOLLOW_LINKS);
