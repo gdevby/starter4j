@@ -64,7 +64,9 @@ public class Main {
 				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
 			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
-			log.error("Error", t);
+			else {
+				eventBus.post(new ExceptionMessage(bundle.getString("unidentified.error")));
+			}
 			System.exit(-1);
 		}
 	}
