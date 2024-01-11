@@ -100,7 +100,7 @@ public class DownloadRunnableImpl implements Runnable {
 					if (!file.getParentFile().exists())
 						file.getParentFile().mkdirs();
 					if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
-							&& file.length() != element.getMetadata().getSize()) {
+							&& file.length() < element.getMetadata().getSize()) {
 						httpGet.addHeader("Range", "bytes= " + file.length() + "-" + element.getMetadata().getSize());
 						resume = true;
 					}
