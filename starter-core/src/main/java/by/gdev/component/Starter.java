@@ -150,6 +150,7 @@ public class Starter {
 		Repo resources;
 		JVMConfig jvm;
 		if (hasInternet) {
+			log.info("app remote config: {}", serverFile.toString());
 			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
 			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
 					remoteAppConfig.getAppDependencies().getResources(), Repo.class, false);
