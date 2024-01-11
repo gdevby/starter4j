@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
@@ -95,8 +94,8 @@ public class DownloadRunnableImpl implements Runnable {
 				BufferedOutputStream out = null;
 				boolean resume = false;
 				String url = repo + element.getMetadata().getRelativeUrl();
+				log.trace(url);
 				HttpGet httpGet = new HttpGet(url);
-				log.trace(String.valueOf(httpGet));
 				try {
 					if (!file.getParentFile().exists())
 						file.getParentFile().mkdirs();
@@ -130,13 +129,13 @@ public class DownloadRunnableImpl implements Runnable {
 					eventBus.post(new DownloadFile(url, file.toString()));
 					LocalTime endTime = LocalTime.now();
 					element.setEnd(endTime);
-					DEFAULT_MAX_ATTEMPTS = 1;
+					return;
 				} finally {
 					httpGet.abort();
 					IOUtils.close(out);
 					IOUtils.close(in);
 				}
-			} catch (SocketTimeoutException e) {
+			} catch (Exception e) {
 				if (attempt == DEFAULT_MAX_ATTEMPTS)
 					throw e;
 			}
