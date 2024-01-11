@@ -16,7 +16,10 @@ import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
+import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.subscriber.ViewSubscriber;
+import by.gdev.util.OSInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,6 +41,8 @@ public class Main {
 				starterStatusFrame = new StarterStatusFrame("get installed app name", true,
 						ResourceBundle.getBundle("application", new Localise().getLocal()));
 				starterStatusFrame.setVisible(true);
+				eventBus.register(starterStatusFrame);
+				eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, OSInfo.getOSType(), starterConfig));
 			}
 			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
 				String errorMessage = String.format(
@@ -46,7 +51,7 @@ public class Main {
 				throw new RuntimeException(errorMessage);
 			}
 			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusFrame);
-			s.collectOSInfoAndRegisterSubscriber();
+			eventBus.register(new ConsoleSubscriber(bundle, s.getFileMapperService(), starterConfig));
 			s.updateApplication();
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();

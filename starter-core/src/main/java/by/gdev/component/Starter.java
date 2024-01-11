@@ -48,10 +48,8 @@ import by.gdev.model.AppLocalConfig;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcessHelper;
-import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.UpdateFrame;
-import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -59,6 +57,7 @@ import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.StringVersionComparator;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -84,6 +83,7 @@ public class Starter {
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private RequestConfig requestConfig;
+	@Getter
 	private FileMapperService fileMapperService;
 	private String workDir;
 	private boolean hasInternet;
@@ -91,7 +91,9 @@ public class Starter {
 	private AppLocalConfig appLocalConfig;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
-			throws UnsupportedOperationException, IOException {
+			throws UnsupportedOperationException, IOException, InterruptedException {
+		osType = OSInfo.getOSType();
+		osArc = OSInfo.getJavaBit();
 		this.eventBus = eventBus;
 		starterStatusFrame = frame;
 		this.bundle = bundle;
@@ -109,20 +111,6 @@ public class Starter {
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
 		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(), requestConfig);
-	}
-
-	/**
-	 * Get information about current OS
-	 */
-	public void collectOSInfoAndRegisterSubscriber() {
-		osType = OSInfo.getOSType();
-		osArc = OSInfo.getJavaBit();
-		if (!GraphicsEnvironment.isHeadless()) {
-			eventBus.register(starterStatusFrame);
-			eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, osType, starterConfig));
-			eventBus.register(new ConsoleSubscriber(bundle, fileMapperService, starterConfig));
-			starterStatusFrame.setVisible(true);
-		}
 	}
 
 	/**
