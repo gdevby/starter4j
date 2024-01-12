@@ -29,6 +29,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
+		log.info("starter was run");
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
