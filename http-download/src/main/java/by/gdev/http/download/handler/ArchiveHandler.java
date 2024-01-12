@@ -22,9 +22,11 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import by.gdev.http.upload.download.downloader.DownloadElement;
+import by.gdev.http.upload.download.downloader.DownloaderJavaContainer;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.model.download.JvmRepo;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
@@ -44,12 +46,14 @@ public class ArchiveHandler implements PostHandler {
 	public void postProcessDownloadElement(DownloadElement e) {
 		try {
 			Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
+			String jrePath = Paths
+					.get(DownloaderJavaContainer.JRE_DEFAULT, ((JvmRepo) e.getRepo()).getJreDirectoryName()).toString();
 			if (String.valueOf(p).endsWith(".zip"))
 				unZip(p.toFile(), new File(e.getPathToDownload()), false, false);
 			else
 				unTarGz(p.toFile(), new File(e.getPathToDownload()), false, false);
 			if (OSInfo.getOSType() == OSType.LINUX | OSInfo.getOSType() == OSType.MACOSX) {
-				Files.walk(Paths.get(e.getPathToDownload(), "jre_default"))
+				Files.walk(Paths.get(e.getPathToDownload(), jrePath))
 						.filter(f -> Files.isRegularFile(f) && (f.endsWith("java") || f.endsWith("java.exe")
 								|| f.endsWith("jspawnhelper") || f.endsWith("jspawnhelper.exe")))
 						.forEach(file -> {
@@ -60,11 +64,11 @@ public class ArchiveHandler implements PostHandler {
 							}
 						});
 			}
+			generateJreConfig(e.getPathToDownload(), jrePath);
+			Files.delete(p);
 		} catch (NoSuchAlgorithmException | IOException e2) {
 			log.info("Error with extracting archive ", e2);
 		}
-
-		generateJreConfig(e.getPathToDownload());
 
 	}
 
@@ -84,7 +88,7 @@ public class ArchiveHandler implements PostHandler {
 				new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(zip))))) {
 			TarArchiveEntry ze;
 			while ((ze = (TarArchiveEntry) zis.getNextEntry()) != null) {
-				String fileName = Paths.get("jre_default", ze.getName()).toString();
+				String fileName = Paths.get(DownloaderJavaContainer.JRE_DEFAULT, ze.getName()).toString();
 				if (ze.isDirectory())
 					continue;
 				unZipAndTarGz(fileName, folder, replace, zis, deleteEmptyFile);
@@ -99,7 +103,7 @@ public class ArchiveHandler implements PostHandler {
 				StandardCharsets.UTF_8)) {
 			ZipEntry ze;
 			while ((ze = zis.getNextEntry()) != null) {
-				String fileName = Paths.get("jre_default", ze.getName()).toString();
+				String fileName = Paths.get(DownloaderJavaContainer.JRE_DEFAULT, ze.getName()).toString();
 				if (ze.isDirectory())
 					continue;
 				unZipAndTarGz(fileName, folder, replace, zis, deleteEmptyFile);
@@ -129,12 +133,12 @@ public class ArchiveHandler implements PostHandler {
 		}
 	}
 
-	private void generateJreConfig(String path) {
+	private void generateJreConfig(String path, String jrePath) {
 		try {
-			List<Metadata> list = DesktopUtil.generateMetadataForJre(path, "jre_default");
+			List<Metadata> list = DesktopUtil.generateMetadataForJre(path, jrePath);
 			Repo r = new Repo();
 			r.setResources(list);
-			fileMapperService.write(r, "jre_default/" + jreConfig);
+			fileMapperService.write(r, Paths.get(jrePath, jreConfig).toString());
 		} catch (Exception e) {
 			log.error("error {}", e);
 		}

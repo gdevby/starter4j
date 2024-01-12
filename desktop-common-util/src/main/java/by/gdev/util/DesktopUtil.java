@@ -1,12 +1,15 @@
 package by.gdev.util;
 
 import java.awt.Desktop;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,17 +24,23 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.swing.JFileChooser;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Metadata;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -284,15 +293,15 @@ public class DesktopUtil {
 		}
 	}
 
-
 	public static List<String> generatePath(List<String> repositories, List<Metadata> resources) {
 		return repositories.stream().map(repo -> {
-			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl())).collect(Collectors.toList());
+			return resources.stream().map(res -> String.format("%s/%s", repo, res.getRelativeUrl()))
+					.collect(Collectors.toList());
 		}).flatMap(List::stream).collect(Collectors.toList());
 	}
-	
+
 	public static List<Metadata> generateMetadataForJre(String path, String jrePath) throws IOException {
-		return Files.walk(Paths.get(path, "jre_default")).filter(Files::isRegularFile)
+		return Files.walk(Paths.get(path, jrePath)).filter(Files::isRegularFile)
 				.filter(pr -> !(pr.getFileName().toString().endsWith(".json"))).map(DesktopUtil.wrap(p -> {
 					Metadata m = new Metadata();
 					m.setSha1(DesktopUtil.getChecksum(p.toFile(), "SHA-1"));
@@ -301,5 +310,24 @@ public class DesktopUtil {
 					m.setSize(p.toFile().length());
 					return m;
 				})).collect(Collectors.toList());
+	}
+
+	@SneakyThrows
+	public static String getRootFolderZip(File zip) {
+		if (zip.getName().endsWith(".tar.gz")) {
+			try (TarArchiveInputStream zis = new TarArchiveInputStream(
+					new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(zip))))) {
+				TarArchiveEntry ze = zis.getNextTarEntry();
+				return ze.getName();
+			}
+		} else if (zip.getName().endsWith(".zip")) {
+			try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(zip)),
+					StandardCharsets.UTF_8)) {
+				ZipEntry ze = zis.getNextEntry();
+				return ze.getName();
+			}
+		} else {
+			return "";
+		}
 	}
 }

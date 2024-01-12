@@ -24,6 +24,7 @@ import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.model.download.JvmRepo;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
@@ -98,8 +99,6 @@ public class AppConfigCreator {
 			Path s = jvms.relativize(e);
 			String simvLink = "";
 			Metadata m = new Metadata();
-			if (s.endsWith("java") | s.endsWith("java.exe"))
-				m.setExecutable(true);
 			m.setSha1(DesktopUtil.getChecksum(e.toFile(), "SHA-1"));
 			m.setPath(s.toString().replace("\\", "/"));
 			m.setSize(e.toFile().length());
@@ -134,21 +133,27 @@ public class AppConfigCreator {
 
 	JVMConfig createJreConfig(AppConfigModel configFile) throws IOException, NoSuchAlgorithmException {
 		JVMConfig jvm = new JVMConfig();
-		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, Repo>>>());
+		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, JvmRepo>>>());
 		for (Path pathTypeOS : listPath(Paths.get(configFile.getJavaFolder()))) {
 			OSType type = OSType.valueOf(pathTypeOS.getFileName().toString().toUpperCase(Locale.ROOT));
-			jvm.getJvms().put(type, new HashMap<OSInfo.Arch, Map<String, Repo>>());
+			jvm.getJvms().put(type, new HashMap<OSInfo.Arch, Map<String, JvmRepo>>());
 			for (Path pathArch : listPath(pathTypeOS)) {
 				Arch arch = Arch.valueOf(pathArch.getFileName().toString().toLowerCase(Locale.ROOT));
-				jvm.getJvms().get(type).put(arch, new HashMap<String, Repo>());
+				jvm.getJvms().get(type).put(arch, new HashMap<String, JvmRepo>());
 				for (Path pathKey : listPath(pathArch)) {
 					String key = String.valueOf(pathKey.getFileName().toString().toLowerCase(Locale.ROOT));
 					if (!(key.endsWith(".tar.gz") || key.endsWith(".zip")))
 						throw new RuntimeException("inaccessible jre archive format, use .tar.gz or .zip");
 					String javaFolder = Paths.get(configFile.getJavaFolder()).getFileName().toString();
 					String str = Paths.get(javaFolder, type.toString().toLowerCase(), arch.toString()).toString();
-					Repo repo = createRepo(pathKey.getParent(), pathKey, str, configFile);
-					jvm.getJvms().get(type).get(arch).put("jre_default", repo);
+					Repo r = createRepo(pathKey.getParent(), pathKey, str, configFile);
+					JvmRepo jvmRepo = new JvmRepo();
+					jvmRepo.setRepositories(r.getRepositories());
+					jvmRepo.setResources(r.getResources());
+					if (jvmRepo.getResources().size() != 1)
+						throw new RuntimeException("it should have only one archive with jvm");
+					jvmRepo.setJreDirectoryName(DesktopUtil.getRootFolderZip(pathKey.toFile()));
+					jvm.getJvms().get(type).get(arch).put("jre_default", jvmRepo);
 				}
 			}
 		}
