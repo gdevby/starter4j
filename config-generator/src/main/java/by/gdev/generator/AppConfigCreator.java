@@ -152,7 +152,10 @@ public class AppConfigCreator {
 					jvmRepo.setResources(r.getResources());
 					if (jvmRepo.getResources().size() != 1)
 						throw new RuntimeException("it should have only one archive with jvm");
-					jvmRepo.setJreDirectoryName(DesktopUtil.getRootFolderZip(pathKey.toFile()));
+					String s = DesktopUtil.getRootFolderZip(pathKey.toFile());
+					if (s.endsWith("/") || s.endsWith("\\"))
+						s = s.substring(0, s.length() - 1);
+					jvmRepo.setJreDirectoryName(s);
 					jvm.getJvms().get(type).get(arch).put("jre_default", jvmRepo);
 				}
 			}
