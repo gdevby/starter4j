@@ -37,25 +37,27 @@ public class ProcessMonitor extends Thread {
 		InputStreamReader reader = new InputStreamReader(process.getInputStream());
 		BufferedReader buf = new BufferedReader(reader);
 		String line;
-		StarterAppProcess status = new StarterAppProcess();
 		while (process.isAlive()) {
 			try {
 				while (Objects.nonNull(line = buf.readLine())) {
+					StarterAppProcess status = new StarterAppProcess();
 					status.setLine(line);
 					status.setProcess(process);
 					listener.post(status);
 				}
 			} catch (IOException t) {
 				DesktopUtil.sleep(1);
-				status.setProcess(this.process);
-				status.setExeption(t);
-				listener.post(status);
+				StarterAppProcess statusError = new StarterAppProcess();
+				statusError.setProcess(this.process);
+				statusError.setExeption(t);
+				statusError.setLine("error");
+				listener.post(statusError);
 				try {
 					int exitValue = process.exitValue();
-					status.setErrorCode(exitValue);
+					statusError.setErrorCode(exitValue);
 				} catch (IllegalThreadStateException s) {
 					listener.post(new ExceptionMessage(s.getMessage()));
-					status.setErrorCode(-3);
+					statusError.setErrorCode(-3);
 					log.warn("warn", s);
 				}
 			} finally {
@@ -66,6 +68,5 @@ public class ProcessMonitor extends Thread {
 				}
 			}
 		}
-		listener.post(status);
 	}
 }
