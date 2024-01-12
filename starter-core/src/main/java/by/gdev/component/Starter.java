@@ -55,6 +55,7 @@ import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.StringVersionComparator;
+import by.gdev.util.model.download.JvmRepo;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 import lombok.Getter;
@@ -78,6 +79,7 @@ public class Starter {
 	private OSType osType;
 	private Arch osArc;
 	private AppConfig remoteAppConfig;
+	private JVMConfig jvm;
 	private Repo dependencis;
 	private StarterStatusFrame starterStatusFrame;
 	private ResourceBundle bundle;
@@ -89,6 +91,7 @@ public class Starter {
 	private boolean hasInternet;
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
+	private JvmRepo java;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException, InterruptedException {
@@ -148,7 +151,6 @@ public class Starter {
 		DownloaderContainer container = new DownloaderContainer();
 		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, null);
 		Repo resources;
-		JVMConfig jvm;
 		if (hasInternet) {
 			log.info("app remote config: {}", serverFile.toString());
 			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
@@ -180,7 +182,7 @@ public class Starter {
 
 		updateApp(gsonService, fileMapperService);
 		Repo fileRepo = remoteAppConfig.getAppFileRepo();
-		Repo java = jvm.getJvms().get(osType).get(osArc).get("jre_default");
+		java = jvm.getJvms().get(osType).get(osArc).get(DownloaderJavaContainer.JRE_DEFAULT);
 		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
 		PostHandlerImpl postHandler = new PostHandlerImpl();
 		for (Repo repo : list) {
@@ -191,9 +193,9 @@ public class Starter {
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
 		}
-		DownloaderContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
-				StarterAppConfig.JRE_CONFIG);
-		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, StarterAppConfig.JRE_CONFIG);
+		DownloaderJavaContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
+				DownloaderJavaContainer.JRE_CONFIG);
+		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, DownloaderJavaContainer.JRE_CONFIG);
 		jreContainer.containerAllSize(java);
 		jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
 		jreContainer.downloadSize(java, workDir);
@@ -241,7 +243,8 @@ public class Starter {
 	 */
 	public void runApp() throws IOException, InterruptedException {
 		log.info("Start application");
-		Path jre = DesktopUtil.getJavaRun(Paths.get(workDir, "jre_default"));
+		Path jre = DesktopUtil
+				.getJavaRun(Paths.get(workDir, DownloaderJavaContainer.JRE_DEFAULT, java.getJreDirectoryName()));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
 		String classPath = DesktopUtil.convertListToString(File.pathSeparator,
 				javaProcess.librariesForRunning(workDir, remoteAppConfig.getAppFileRepo(), dependencis));
