@@ -3,12 +3,12 @@ package by.gdev.handler;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,10 @@ import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
+@Slf4j
 public class UpdateCore {
 
 	private ResourceBundle bundle;
@@ -52,8 +54,6 @@ public class UpdateCore {
 		String localeSha1 = DesktopUtil.getChecksum(jarFile, "SHA-1");
 		File temp = new File(jarFile.toString() + ".temp");
 		if (!update.getSha1().equals(localeSha1)) {
-			JLabelHtmlWrapper label = new JLabelHtmlWrapper(bundle.getString("update.message"));
-			JOptionPane.showMessageDialog(new JFrame(), label);
 			BufferedInputStream in = null;
 			BufferedOutputStream out = null;
 			HttpGet httpGet = new HttpGet(update.getUri());
@@ -74,7 +74,12 @@ public class UpdateCore {
 				IOUtils.close(out);
 				IOUtils.close(in);
 			}
-			Files.move(temp.toPath(), jarFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			JLabelHtmlWrapper label = new JLabelHtmlWrapper(bundle.getString("update.message"));
+			JOptionPane.showMessageDialog(new JFrame(), label, "", JOptionPane.INFORMATION_MESSAGE);
+			log.info("from {} to {}", temp.toPath().toString(), jarFile.toPath().toString());
+			try (OutputStream outputStream = new FileOutputStream(jarFile)) {
+				IOUtils.copy(new FileInputStream(temp), outputStream);
+			}
 			System.exit(0);
 		}
 	}
