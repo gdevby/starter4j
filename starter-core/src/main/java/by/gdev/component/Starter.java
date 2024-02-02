@@ -215,7 +215,8 @@ public class Starter {
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
 		StringVersionComparator versionComparator = new StringVersionComparator();
-		if (versionComparator.compare(appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()) == -1) {
+		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
+				remoteAppConfig.getAppVersion()) == -1) {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
