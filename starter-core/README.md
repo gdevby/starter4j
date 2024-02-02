@@ -21,7 +21,7 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 | -memory| 500 | The size of the required free disk space to download the application |  
 | -uriAppConfig| http://127.0.0.1:80/starter-app/, http://127.0.0.1:81/starter-app/  | The URI by which appConfig.json is available, which contains all the information about the application being launched, this config is used by all applications by default. The URI must be specified without a version, see the description of the version parameter|  
 | -workDirectory| starter  |The working directory where the files necessary for the application will be downloaded and where the application will run |  
-| -version| 1.0 | Specifies the version of the application to run. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. This way we can install older versions of the application | 
+| -version| null | Specifies the version of the application to run. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. This way we can install older versions of the application | 
 |-cacheDirectory| starter/cache  | Directory for storing cached configs |  
 |-urlConnection| http://www.google.com, http://www.baidu.com | List of sites to check Internet connection |
 |-attempts| 3 | Number of attempts to restore the connection|

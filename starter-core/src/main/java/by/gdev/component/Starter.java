@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -149,7 +150,7 @@ public class Starter {
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
 		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
-		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, null);
+		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
 		if (hasInternet) {
 			log.info("app remote config: {}", serverFile.toString());
@@ -177,6 +178,10 @@ public class Starter {
 		if (appLocalConfig == null) {
 			appLocalConfig = new AppLocalConfig();
 			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
+		if (Objects.nonNull(starterConfig.getVersion())) {
+			appLocalConfig.setCurrentAppVersion(starterConfig.getVersion());
 			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 		}
 

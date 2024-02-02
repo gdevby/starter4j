@@ -74,7 +74,7 @@ public class StarterAppConfig {
 	private boolean stop;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
-			Paths.get("starter/cache"), "1.0", Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
+			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
 			60000, 600000, false);
 
 	public List<String> getServerFileConfig(StarterAppConfig config, String version) {
