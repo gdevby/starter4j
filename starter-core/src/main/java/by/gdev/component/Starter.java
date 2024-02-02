@@ -155,6 +155,7 @@ public class Starter {
 		if (hasInternet) {
 			log.info("app remote config: {}", serverFile.toString());
 			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
+			updateApp(gsonService, fileMapperService);
 			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
 					remoteAppConfig.getAppDependencies().getResources(), Repo.class, false);
 			resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
@@ -185,7 +186,6 @@ public class Starter {
 			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 		}
 
-		updateApp(gsonService, fileMapperService);
 		Repo fileRepo = remoteAppConfig.getAppFileRepo();
 		java = jvm.getJvms().get(osType).get(osArc).get(DownloaderJavaContainer.JRE_DEFAULT);
 		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
