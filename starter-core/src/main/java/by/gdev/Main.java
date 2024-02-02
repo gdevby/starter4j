@@ -65,6 +65,7 @@ public class Main {
 						"https://gdev.by/help/java/check-disk"));
 			}
 		} catch (Throwable t) {
+			log.error("error", t);
 			String message = t.getMessage();
 			if ("file doesn't exist".equals(message)) {
 				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
