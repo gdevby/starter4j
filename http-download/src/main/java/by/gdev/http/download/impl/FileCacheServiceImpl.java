@@ -59,40 +59,54 @@ public class FileCacheServiceImpl implements FileCacheService {
 
 	@Override
 	public Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException {
+		IOException error = null;
 		for (String url : urls) {
-			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
-			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
-			return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath)
-					: getResourceWithHttpHead(url, urlPath, metaFile);
+			try {
+				Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
+				Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
+				return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath)
+						: getResourceWithHttpHead(url, urlPath, metaFile);
+			} catch (IOException e) {
+				error = e;
+			}
 		}
-		throw new NullPointerException("metadata is empty");
+		throw error;
 	}
 
 	@Override
 	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)
 			throws IOException, NoSuchAlgorithmException {
+		IOException error = null;
 		for (String url : urls) {
-			return getRawObject(url + metadata.getRelativeUrl(), cache);
+			try {
+				return getRawObject(url + metadata.getRelativeUrl(), cache);
+			} catch (IOException e) {
+				error = e;
+			}
 		}
-		throw new NullPointerException("metadata is empty");
+		throw error;
 	}
 
 	@Override
 	public Path getRawObject(List<String> urls) throws NoSuchAlgorithmException, IOException {
+		IOException error = null;
 		for (String url : urls) {
-			Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"))
-					.toAbsolutePath();
-			Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
-			if (urlPath.toFile().exists() && Files.exists(metaFile)) {
-				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
-						RequestMetadata.class);
-				String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
-				if (!sha.equals(localMetadata.getSha1()))
-					throw new IOException("sha not equals");
-				return urlPath;
+			try {
+				Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"))
+						.toAbsolutePath();
+				Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
+				if (urlPath.toFile().exists() && Files.exists(metaFile)) {
+					RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
+					String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
+					if (!sha.equals(localMetadata.getSha1()))
+						throw new IOException("sha not equals");
+					return urlPath;
+				}
+			} catch (IOException e) {
+				error = e;
 			}
 		}
-		throw new IOException("file doesn't exist");
+		throw error;
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
@@ -101,8 +115,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (urlPath.toFile().lastModified() < purgeTime)
 			Files.deleteIfExists(urlPath);
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
-			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
-					RequestMetadata.class);
+			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (sha.equals(localMetadata.getSha1())) {
 				log.trace("HTTP HEAD -> " + url);
@@ -128,8 +141,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		try {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
-				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(),
-						RequestMetadata.class);
+				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())

@@ -43,32 +43,28 @@ public class ArchiveHandler implements PostHandler {
 	private String jreConfig;
 
 	@Override
-	public void postProcessDownloadElement(DownloadElement e) {
-		try {
-			Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
-			String jrePath = Paths
-					.get(DownloaderJavaContainer.JRE_DEFAULT, ((JvmRepo) e.getRepo()).getJreDirectoryName()).toString();
-			if (String.valueOf(p).endsWith(".zip"))
-				unZip(p.toFile(), new File(e.getPathToDownload()), false, false);
-			else
-				unTarGz(p.toFile(), new File(e.getPathToDownload()), false, false);
-			if (OSInfo.getOSType() == OSType.LINUX | OSInfo.getOSType() == OSType.MACOSX) {
-				Files.walk(Paths.get(e.getPathToDownload(), jrePath))
-						.filter(f -> Files.isRegularFile(f) && (f.endsWith("java") || f.endsWith("java.exe")
-								|| f.endsWith("jspawnhelper") || f.endsWith("jspawnhelper.exe")))
-						.forEach(file -> {
-							try {
-								Files.setPosixFilePermissions(file, DesktopUtil.PERMISSIONS);
-							} catch (IOException e1) {
-								log.error("Error with set file permissions ", e1);
-							}
-						});
-			}
-			generateJreConfig(e.getPathToDownload(), jrePath);
-			Files.delete(p);
-		} catch (NoSuchAlgorithmException | IOException e2) {
-			log.info("Error with extracting archive ", e2);
+	public void postProcessDownloadElement(DownloadElement e) throws IOException, NoSuchAlgorithmException {
+		Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
+		String jrePath = Paths.get(DownloaderJavaContainer.JRE_DEFAULT, ((JvmRepo) e.getRepo()).getJreDirectoryName())
+				.toString();
+		if (String.valueOf(p).endsWith(".zip"))
+			unZip(p.toFile(), new File(e.getPathToDownload()), false, false);
+		else
+			unTarGz(p.toFile(), new File(e.getPathToDownload()), false, false);
+		if (OSInfo.getOSType() == OSType.LINUX | OSInfo.getOSType() == OSType.MACOSX) {
+			Files.walk(Paths.get(e.getPathToDownload(), jrePath))
+					.filter(f -> Files.isRegularFile(f) && (f.endsWith("java") || f.endsWith("java.exe")
+							|| f.endsWith("jspawnhelper") || f.endsWith("jspawnhelper.exe")))
+					.forEach(file -> {
+						try {
+							Files.setPosixFilePermissions(file, DesktopUtil.PERMISSIONS);
+						} catch (IOException e1) {
+							log.error("Error with set file permissions ", e1);
+						}
+					});
 		}
+		generateJreConfig(e.getPathToDownload(), jrePath);
+		Files.delete(p);
 
 	}
 

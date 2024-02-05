@@ -13,7 +13,6 @@ import by.gdev.http.download.model.Headers;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.util.DesktopUtil;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Checks the hash sum and size of the downloaded file with the value specified
@@ -22,44 +21,29 @@ import lombok.extern.slf4j.Slf4j;
  * @author Robert Makrytski
  *
  */
-@Slf4j
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {
 
 	@Override
-	public void postProcessDownloadElement(DownloadElement element) {
-		try {
+	public void postProcessDownloadElement(DownloadElement element) throws NoSuchAlgorithmException, IOException {
 
-			Path localeFile = Paths.get(element.getPathToDownload(), element.getMetadata().getPath());
-			String shaLocalFile = DesktopUtil.getChecksum(localeFile.toFile(), Headers.SHA1.getValue());
-			long sizeLocalFile = localeFile.toFile().length();
-			if (sizeLocalFile != element.getMetadata().getSize()
-					&& StringUtils.isEmpty(element.getMetadata().getLink())) {
-				element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(),
-						element.getPathToDownload() + element.getMetadata().getPath(),
-						"The size should be " + element.getMetadata().getSize()));
-				removeFile(localeFile);
-			}
-
-			if (!shaLocalFile.equals(element.getMetadata().getSha1())
-					&& StringUtils.isEmpty(element.getMetadata().getLink())) {
-				element.setError(new HashSumAndSizeError(
-						element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
-						element.getPathToDownload() + element.getMetadata().getPath(),
-						"The hash sum should be " + element.getMetadata().getSha1()));
-				removeFile(localeFile);
-			}
-
-		} catch (IOException | NoSuchAlgorithmException e) {
-			log.error("Erorr", e);
+		Path localeFile = Paths.get(element.getPathToDownload(), element.getMetadata().getPath());
+		String shaLocalFile = DesktopUtil.getChecksum(localeFile.toFile(), Headers.SHA1.getValue());
+		long sizeLocalFile = localeFile.toFile().length();
+		if (sizeLocalFile != element.getMetadata().getSize() && StringUtils.isEmpty(element.getMetadata().getLink())) {
+			element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(),
+					element.getPathToDownload() + element.getMetadata().getPath(), String.format(
+							"The size should be %s, but was %s", element.getMetadata().getSize(), sizeLocalFile)));
+			Files.deleteIfExists(localeFile.toAbsolutePath());
 		}
-	}
 
-	private void removeFile(Path localeFile) {
-		try {
-			Files.delete(localeFile.toAbsolutePath());
-		} catch (IOException e) {
-			log.error("file can't be deleted {}", e.getMessage());
+		if (!shaLocalFile.equals(element.getMetadata().getSha1())
+				&& StringUtils.isEmpty(element.getMetadata().getLink())) {
+			element.setError(new HashSumAndSizeError(
+					element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
+					element.getPathToDownload() + element.getMetadata().getPath(), String.format(
+							"The hash sum should be %s, but was %s", element.getMetadata().getSha1(), shaLocalFile)));
+			Files.deleteIfExists(localeFile.toAbsolutePath());
 		}
 	}
 }
