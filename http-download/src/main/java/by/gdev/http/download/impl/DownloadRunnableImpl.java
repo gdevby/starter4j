@@ -21,6 +21,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import com.google.common.eventbus.EventBus;
 
 import by.gdev.http.download.exeption.UploadFileException;
+import by.gdev.http.download.handler.PostHandler;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
@@ -62,7 +63,8 @@ public class DownloadRunnableImpl implements Runnable {
 					for (String repo : element.getRepo().getRepositories()) {
 						try {
 							download(element, repo);
-							element.getHandlers().forEach(post -> post.postProcessDownloadElement(element));
+							for (PostHandler h : element.getHandlers())
+								h.postProcessDownloadElement(element);
 							break;
 						} catch (Throwable e1) {
 							element.setError(new UploadFileException(repo + element.getMetadata().getRelativeUrl(),

@@ -35,8 +35,10 @@ public class ConsoleSubscriber {
 						status.getLeftFiles(), status.getAllFiles(), status.getDownloadSize() / 1048576,
 						status.getAllDownloadSize() / 1048576));
 		if (status.getDownloaderStatusEnum().equals(DownloaderStatusEnum.DONE))
-			if (status.getThrowables().size() != 0)
+			if (status.getThrowables().size() != 0) {
+				log.error("error", status.getThrowables().get(0));
 				System.exit(-1);
+			}
 	}
 
 	@Subscribe
