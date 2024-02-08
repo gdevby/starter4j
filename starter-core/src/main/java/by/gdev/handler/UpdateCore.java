@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +81,7 @@ public class UpdateCore {
 			try (OutputStream outputStream = new FileOutputStream(jarFile)) {
 				IOUtils.copy(new FileInputStream(temp), outputStream);
 			}
+			Files.deleteIfExists(temp.toPath());
 			System.exit(0);
 		}
 	}
