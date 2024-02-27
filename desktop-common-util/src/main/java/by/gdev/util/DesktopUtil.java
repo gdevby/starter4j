@@ -152,6 +152,14 @@ public class DesktopUtil {
 		}
 	}
 
+	public static <T> void uncheckCallVoid(Callable<T> callable) {
+		try {
+			callable.call();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * {@inheritDoc CheckedFunction}
 	 */
