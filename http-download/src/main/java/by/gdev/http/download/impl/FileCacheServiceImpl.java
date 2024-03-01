@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -98,7 +99,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 				if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 					RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 					String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
-					if (!sha.equals(localMetadata.getSha1()))
+					if (Objects.isNull(localMetadata) || !Objects.equals(localMetadata.getSha1(), sha))
 						throw new IOException("sha not equals");
 					return urlPath;
 				}
@@ -117,8 +118,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
-			if (sha.equals(localMetadata.getSha1())) {
-				log.trace("HTTP HEAD -> " + url);
+			if (Objects.nonNull(localMetadata) && Objects.equals(localMetadata.getSha1(), sha)) {
+				log.trace("use local file -> " + url);
 				return urlPath;
 			} else {
 				log.trace("not proper hashsum HTTP GET -> " + url);
@@ -142,7 +143,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
-				if (StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
+				if (Objects.nonNull(localMetadata)
+						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
 						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
