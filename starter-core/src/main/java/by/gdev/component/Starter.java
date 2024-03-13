@@ -175,7 +175,11 @@ public class Starter {
 			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
 			jvm = gsonService.getLocalObject(j, JVMConfig.class);
 		}
-		appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		try {
+			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		} catch (Exception e) {
+			log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
+		}
 		if (appLocalConfig == null) {
 			appLocalConfig = new AppLocalConfig();
 			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
