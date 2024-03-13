@@ -81,7 +81,6 @@ public class UpdateCore {
 			try (OutputStream outputStream = new FileOutputStream(jarFile)) {
 				IOUtils.copy(new FileInputStream(temp), outputStream);
 			}
-			Files.deleteIfExists(temp.toPath());
 			System.exit(0);
 		}
 	}
@@ -94,5 +93,15 @@ public class UpdateCore {
 			return gsonService.getObjectWithoutSaving(uri, mapType);
 		}
 		return null;
+	}
+
+	public static void deleteTmpFileIfExist() {
+		try {
+			File jarFile = new File(URLDecoder
+					.decode(FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+			Files.deleteIfExists(new File(jarFile.toString() + ".temp").toPath());
+		} catch (Throwable e) {
+			log.error("error", e);
+		}
 	}
 }
