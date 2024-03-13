@@ -91,6 +91,7 @@ public class HttpServiceImpl implements HttpService {
 		return request;
 	}
 
+	@Override
 	public String getRequestByUrl(String url) throws IOException {
 		return getRequestByUrl(url, null);
 	}
@@ -114,7 +115,8 @@ public class HttpServiceImpl implements HttpService {
 						String.format("code %s phrase %s %s", st.getStatusCode(), st.getReasonPhrase(), url));
 			}
 		} finally {
-			httpGet.abort();
+			if (Objects.nonNull(httpGet))
+				httpGet.abort();
 			IOUtils.closeQuietly(in);
 		}
 	}
@@ -162,7 +164,8 @@ public class HttpServiceImpl implements HttpService {
 				curread = in.read(buffer);
 			}
 		} finally {
-			httpGet.abort();
+			if (Objects.nonNull(httpGet))
+				httpGet.abort();
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
