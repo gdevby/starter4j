@@ -14,6 +14,7 @@ import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
+import by.gdev.handler.UpdateCore;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
@@ -57,6 +58,7 @@ public class Main {
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();
 			s.runApp();
+			UpdateCore.deleteTmpFileIfExist();
 		} catch (FileSystemException ex) {
 			log.error("error", ex);
 			if (Objects.nonNull(bundle)) {
