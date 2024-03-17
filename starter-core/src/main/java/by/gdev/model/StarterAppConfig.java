@@ -100,7 +100,7 @@ public class StarterAppConfig {
 		if (starterFile.exists()) {
 			AppLocalConfig app = new FileMapperService(Main.GSON, Main.charset, "").read(starterFile.toString(),
 					AppLocalConfig.class);
-			if (!StringUtils.isEmpty(app.getDir()))
+			if (Objects.nonNull(app) && !StringUtils.isEmpty(app.getDir()))
 				return Paths.get(app.getDir()).toAbsolutePath().toString();
 		}
 		Path installer = Paths.get("installer.properties").toAbsolutePath();
