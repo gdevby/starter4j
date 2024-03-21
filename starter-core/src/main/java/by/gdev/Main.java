@@ -59,6 +59,7 @@ public class Main {
 			s.prepareResources();
 			s.runApp();
 			UpdateCore.deleteTmpFileIfExist();
+
 		} catch (FileSystemException ex) {
 			log.error("error", ex);
 			if (Objects.nonNull(bundle)) {
@@ -74,7 +75,7 @@ public class Main {
 			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
 			else {
-				eventBus.post(new ExceptionMessage(bundle.getString("unidentified.error")));
+				eventBus.post(new ExceptionMessage(bundle.getString("unidentified.error"), t));
 			}
 			System.exit(-1);
 		}

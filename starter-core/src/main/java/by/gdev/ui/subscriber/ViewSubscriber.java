@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -75,7 +76,9 @@ public class ViewSubscriber {
 
 	@Subscribe
 	public void message(ExceptionMessage s) {
-		JLabelHtmlWrapper label = new JLabelHtmlWrapper(s.getMessage());
+		JLabelHtmlWrapper label = new JLabelHtmlWrapper(s.getMessage() + (Objects.nonNull(s.getError())
+				? "<br> <br>" + ExceptionUtils.getStackTrace(s.getError()).replaceAll("\n", "<br>")
+				: ""));
 		if (Objects.nonNull(s.getLink())) {
 			label.addMouseListener(new MouseAdapter() {
 				@Override
@@ -87,5 +90,6 @@ public class ViewSubscriber {
 			});
 		}
 		JOptionPane.showMessageDialog(frame, label, "", JOptionPane.ERROR_MESSAGE);
+
 	}
 }
