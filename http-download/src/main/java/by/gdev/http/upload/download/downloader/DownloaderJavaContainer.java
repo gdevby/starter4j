@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.io.FileUtils;
 
@@ -67,12 +68,14 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 		}
 		List<Metadata> configMetadata = new ArrayList<Metadata>();
 		if (!notExistJre) {
-			configMetadata = fileMapperService
-					.read(Paths.get(JRE_DEFAULT, repo.getJreDirectoryName(), jreConfig).toString(), Repo.class)
-					.getResources();
-			List<Metadata> localeJreMetadata = DesktopUtil.generateMetadataForJre(workDir,
-					Paths.get(JRE_DEFAULT, repo.getJreDirectoryName()).toString());
-			configMetadata.removeAll(localeJreMetadata);
+			Repo repo1 = fileMapperService
+					.read(Paths.get(JRE_DEFAULT, repo.getJreDirectoryName(), jreConfig).toString(), Repo.class);
+			if (Objects.nonNull(repo1)) {
+				configMetadata = repo1.getResources();
+				List<Metadata> localeJreMetadata = DesktopUtil.generateMetadataForJre(workDir,
+						Paths.get(JRE_DEFAULT, repo.getJreDirectoryName()).toString());
+				configMetadata.removeAll(localeJreMetadata);
+			}
 		}
 
 		if (notExistJre || configMetadata.size() != 0) {
