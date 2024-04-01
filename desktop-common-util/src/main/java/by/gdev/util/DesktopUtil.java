@@ -193,6 +193,7 @@ public class DesktopUtil {
 				return maxAttepmts;
 
 			} catch (IOException e) {
+				log.info("error during test net {} {}", url, e.getMessage());
 			}
 		}
 		return attempt;
