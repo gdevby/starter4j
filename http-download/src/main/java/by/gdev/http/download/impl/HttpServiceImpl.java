@@ -122,22 +122,9 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	private RequestMetadata getMetadata(String url) throws IOException {
-		RequestMetadata request = new RequestMetadata();
 		HttpHead httpUrl = new HttpHead(url);
 		CloseableHttpResponse response = getResponse(httpUrl);
-		if (response.containsHeader(Headers.ETAG.getValue()))
-			request.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
-		else
-			request.setETag(null);
-		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
-			request.setLastModified(
-					response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
-		else
-			request.setLastModified(null);
-		if (response.containsHeader(Headers.CONTENTLENGTH.getValue()))
-			request.setContentLength(response.getFirstHeader(Headers.CONTENTLENGTH.getValue()).getValue());
-		else
-			request.setContentLength(null);
+		RequestMetadata request = generateRequestMetadata(response);
 		return request;
 	}
 
@@ -163,21 +150,32 @@ public class HttpServiceImpl implements HttpService {
 				out.write(buffer, 0, curread);
 				curread = in.read(buffer);
 			}
+			Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+			RequestMetadata requestMetadata = generateRequestMetadata(response);
+			return requestMetadata;
 		} finally {
 			if (Objects.nonNull(httpGet))
 				httpGet.abort();
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
-		Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-		return getMetadata(url);
 	}
 
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
 		http.setConfig(requestConfig);
 		return httpclient.execute(http);
 	}
-
+	
+	private RequestMetadata generateRequestMetadata(CloseableHttpResponse response) {
+		RequestMetadata requestMetadata = new RequestMetadata();
+		if (response.containsHeader(Headers.ETAG.getValue()))
+			requestMetadata.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));
+		if (response.containsHeader(Headers.LASTMODIFIED.getValue()))
+			requestMetadata.setLastModified(
+					response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
+		return requestMetadata;
+	}
+	
 	@Override
 	public String getRequestByUrl(String url, Map<String, String> map) throws IOException {
 		SocketTimeoutException ste = null;
