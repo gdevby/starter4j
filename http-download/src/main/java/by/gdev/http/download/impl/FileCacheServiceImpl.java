@@ -130,7 +130,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		} else {
 			log.trace("HTTP GET -> " + url);
 			httpService.getRequestByUrlAndSave(url, urlPath);
-			checkMetadataFile(metaFile, url);
+			checkMetadataFile(metaFile, urlPath, url);
 			return urlPath;
 		}
 	}
@@ -138,14 +138,13 @@ public class FileCacheServiceImpl implements FileCacheService {
 	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile)
 			throws IOException, NoSuchAlgorithmException {
 		boolean fileExists = urlPath.toFile().exists();
-		checkMetadataFile(metaFile, url);
 		try {
 			if (fileExists) {
+				checkMetadataFile(metaFile, urlPath, url);
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 				if (Objects.nonNull(localMetadata)
 						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
-						&& StringUtils.equals(serverMetadata.getContentLength(), localMetadata.getContentLength())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
 						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
 								localMetadata.getSha1())) {
@@ -172,9 +171,11 @@ public class FileCacheServiceImpl implements FileCacheService {
 		fileMapperService.write(metadata, metaFile.toString());
 	}
 
-	private void checkMetadataFile(Path metaFile, String url) throws IOException {
+	
+	private void checkMetadataFile(Path metaFile, Path urlPath, String url) throws IOException, NoSuchAlgorithmException {
 		if (!metaFile.toFile().exists()) {
 			RequestMetadata metadata = httpService.getMetaByUrl(url);
+			metadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 			fileMapperService.write(metadata, metaFile.toString());
 		}
 	}
