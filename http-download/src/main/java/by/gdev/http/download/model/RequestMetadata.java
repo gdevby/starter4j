@@ -8,7 +8,6 @@ import lombok.Data;
  */
 @Data
 public class RequestMetadata {
-	private String contentLength;
 	private String lastModified;
 	private String eTag;
 	private String sha1;
