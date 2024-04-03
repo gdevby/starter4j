@@ -75,6 +75,8 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 				List<Metadata> localeJreMetadata = DesktopUtil.generateMetadataForJre(workDir,
 						Paths.get(JRE_DEFAULT, repo.getJreDirectoryName()).toString());
 				configMetadata.removeAll(localeJreMetadata);
+			} else {
+				notExistJre = true;
 			}
 		}
 
