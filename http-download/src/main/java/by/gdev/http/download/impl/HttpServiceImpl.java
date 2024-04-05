@@ -135,8 +135,9 @@ public class HttpServiceImpl implements HttpService {
 		if (!path.toFile().getParentFile().exists())
 			path.toFile().getParentFile().mkdirs();
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
+		CloseableHttpResponse response;
 		try {
-			CloseableHttpResponse response = getResponse(httpGet);
+			response = getResponse(httpGet);
 			StatusLine st = response.getStatusLine();
 			HttpEntity entity = response.getEntity();
 			if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
@@ -150,22 +151,23 @@ public class HttpServiceImpl implements HttpService {
 				out.write(buffer, 0, curread);
 				curread = in.read(buffer);
 			}
-			Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-			RequestMetadata requestMetadata = generateRequestMetadata(response);
-			return requestMetadata;
 		} finally {
 			if (Objects.nonNull(httpGet))
 				httpGet.abort();
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
+		Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+		RequestMetadata requestMetadata = generateRequestMetadata(response);
+		return requestMetadata;
+
 	}
 
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
 		http.setConfig(requestConfig);
 		return httpclient.execute(http);
 	}
-	
+
 	private RequestMetadata generateRequestMetadata(CloseableHttpResponse response) {
 		RequestMetadata requestMetadata = new RequestMetadata();
 		if (response.containsHeader(Headers.ETAG.getValue()))
@@ -175,7 +177,7 @@ public class HttpServiceImpl implements HttpService {
 					response.getFirstHeader(Headers.LASTMODIFIED.getValue()).getValue().replaceAll("\"", ""));
 		return requestMetadata;
 	}
-	
+
 	@Override
 	public String getRequestByUrl(String url, Map<String, String> map) throws IOException {
 		SocketTimeoutException ste = null;
