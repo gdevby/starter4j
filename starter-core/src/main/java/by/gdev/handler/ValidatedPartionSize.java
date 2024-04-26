@@ -21,7 +21,6 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 
 	@Override
 	public boolean validate() {
-		System.out.println(workDir.toPath().getRoot());
 		try {
 			if (!workDir.exists())
 				workDir.mkdirs();
