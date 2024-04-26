@@ -5,6 +5,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
@@ -17,6 +18,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -339,4 +341,14 @@ public class DesktopUtil {
 			return "";
 		}
 	}
+	
+    public static String getTime(Class<?> cl) {
+        try {
+            String rn = cl.getName().replace('.', '/') + ".class";
+            JarURLConnection j = (JarURLConnection) cl.getClassLoader().getResource(rn).openConnection();
+            return new Date(j.getJarFile().getEntry("META-INF/MANIFEST.MF").getTime()).toString();
+        } catch (Exception e) {
+        	return "dev";
+        }
+    }
 }
