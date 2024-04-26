@@ -72,10 +72,12 @@ public class StarterAppConfig {
 	private int timeToLife;
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
+	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. Doesn't implemented.")
+	private String logURIService;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
 			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
-			60000, 600000, false);
+			60000, 600000, false, null);
 
 	public List<String> getServerFileConfig(StarterAppConfig config, String version) {
 		return config.getServerFile().stream().map(file -> {
