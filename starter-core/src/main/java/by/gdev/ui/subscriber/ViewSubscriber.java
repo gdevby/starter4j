@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,6 @@ import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterAppProcess;
-import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
@@ -76,11 +76,17 @@ public class ViewSubscriber {
 
 	@Subscribe
 	public void message(ExceptionMessage s) {
-		JLabelHtmlWrapper label = new JLabelHtmlWrapper(s.getMessage() + (Objects.nonNull(s.getError())
-				? "<br> <br>" + ExceptionUtils.getStackTrace(s.getError()).replaceAll("\n", "<br>")
-				: ""));
+		JTextPane f = new JTextPane();
+		f.setContentType("text/html");
+		f.setText(String.format("<html>%s</html>",
+				s.getMessage() + (Objects.nonNull(s.getError())
+						? "<br> <br>" + ExceptionUtils.getStackTrace(s.getError()).replaceAll("\n", "<br>")
+						: "")));
+		f.setEditable(false);
+		f.setBackground(null);
+		f.setBorder(null);
 		if (Objects.nonNull(s.getLink())) {
-			label.addMouseListener(new MouseAdapter() {
+			f.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if (SwingUtilities.isLeftMouseButton(e)) {
@@ -89,7 +95,7 @@ public class ViewSubscriber {
 				}
 			});
 		}
-		JOptionPane.showMessageDialog(frame, label, "", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(frame, f, "", JOptionPane.ERROR_MESSAGE);
 
 	}
 }
