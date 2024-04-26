@@ -20,6 +20,7 @@ import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.subscriber.ViewSubscriber;
+import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,10 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
-
+    
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
 		log.info("starter was run");
+		log.info("starter created {}", DesktopUtil.getTime(Main.class));
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
