@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
@@ -20,6 +21,7 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 
 	@Override
 	public boolean validate() {
+		System.out.println(workDir.toPath().getRoot());
 		try {
 			if (!workDir.exists())
 				workDir.mkdirs();
@@ -34,6 +36,7 @@ public class ValidatedPartionSize implements ValidateEnvironment {
 	
 	@Override
 	public ExceptionMessage getExceptionMessage() {
-		return new ExceptionMessage(String.format(bundle.getString("validate.size"), workDir , workDir.getFreeSpace() / 1024 / 1024, workDir));
+		Path disk = workDir.toPath().getRoot();
+		return new ExceptionMessage(String.format(bundle.getString("validate.size"), disk , workDir.getFreeSpace() / 1024 / 1024, disk));
 	}
 }
