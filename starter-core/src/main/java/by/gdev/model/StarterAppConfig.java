@@ -72,7 +72,8 @@ public class StarterAppConfig {
 	private int timeToLife;
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
-	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. Doesn't implemented.")
+	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. "
+			+ "Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest")
 	private String logURIService;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
