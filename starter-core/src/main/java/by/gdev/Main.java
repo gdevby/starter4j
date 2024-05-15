@@ -1,11 +1,16 @@
 package by.gdev;
 
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
+
+import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.eventbus.EventBus;
@@ -22,6 +27,9 @@ import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -37,7 +45,9 @@ public class Main {
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
+		loadLogbackConfig(starterConfig);
 		ResourceBundle bundle = null;
+
 		try {
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 			StarterStatusFrame starterStatusFrame = null;
@@ -77,9 +87,24 @@ public class Main {
 			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
 			else {
-				eventBus.post(new ExceptionMessage(bundle.getString("unidentified.error"), t));
+				String s1 = Objects.nonNull(starterConfig.getLogURIService()) ? "unidentified.error"
+						: "unidentified.error.1";
+				eventBus.post(new ExceptionMessage(bundle.getString(s1), t, true));
 			}
 			System.exit(-1);
 		}
+	}
+
+	protected static void loadLogbackConfig(StarterAppConfig starterConfig) throws JoranException, IOException {
+		System.setProperty("logs_dir", Paths.get(".").toAbsolutePath().toString());
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		loggerContext.reset();
+		JoranConfigurator configurator = new JoranConfigurator();
+		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		InputStream configStream = classloader.getResourceAsStream("logbackFull.xml");
+		configurator.setContext(loggerContext);
+		configurator.doConfigure(configStream); // loads logback file
+		configStream.close();
+		log.info("logs directory {}", System.getProperty("logs_dir") + "/logs/starter/");
 	}
 }
