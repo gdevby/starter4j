@@ -1,0 +1,25 @@
+<configuration>
+	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <!-- Logging configuration -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %logger{15} %-5level - %msg%n</pattern>
+        </encoder>
+      
+    </appender>
+    <appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logs_dir}/logs/starter/log.%d{yyyy-MM-dd_HH}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{15}- %msg%n</pattern>
+        </encoder>
+    </appender>
+<!-- <logger level="trace" name="by.gdev"/> -->
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_APPENDER"/>
+    </root>
+</configuration>

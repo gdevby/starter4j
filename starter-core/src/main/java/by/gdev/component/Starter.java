@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -93,6 +94,8 @@ public class Starter {
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 	private JvmRepo java;
+	@Getter
+	private CloseableHttpClient client;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException, InterruptedException {
@@ -115,6 +118,7 @@ public class Starter {
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
 		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(), requestConfig);
+		client = HttpClientConfig.getInstanceHttpClient();
 	}
 
 	/**
