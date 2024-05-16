@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.IOExceptionList;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
@@ -72,7 +73,7 @@ public class Main {
 			s.runApp();
 			UpdateCore.deleteTmpFileIfExist();
 
-		} catch (FileSystemException ex) {
+		} catch (FileSystemException | IOExceptionList ex) {
 			log.error("error", ex);
 			if (Objects.nonNull(bundle)) {
 				eventBus.post(new ExceptionMessage(
