@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DownloaderContainer {
 	String destinationRepositories;
 	long containerSize;
-	long readyDownloadSize;
 	Repo repo;
 	List<PostHandler> handlers;
 
@@ -62,11 +61,5 @@ public class DownloaderContainer {
 
 	public void containerAllSize(Repo repo) {
 		containerSize = repo.getResources().stream().map(Metadata::getSize).reduce(Long::sum).orElse(0L);
-	}
-
-	public void downloadSize(Repo repo, String workDirectory) {
-		readyDownloadSize = repo.getResources().stream().map(e -> {
-			return Paths.get(workDirectory, e.getPath()).toFile().length();
-		}).reduce(Long::sum).orElse(0L);
 	}
 }

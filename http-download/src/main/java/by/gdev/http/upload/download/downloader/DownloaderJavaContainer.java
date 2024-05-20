@@ -97,11 +97,4 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 	public void containerAllSize(Repo repo) {
 		containerSize = repo.getResources().stream().map(Metadata::getSize).reduce(Long::sum).orElse(0L);
 	}
-
-	@Override
-	public void downloadSize(Repo repo, String workDirectory) {
-		readyDownloadSize = repo.getResources().stream().map(e -> {
-			return Paths.get(workDirectory, e.getPath()).toFile().length();
-		}).reduce(Long::sum).orElse(0L);
-	}
 }
