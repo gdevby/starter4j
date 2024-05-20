@@ -26,25 +26,25 @@ public interface GsonService {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * 
-	 * If we dont't have internet it should return old value.
+	 *                                  If we dont't have internet it should return
+	 *                                  old value.
 	 */
 	<T> T getObject(String uri, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
-	
-	
+
 	<T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache)
 			throws IOException, NoSuchAlgorithmException;
-	
+
 	/**
 	 * @param <T>
 	 * @param uris
 	 * @param class1
-	 * @return
+	 * @return null if file not exists.
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	<T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException ;
-	
+	<T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException;
+
 	/**
 	 * @param <T>    type return object
 	 * @param urls   Information about the location of the resource being loaded.
@@ -60,12 +60,12 @@ public interface GsonService {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * 
-	 * 	 * If we dont't have internet it should return old value.
+	 *                                  * If we dont't have internet it should
+	 *                                  return old value.
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
-	
-	
+
 	<T> T getObjectByUrls(List<String> urls, List<Metadata> urns, Class<T> class1, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 

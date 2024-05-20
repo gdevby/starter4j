@@ -107,7 +107,10 @@ public class FileCacheServiceImpl implements FileCacheService {
 				error = e;
 			}
 		}
-		throw error;
+		if (Objects.nonNull(error))
+			throw error;
+		else
+			return null;
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
