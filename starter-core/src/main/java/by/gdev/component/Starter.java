@@ -47,6 +47,7 @@ import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderJavaContainer;
 import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
+import by.gdev.model.ExceptionMessage;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcessHelper;
@@ -169,6 +170,10 @@ public class Starter {
 		} else {
 			log.info("No Internet connection");
 			remoteAppConfig = gsonService.getLocalObject(Lists.newArrayList(serverFile), AppConfig.class);
+			if (Objects.isNull(remoteAppConfig)) {
+				eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
+				System.exit(-1);
+			}
 			Repo dep = remoteAppConfig.getAppDependencies();
 			List<String> d = DesktopUtil.generatePath(dep.getRepositories(), dep.getResources());
 			dependencis = gsonService.getLocalObject(d, Repo.class);

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.google.gson.Gson;
 
@@ -87,6 +88,8 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(uris);
+		if (Objects.isNull(pathFile))
+			return null;
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
 			return gson.fromJson(read, class1);
@@ -94,7 +97,8 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
-	public <T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
+	public <T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(url, cache);
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
