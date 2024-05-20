@@ -60,7 +60,6 @@ public class DownloaderImpl implements Downloader {
 	 * Shown status of the downloading
 	 */
 	private List<Long> allContainerSize = new ArrayList<Long>();
-	private List<Long> allReadyDownloadSize = new ArrayList<Long>();
 	private volatile DownloaderStatusEnum status;
 	private DownloadRunnableImpl runnable;
 	private volatile Integer allCountElement;
@@ -91,14 +90,15 @@ public class DownloaderImpl implements Downloader {
 		}
 		pathToDownload = container.getDestinationRepositories();
 		allContainerSize.add(container.getContainerSize());
-		allReadyDownloadSize.add(container.getReadyDownloadSize());
 	}
 
 	@Override
 	public void startDownload(boolean sync)
 			throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		fullDownloadSize = allContainerSize.stream().reduce(Long::sum).orElse(0L);
-		sizeDownloadNow = allReadyDownloadSize.stream().reduce(Long::sum).orElse(0L);
+		downloadElements.stream().map(e->e.getMetadata().getSize()).reduce(Long::sum).ifPresent(e->{
+			fullDownloadSize = e;
+		});
+		
 		start = LocalTime.now();
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;

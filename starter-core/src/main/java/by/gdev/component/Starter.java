@@ -105,19 +105,20 @@ public class Starter {
 		starterStatusFrame = frame;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		client = HttpClientConfig.getInstanceHttpClient();
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				requestConfig, client);
+				requestConfig, HttpClientConfig.getInstanceHttpClient());
 		hasInternet = maxAttepmts == 1 ? false : true;
 		log.trace("Max attempts from download = " + maxAttepmts);
-		HttpService httpService = new HttpServiceImpl(null, client, requestConfig, maxAttepmts);
+		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig,
+				maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
-		updateCore = new UpdateCore(bundle, gsonService, client, requestConfig);
+		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(), requestConfig);
+		client = HttpClientConfig.getInstanceHttpClient();
 	}
 
 	/**
@@ -151,7 +152,7 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, client, requestConfig);
+		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
@@ -200,7 +201,6 @@ public class Starter {
 		for (Repo repo : list) {
 			container.containerAllSize(repo);
 			container.filterNotExistResoursesAndSetRepo(repo, workDir);
-			container.downloadSize(repo, workDir);
 			container.setDestinationRepositories(workDir);
 			container.setHandlers(Arrays.asList(postHandler));
 			downloader.addContainer(container);
@@ -210,7 +210,6 @@ public class Starter {
 		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, DownloaderJavaContainer.JRE_CONFIG);
 		jreContainer.containerAllSize(java);
 		jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
-		jreContainer.downloadSize(java, workDir);
 		jreContainer.setDestinationRepositories(workDir);
 		jreContainer.setHandlers(Arrays.asList(postHandler, archiveHandler));
 		downloader.addContainer(jreContainer);
