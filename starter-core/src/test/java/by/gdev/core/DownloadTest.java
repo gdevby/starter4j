@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -77,11 +78,12 @@ public class DownloadTest {
 	private static void initialization(Path testFolder, Gson gson) {
 		EventBus eventBus = new EventBus();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
-		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig, 3);
+		CloseableHttpClient client = HttpClientConfig.getInstanceHttpClient();
+		HttpService httpService = new HttpServiceImpl(null, client, requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000);
 		gsonService = new GsonServiceImpl(gson, fileService, httpService);
-		downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
+		downloader = new DownloaderImpl(eventBus, client, requestConfig);
 	}
 
 	@AfterClass

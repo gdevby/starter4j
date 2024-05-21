@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -32,7 +31,6 @@ import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
-import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.http.download.handler.ArchiveHandler;
 import by.gdev.http.download.handler.PostHandlerImpl;
 import by.gdev.http.download.impl.DownloaderImpl;
@@ -95,8 +93,6 @@ public class Starter {
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 	private JvmRepo java;
-	@Getter
-	private CloseableHttpClient client;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException, InterruptedException {
@@ -110,16 +106,15 @@ public class Starter {
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				requestConfig, HttpClientConfig.getInstanceHttpClient());
+				requestConfig, Main.client);
 		hasInternet = maxAttepmts == 1 ? false : true;
 		log.trace("Max attempts from download = " + maxAttepmts);
-		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig,
-				maxAttepmts);
+		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, maxAttepmts);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
-		updateCore = new UpdateCore(bundle, gsonService, HttpClientConfig.getInstanceHttpClient(), requestConfig);
-		client = HttpClientConfig.getInstanceHttpClient();
+		updateCore = new UpdateCore(bundle, gsonService, Main.client, requestConfig);
+
 	}
 
 	/**
@@ -153,7 +148,7 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, HttpClientConfig.getInstanceHttpClient(), requestConfig);
+		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig);
 		DownloaderContainer container = new DownloaderContainer();
 		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;

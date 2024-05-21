@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.IOExceptionList;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
@@ -21,6 +22,7 @@ import com.google.gson.GsonBuilder;
 import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
 import by.gdev.handler.UpdateCore;
+import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
@@ -37,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
-    
+	public static CloseableHttpClient client;
+
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
 		log.info("starter was run");
@@ -50,6 +53,7 @@ public class Main {
 		ResourceBundle bundle = null;
 
 		try {
+			client = HttpClientConfig.getInstanceHttpClient();
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 			StarterStatusFrame starterStatusFrame = null;
 			if (!GraphicsEnvironment.isHeadless()) {

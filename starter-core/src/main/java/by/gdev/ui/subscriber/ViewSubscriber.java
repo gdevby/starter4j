@@ -31,13 +31,11 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import com.google.common.eventbus.Subscribe;
 
 import by.gdev.Main;
-import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.http.download.exeption.HashSumAndSizeError;
 import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
@@ -162,9 +160,8 @@ public class ViewSubscriber {
 				g.close();
 				byte[] body = out.toByteArray();
 				method.setEntity(new ByteArrayEntity(body));
-				CloseableHttpClient httpclient = HttpClientConfig.getInstanceHttpClient();
 				method.setConfig(RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build());
-				response = httpclient.execute(method);
+				response = Main.client.execute(method);
 				if (response.getStatusLine().getStatusCode() >= 300) {
 					log.info("not proper code " + response.getStatusLine().toString());
 					showError(p, pair);
