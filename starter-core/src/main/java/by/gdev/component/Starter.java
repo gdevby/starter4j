@@ -152,6 +152,20 @@ public class Starter {
 		DownloaderContainer container = new DownloaderContainer();
 		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
+		try {
+			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+		} catch (Exception e) {
+			log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
+		}
+		if (appLocalConfig == null) {
+			appLocalConfig = new AppLocalConfig();
+			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
+		if (Objects.nonNull(starterConfig.getVersion())) {
+			appLocalConfig.setCurrentAppVersion(starterConfig.getVersion());
+			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+		}
 		if (hasInternet) {
 			log.info("app remote config: {}", serverFile.toString());
 			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
@@ -178,20 +192,6 @@ public class Starter {
 			Repo javaRepo = remoteAppConfig.getJavaRepo();
 			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
 			jvm = gsonService.getLocalObject(j, JVMConfig.class);
-		}
-		try {
-			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
-		} catch (Exception e) {
-			log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
-		}
-		if (appLocalConfig == null) {
-			appLocalConfig = new AppLocalConfig();
-			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-		}
-		if (Objects.nonNull(starterConfig.getVersion())) {
-			appLocalConfig.setCurrentAppVersion(starterConfig.getVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 		}
 
 		Repo fileRepo = remoteAppConfig.getAppFileRepo();

@@ -49,7 +49,7 @@ public class UpdateFrame extends JFrame {
 		this.setLocation(width / 2 - this.getSize().width / 2, height / 2 - this.getSize().height / 2);
 		progressFrame.setVisible(false);
 		JPanel p = new JPanel(new BorderLayout(0, 0));
-		p.setBackground(Color.WHITE);
+		p.setBackground(new Color(215, 215, 215));
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		String link = String.join("/", starterAppConfig.getServerFile().get(0), StarterAppConfig.APP_CHANGES_LOG);
 		JLabel text = new JLabelHtmlWrapper(String.format(resourceBundle.getString("update.app"),
@@ -98,14 +98,14 @@ public class UpdateFrame extends JFrame {
 				text.setForeground(c);
 			}
 		});
-		verticalPanel.add(j);
+		verticalPanel.add(j, BorderLayout.CENTER);
 
 		buttonPanel.setOpaque(false);
 
 		p.add(text, BorderLayout.CENTER);
 		p.add(verticalPanel, BorderLayout.SOUTH);
 		this.add(p);
-
+		pack();
 		setVisible(true);
 
 		while (isVisible()) {
