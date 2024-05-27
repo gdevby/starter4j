@@ -106,7 +106,7 @@ public class Starter {
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				requestConfig, Main.client);
+				RequestConfig.custom().setConnectTimeout(10000).setSocketTimeout(10000).build(), Main.client);
 		hasInternet = maxAttepmts == 1 ? false : true;
 		log.trace("Max attempts from download = " + maxAttepmts);
 		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, maxAttepmts);
