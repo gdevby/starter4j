@@ -143,7 +143,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
-				if (Objects.nonNull(localMetadata)
+				if (Objects.nonNull(localMetadata) && Objects.nonNull(localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
 						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
