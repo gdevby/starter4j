@@ -188,13 +188,13 @@ public class DesktopUtil {
 	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
 		ism.putAll(urls.stream().parallel().map(link -> {
-			int time = 2;
+			int time = 2000;
 			IOException e = null;
 			for (int i = 0; i < 2; i++) {
 				try {
 					HttpHead http = new HttpHead(link);
 					http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
-					log.info("check internet connection {} timeout {} seconds", link, time);
+					log.info("check internet connection {} timeout {} ms", link, time);
 					httpclient.execute(http);
 					return new AbstractMap.SimpleEntry<>(link, Boolean.TRUE);
 				} catch (IOException e1) {
