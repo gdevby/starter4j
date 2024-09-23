@@ -17,7 +17,7 @@
             <pattern>%d{HH:mm:ss.SSS} %-5level %logger{15}- %msg%n</pattern>
         </encoder>
     </appender>
-<!-- <logger level="trace" name="by.gdev"/> -->
+<logger level="trace" name="by.gdev"/>
     <root level="info">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_APPENDER"/>

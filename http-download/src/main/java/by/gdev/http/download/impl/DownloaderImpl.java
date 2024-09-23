@@ -26,6 +26,7 @@ import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.util.InternetServerMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -68,12 +69,14 @@ public class DownloaderImpl implements Downloader {
 	private LocalTime start;
 	private long sizeDownloadNow;
 
-	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig) {
+	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig,
+			InternetServerMap workedServers) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
-		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus);
+		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus,
+				workedServers);
 	}
 
 	@Override
@@ -95,10 +98,10 @@ public class DownloaderImpl implements Downloader {
 	@Override
 	public void startDownload(boolean sync)
 			throws InterruptedException, ExecutionException, StatusExeption, IOException {
-		downloadElements.stream().map(e->e.getMetadata().getSize()).reduce(Long::sum).ifPresent(e->{
+		downloadElements.stream().map(e -> e.getMetadata().getSize()).reduce(Long::sum).ifPresent(e -> {
 			fullDownloadSize = e;
 		});
-		
+
 		start = LocalTime.now();
 		if (status.equals(DownloaderStatusEnum.IDLE)) {
 			status = DownloaderStatusEnum.WORK;
@@ -133,7 +136,7 @@ public class DownloaderImpl implements Downloader {
 		runnable.setStatus(DownloaderStatusEnum.CANCEL);
 	}
 
-	private DownloaderStatus buildDownloaderStatus(){
+	private DownloaderStatus buildDownloaderStatus() {
 		DownloaderStatus statusDownload = new DownloaderStatus();
 		long downloadBytesNow = 0;
 		List<DownloadElement> list = new ArrayList<DownloadElement>(processedElements);

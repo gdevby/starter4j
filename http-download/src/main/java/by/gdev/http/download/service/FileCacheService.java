@@ -12,39 +12,39 @@ import by.gdev.util.model.download.Repo;
  * Saved files in cache and got from it
  */
 public interface FileCacheService {
+
 	/**
-	 * @param uri - uri address
-	 * @param cache - If cache = true file exists and hashsum is valid it should
-	 *              return content without head request. 
-	 *              If cache false we need to do http head request to check version in the cache with ETag
-	 * @return path which contains response of the http get request
+	 * Allowed to download small files and used without GsonService
+	 * 
+	 * @param cache    - {@link FileCacheService#getRawObject(String, boolean)}
+	 * @param urls     Get array url from {@link Repo}
+	 * @param urn      related path
+	 * @param metadata - {@link Metadata}
+	 * @return Path - which contains file
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
+	Path getRawObject(List<String> urls, String urn, boolean cache) throws IOException, NoSuchAlgorithmException;
 
-	Path getRawObject(String uri, boolean cache) throws IOException, NoSuchAlgorithmException;
-	
-	
-	Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException;
-	
-	
 	/**
-	 * Allowed to download small files and used without GsonService 
-	 * @param cache - {@link FileCacheService#getRawObject(String, boolean)}
-	 * @param urls Got array url from {@link Repo}
-	 * @param metadata - {@link Metadata} 
-	 * @return Path - which contains file
-	 * @throws IOException 
-	 * @throws NoSuchAlgorithmException 
+	 * @see FileCacheService#getRawObject(List, String, boolean)
 	 */
-	Path getRawObject(List<String> urls, Metadata metadata, boolean cache)throws IOException, NoSuchAlgorithmException;
-	
+	Path getRawObject(List<String> urls, Metadata metadata, boolean cache) throws IOException, NoSuchAlgorithmException;
+
 	/**
 	 * 
-	 * @param urls Got array url from {@link Repo}
-	 * @return local files from this repo
+	 * @param cache    - {@link FileCacheService#getRawObject(String, boolean)}
+	 * @param urls     Get array url from {@link Repo}
+	 * @param metadata - {@link Metadata}
+	 * @return local file or null pointer
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	Path getRawObject(List<String> urls)throws IOException, NoSuchAlgorithmException;
+	Path getLocalRawObject(List<String> urls, Metadata metadata, boolean cache)
+			throws IOException, NoSuchAlgorithmException;
+	/**
+	 * @see FileCacheService#getLocalRawObject(List, Metadata, boolean)
+	 */
+	Path getLocalRawObject(List<String> urls, String urn, boolean cache) throws IOException, NoSuchAlgorithmException;
+
 }

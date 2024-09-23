@@ -41,5 +41,8 @@ public interface HttpService {
 	 */
 	String getRequestByUrl(String url) throws IOException;
 
+	/**
+	 * {@inheritDoc}{@link HttpService#getMetaByUrl(String)}
+	 */
 	String getRequestByUrl(String url, Map<String, String> map) throws IOException;
 }

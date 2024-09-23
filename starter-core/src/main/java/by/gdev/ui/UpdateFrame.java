@@ -51,7 +51,7 @@ public class UpdateFrame extends JFrame {
 		JPanel p = new JPanel(new BorderLayout(0, 0));
 		p.setBackground(new Color(215, 215, 215));
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		String link = String.join("/", starterAppConfig.getServerFile().get(0), StarterAppConfig.APP_CHANGES_LOG);
+		String link = starterAppConfig.getServerFile().get(0) + StarterAppConfig.APP_CHANGES_LOG;
 		JLabel text = new JLabelHtmlWrapper(String.format(resourceBundle.getString("update.app"),
 				appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()));
 		text.setFont(text.getFont().deriveFont(Font.BOLD));

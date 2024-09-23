@@ -9,6 +9,7 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOExceptionList;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -50,6 +51,14 @@ public class Main {
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		loadLogbackConfig(starterConfig);
+		// fix for new and old client without /
+		starterConfig.setServerFile(starterConfig.getServerFile().stream().map(e -> {
+			if (!e.endsWith("/")) {
+				log.warn("does't end with /, will add, {}", e);
+				return e + "/";
+			} else
+				return e;
+		}).collect(Collectors.toList()));
 		ResourceBundle bundle = null;
 
 		try {

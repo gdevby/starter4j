@@ -18,6 +18,7 @@ import by.gdev.http.download.model.RequestMetadata;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.util.DesktopUtil;
+import by.gdev.util.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,52 +36,45 @@ public class FileCacheServiceImpl implements FileCacheService {
 	private int timeToLife;
 
 	private FileMapperService fileMapperService;
+	/**
+	 * Can skip requests except this servers. Used only for related uri.
+	 */
+	private InternetServerMap workedServers;
 
-	public FileCacheServiceImpl(HttpService httpService, Gson gson, Charset charset, Path directory, int timeToLife) {
+	public FileCacheServiceImpl(HttpService httpService, Gson gson, Charset charset, Path directory, int timeToLife,
+			InternetServerMap workedServers) {
 		this.httpService = httpService;
 		this.directory = directory;
 		this.timeToLife = timeToLife;
 		fileMapperService = new FileMapperService(gson, charset, "");
+		this.workedServers = workedServers;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-
-	@Override
-	public Path getRawObject(String url, boolean cache) throws IOException, NoSuchAlgorithmException {
-		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
-		Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
+	private Path getRawObject(String url, boolean cache, Path savedPath) throws IOException, NoSuchAlgorithmException {
+		Path metaFile = Paths.get(String.valueOf(savedPath).concat(".metadata"));
 		if (cache) {
-			return getResourceWithoutHttpHead(url, metaFile, urlPath);
+			return getResourceWithoutHttpHead(url, metaFile, savedPath);
 		} else {
-			return getResourceWithHttpHead(url, urlPath, metaFile);
+			return getResourceWithHttpHead(url, metaFile, savedPath);
 		}
-	}
-
-	@Override
-	public Path getRawObject(List<String> urls, boolean cache) throws IOException, NoSuchAlgorithmException {
-		IOException error = null;
-		for (String url : urls) {
-			try {
-				Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
-				Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata"));
-				return cache ? getResourceWithoutHttpHead(url, metaFile, urlPath)
-						: getResourceWithHttpHead(url, urlPath, metaFile);
-			} catch (IOException e) {
-				error = e;
-			}
-		}
-		throw error;
 	}
 
 	@Override
 	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)
 			throws IOException, NoSuchAlgorithmException {
+		String urn = metadata.getRelativeUrl();
+		return getRawObject1(urls, urn, cache);
+	}
+
+	protected Path getRawObject1(List<String> urls, String urn, boolean cache)
+			throws NoSuchAlgorithmException, IOException {
 		IOException error = null;
+		Path savedPath = buildPath(urls.get(0) + urn);
 		for (String url : urls) {
 			try {
-				return getRawObject(url + metadata.getRelativeUrl(), cache);
+				if (workedServers.isSkippedURL(url))
+					continue;
+				return getRawObject(url + urn, cache, savedPath);
 			} catch (IOException e) {
 				error = e;
 			}
@@ -89,28 +83,34 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	@Override
-	public Path getRawObject(List<String> urls) throws NoSuchAlgorithmException, IOException {
-		IOException error = null;
-		for (String url : urls) {
-			try {
-				Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"))
-						.toAbsolutePath();
-				Path metaFile = Paths.get(String.valueOf(urlPath).concat(".metadata")).toAbsolutePath();
-				if (urlPath.toFile().exists() && Files.exists(metaFile)) {
-					RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
-					String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
-					if (Objects.isNull(localMetadata) || !Objects.equals(localMetadata.getSha1(), sha))
-						throw new IOException("sha not equals");
-					return urlPath;
-				}
-			} catch (IOException e) {
-				error = e;
-			}
+	public Path getRawObject(List<String> urls, String urn, boolean cache)
+			throws NoSuchAlgorithmException, IOException {
+		return getRawObject1(urls, urn, cache);
+	}
+
+	@Override
+	public Path getLocalRawObject(List<String> urls, Metadata metadata, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
+		return readLocalRawObject(urls, metadata.getRelativeUrl());
+	}
+
+	@Override
+	public Path getLocalRawObject(List<String> urls, String urn, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
+		return readLocalRawObject(urls, urn);
+	}
+
+	protected Path readLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException {
+		Path savedPath = buildPath(urls.get(0)  + urn).toAbsolutePath();
+		Path metaFile = Paths.get(String.valueOf(savedPath).concat(".metadata")).toAbsolutePath();
+		if (savedPath.toFile().exists() && Files.exists(metaFile)) {
+			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
+			String sha = DesktopUtil.getChecksum(savedPath.toFile(), Headers.SHA1.getValue());
+			if (Objects.isNull(localMetadata) || !Objects.equals(localMetadata.getSha1(), sha))
+				throw new IOException("sha not equals");
+			return savedPath;
 		}
-		if (Objects.nonNull(error))
-			throw error;
-		else
-			return null;
+		return null;
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
@@ -136,7 +136,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 	}
 
-	private Path getResourceWithHttpHead(String url, Path urlPath, Path metaFile)
+	private Path getResourceWithHttpHead(String url, Path metaFile, Path urlPath)
 			throws IOException, NoSuchAlgorithmException {
 		boolean fileExists = urlPath.toFile().exists();
 		try {
@@ -168,4 +168,10 @@ public class FileCacheServiceImpl implements FileCacheService {
 		fileMapperService.write(requestMetadata, metaFile.toString());
 		return urlPath;
 	}
+
+	protected Path buildPath(String url) {
+		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
+		return urlPath;
+	}
+
 }

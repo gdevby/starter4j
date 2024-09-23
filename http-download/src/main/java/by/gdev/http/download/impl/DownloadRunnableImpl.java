@@ -25,6 +25,7 @@ import by.gdev.http.download.handler.PostHandler;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.util.InternetServerMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,14 +43,17 @@ public class DownloadRunnableImpl implements Runnable {
 	private RequestConfig requestConfig;
 	private EventBus eventBus;
 	private int DEFAULT_MAX_ATTEMPTS = 3;
+	private InternetServerMap workedServers;
 
 	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements,
-			CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus) {
+			CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus,
+			InternetServerMap workedServers) {
 		this.downloadElements = downloadElements;
 		this.processedElements = processedElements;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		this.eventBus = eventBus;
+		this.workedServers = workedServers;
 	}
 
 	@Override
@@ -62,6 +66,8 @@ public class DownloadRunnableImpl implements Runnable {
 				if (Objects.nonNull(element)) {
 					for (String repo : element.getRepo().getRepositories()) {
 						try {
+							if (workedServers.isSkippedURL(repo))
+								continue;
 							download(element, repo);
 							for (PostHandler h : element.getHandlers())
 								h.postProcessDownloadElement(element);

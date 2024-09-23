@@ -17,77 +17,50 @@ import com.google.gson.Gson;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
-import by.gdev.util.model.download.Metadata;
+import by.gdev.util.InternetServerMap;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@inheritDoc}
  */
-@Slf4j
 @AllArgsConstructor
 public class GsonServiceImpl implements GsonService {
 	private Gson gson;
 	private FileCacheService fileService;
 	private HttpService httpService;
+	private InternetServerMap workedServers;
 
 	/**
 	 * {@inheritDoc}
 	 */
 
 	@Override
-	public <T> T getObject(String url, Class<T> class1, boolean cache) throws IOException, NoSuchAlgorithmException {
-		Path pathFile = fileService.getRawObject(url, cache);
-		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
-				StandardCharsets.UTF_8)) {
-			return gson.fromJson(read, class1);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		T returnValue = null;
-		for (String url : urls) {
-			try {
-				Path pathFile = fileService.getRawObject(url + urn, cache);
-				try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
-						StandardCharsets.UTF_8)) {
-					returnValue = gson.fromJson(read, class1);
-				}
-			} catch (IOException e) {
-				log.error("Error = " + e.getMessage());
-			}
-		}
-		return returnValue;
+	public <T> T getObjectWithoutSaving(List<String> urls, String urn, Class<T> class1) throws IOException {
+		return getObjectWithoutSaving(urls, urn, class1, null);
 	}
 
 	@Override
-	public <T> T getObjectWithoutSaving(String url, Class<T> class1) throws IOException {
-		return getObjectWithoutSaving(url, class1, null);
+	public <T> T getObjectWithoutSaving(List<String> urls, String urn, Type type) throws IOException {
+		return getObjectWithoutSaving(urls, urn, type, null);
 	}
 
 	@Override
-	public <T> T getObjectWithoutSaving(String url, Type type) throws IOException {
-		return getObjectWithoutSaving(url, type, null);
+	public <T> T getObjectWithoutSaving(List<String> urls, String urn, Class<T> class1, Map<String, String> headers)
+			throws IOException {
+		return doRequest(urls, urn, class1, null, headers);
+
 	}
 
 	@Override
-	public <T> T getObjectWithoutSaving(String url, Class<T> class1, Map<String, String> headers) throws IOException {
-		return gson.fromJson(httpService.getRequestByUrl(url, headers), class1);
+	public <T> T getObjectWithoutSaving(List<String> urls, String urn, Type type, Map<String, String> headers)
+			throws IOException {
+		return doRequest(urls, urn, null, type, headers);
 	}
 
 	@Override
-	public <T> T getObjectWithoutSaving(String url, Type type, Map<String, String> headers) throws IOException {
-		return gson.fromJson(httpService.getRequestByUrl(url, headers), type);
-	}
-
-	@Override
-	public <T> T getLocalObject(List<String> uris, Class<T> class1) throws IOException, NoSuchAlgorithmException {
-		Path pathFile = fileService.getRawObject(uris);
+	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
+			throws IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(uris, urn, true);
 		if (Objects.isNull(pathFile))
 			return null;
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
@@ -97,31 +70,35 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
-	public <T> T getObjectByUrls(List<String> url, Class<T> class1, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
-		Path pathFile = fileService.getRawObject(url, cache);
+	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		Path pathFile = fileService.getRawObject(urls, urn, cache);
+		if (Objects.isNull(pathFile))
+			return null;
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
 			return gson.fromJson(read, class1);
 		}
 	}
-
 	@Override
-	public <T> T getObjectByUrls(List<String> urls, List<Metadata> urns, Class<T> class1, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
-		for (String url : urls) {
-			for (Metadata urn : urns) {
-				try {
-					Path pathFile = fileService.getRawObject(url + urn.getRelativeUrl(), cache);
-					try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
-							StandardCharsets.UTF_8)) {
-						return gson.fromJson(read, class1);
-					}
-				} catch (IOException e) {
-					log.error("Error", e);
-				}
-			}
-		}
+	public <T> T getLocalObject(String uri, Class<T> class1) throws IOException, NoSuchAlgorithmException {
 		return null;
 	}
+	protected <T> T doRequest(List<String> urls, String urn, Class<T> class1, Type type, Map<String, String> headers)
+			throws IOException {
+		IOException ex = null;
+		for (String url : urls) {
+			try {
+				if (workedServers.isSkippedURL(url))
+					continue;
+				String s = httpService.getRequestByUrl(url + urn, headers);
+				return Objects.nonNull(class1) ? gson.fromJson(s, class1) : gson.fromJson(s, type);
+			} catch (IOException e) {
+				ex = e;
+			}
+		}
+		throw ex;
+	}
+
+	
 }

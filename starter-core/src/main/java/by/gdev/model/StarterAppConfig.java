@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,12 +43,12 @@ public class StarterAppConfig {
 	public static final String APP_STARTER_UPDATE_CONFIG = "starterUpdate.json";
 
 	public static final List<String> URI_APP_CONFIG = Lists.newArrayList(
-			"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app");
+			"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app/");
 	private final boolean prod = false;
 
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
-	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description")
+	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description, should be end with /")
 	private List<String> serverFile;
 	@Parameter(names = "-workDirectory", description = "Working directory where the files required for the application will be loaded and in which the application will be launched. The param used for test. "
 			+ "The second way is to put in file with installer.  The file name is installer.properties which contains work.dir=... This is for production. "
@@ -60,8 +59,8 @@ public class StarterAppConfig {
 	@Parameter(names = "-version", description = "Specifies the version of the application to launch. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. "
 			+ "This way we can install old versions of the application. For this you need set exactly version.")
 	private String version;
-	@Parameter(names = "-urlConnection", description = "List of sites for checking Internet connection access")
-	private List<String> urlConnection;
+	@Parameter(names = "-testURLs", description = "List of url which use to do requests. When some url or servers are not available, it doesn't do request. It will skip for download file and to do reuests. If we have server file http://example.com/repo than this field should be http://example.com")
+	private List<String> testURLs;
 	@Parameter(names = "-attempts", description = "The number of allowed attempts to restore the connection")
 	private int maxAttempts;
 	@Parameter(names = "-connectTimeout", description = "Set connect timeout")
@@ -80,17 +79,8 @@ public class StarterAppConfig {
 			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
 			60000, 600000, false, null);
 
-	public List<String> getServerFileConfig(StarterAppConfig config, String version) {
-		return config.getServerFile().stream().map(file -> {
-			return Objects.isNull(version) ? String.join("/", file, APP_CONFIG)
-					: String.join("/", file, version, APP_CONFIG);
-		}).collect(Collectors.toList());
-	}
-
-	public List<String> getStarterUpdateConfig() {
-		return this.getServerFile().stream().map(file -> {
-			return String.join("/", file, APP_STARTER_UPDATE_CONFIG);
-		}).collect(Collectors.toList());
+	public String getServerFileConfig(StarterAppConfig config, String version) {
+		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);
 	}
 
 	/**
