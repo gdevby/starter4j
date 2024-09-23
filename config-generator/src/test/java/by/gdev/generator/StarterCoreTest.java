@@ -31,12 +31,11 @@ public class StarterCoreTest {
 		server = ServerBootstrap.bootstrap().setListenerPort(65079).setSocketConfig(config)
 				.registerHandler("*", new HttpRequestHandlerServer(acm)).create();
 		server.start();
-		
+
 		if (jre.exists()) {
 			FileUtils.deleteDirectory(jre);
 		}
-		
-		
+
 		Path testFolder = Paths.get(testWorkDirectory);
 		if (testFolder.toFile().exists()) {
 			FileUtils.deleteDirectory(testFolder.toFile());
@@ -51,11 +50,12 @@ public class StarterCoreTest {
 
 	@Test
 	public void mainTest() throws Exception {
-		String[] configGenerator = { "-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/", "-mainClass", "desktop.starter.app.Main" };
+		String[] configGenerator = { "-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/",
+				"-mainClass", "desktop.starter.app.Main" };
 		by.gdev.generator.Main.main(configGenerator);
 		FileUtils.copyDirectory(new File(acm.getJavaFolder()), jre);
-		String[] starterCoreArg = { "-uriAppConfig", "http://127.0.0.1:65079/test-core", "-version", "0.9",
-				"-workDirectory", testWorkDirectory, "-cacheDirectory", testWorkDirectory + "/cache", "-stop"};
+		String[] starterCoreArg = { "-uriAppConfig", "http://127.0.0.1:65079/test-core/", "-version", "0.9",
+				"-workDirectory", testWorkDirectory, "-cacheDirectory", testWorkDirectory + "/cache", "-stop" };
 		by.gdev.Main.main(starterCoreArg);
 	}
 }

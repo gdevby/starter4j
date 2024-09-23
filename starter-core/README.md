@@ -23,7 +23,7 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 | -workDirectory| starter  |The working directory where the files necessary for the application will be downloaded and where the application will run |  
 | -version| null | Specifies the version of the application to run. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. This way we can install older versions of the application | 
 |-cacheDirectory| starter/cache  | Directory for storing cached configs |  
-|-urlConnection| http://www.google.com, http://www.baidu.com | List of sites to check Internet connection |
+|-urlConnection| http://www.google.com, http://www.baidu.com | List of url which use to do requests. When some url or servers are not available, it doesn't do request. It will skip for download file and to do requests. If we have server file http://example.com/repo than this field should be http://example.com") |
 |-attempts| 3 | Number of attempts to restore the connection|
 |-connectTimeout| 60000  |setting a value setConnectTimeout|
 |-socketTimeout| 60000  |setting a value setSocketTimeout|

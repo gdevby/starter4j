@@ -7,11 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -29,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import com.google.common.reflect.TypeToken;
 
 import by.gdev.http.download.service.GsonService;
+import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterUpdate;
 import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.util.DesktopUtil;
@@ -44,9 +43,10 @@ public class UpdateCore {
 	private GsonService gsonService;
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
+	private StarterAppConfig starterConfig;
 
-	public void checkUpdates(OSType osType, List<String> updateConfigUri) throws IOException, NoSuchAlgorithmException {
-		Map<OSType, StarterUpdate> map = getUpdateFile(updateConfigUri);
+	public void checkUpdates(OSType osType) throws IOException, NoSuchAlgorithmException {
+		Map<OSType, StarterUpdate> map = getUpdateFile();
 		if (map == null || !map.containsKey(osType))
 			return;
 		StarterUpdate update = map.get(osType);
@@ -85,14 +85,11 @@ public class UpdateCore {
 		}
 	}
 
-	private Map<OSType, StarterUpdate> getUpdateFile(List<String> updateConfigUri) throws IOException {
-		Type mapType = new TypeToken<Map<OSType, StarterUpdate>>() {
-			private static final long serialVersionUID = 1L;
-		}.getType();
-		for (String uri : updateConfigUri) {
-			return gsonService.getObjectWithoutSaving(uri, mapType);
-		}
-		return null;
+	private Map<OSType, StarterUpdate> getUpdateFile() throws IOException {
+		return gsonService.getObjectWithoutSaving(starterConfig.getServerFile(),
+				StarterAppConfig.APP_STARTER_UPDATE_CONFIG, new TypeToken<Map<OSType, StarterUpdate>>() {
+					private static final long serialVersionUID = 1L;
+				}.getType());
 	}
 
 	public static void deleteTmpFileIfExist() {

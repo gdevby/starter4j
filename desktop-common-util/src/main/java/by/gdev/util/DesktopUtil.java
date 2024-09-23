@@ -18,6 +18,8 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -183,22 +185,29 @@ public class DesktopUtil {
 		}
 	}
 
-	public static int numberOfAttempts(List<String> urls, int maxAttepmts, RequestConfig requestConfig,
-			CloseableHttpClient httpclient) {
-		int attempt = 1;
-
-		for (String url : urls) {
-			try {
-				HttpHead http = new HttpHead(url);
-				http.setConfig(requestConfig);
-				httpclient.execute(http);
-				return maxAttepmts;
-
-			} catch (IOException e) {
-				log.info("error during test net {} {}", url, e.getMessage());
+	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
+		InternetServerMap ism = new InternetServerMap();
+		ism.putAll(urls.stream().parallel().map(link -> {
+			int time = 2;
+			IOException e = null;
+			for (int i = 0; i < 2; i++) {
+				try {
+					HttpHead http = new HttpHead(link);
+					http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
+					log.info("check internet connection {} timeout {} seconds", link, time);
+					httpclient.execute(http);
+					return new AbstractMap.SimpleEntry<>(link, Boolean.TRUE);
+				} catch (IOException e1) {
+					e = e1;
+				}
+				DesktopUtil.sleep(1000);
+				time *= 3;
 			}
-		}
-		return attempt;
+			log.info("error during test net {} {}", link, e.getMessage());
+			return new AbstractMap.SimpleEntry<>(link, Boolean.FALSE);
+		}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
+
+		return ism;
 	}
 
 	private static void createDirectory(File file) throws IOException {
@@ -341,14 +350,14 @@ public class DesktopUtil {
 			return "";
 		}
 	}
-	
-    public static String getTime(Class<?> cl) {
-        try {
-            String rn = cl.getName().replace('.', '/') + ".class";
-            JarURLConnection j = (JarURLConnection) cl.getClassLoader().getResource(rn).openConnection();
-            return new Date(j.getJarFile().getEntry("META-INF/MANIFEST.MF").getTime()).toString();
-        } catch (Exception e) {
-        	return "dev";
-        }
-    }
+
+	public static String getTime(Class<?> cl) {
+		try {
+			String rn = cl.getName().replace('.', '/') + ".class";
+			JarURLConnection j = (JarURLConnection) cl.getClassLoader().getResource(rn).openConnection();
+			return new Date(j.getJarFile().getEntry("META-INF/MANIFEST.MF").getTime()).toString();
+		} catch (Exception e) {
+			return "dev";
+		}
+	}
 }

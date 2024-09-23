@@ -24,6 +24,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpResponse;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 
@@ -39,6 +40,7 @@ import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
+import by.gdev.util.InternetServerMap;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 
@@ -46,6 +48,9 @@ public class DownloadTest {
 	static GsonService gsonService;
 	static DownloaderImpl downloader;
 	static ClientAndServer mockServer;
+	public static String host = "http://127.0.0.1";
+	public static Integer port = 34631;
+	public static String url = host + ":" + port + "/";
 
 	@BeforeClass
 	public static void init() throws IOException {
@@ -58,7 +63,7 @@ public class DownloadTest {
 		Repo repo = new FileMapperService(gson, StandardCharsets.UTF_8, "").read("src/test/resources/dependencies.json",
 				Repo.class);
 		String str = gson.toJson(repo, Repo.class);
-		mockServer = ClientAndServer.startClientAndServer(34631);
+		mockServer = ClientAndServer.startClientAndServer(port);
 		ConfigurationProperties.disableSystemOut(true);
 		mockServer.when(request().withMethod("GET").withPath("/dependencises.json"))
 				.respond(HttpResponse.response().withStatusCode(200)
@@ -81,9 +86,9 @@ public class DownloadTest {
 		CloseableHttpClient client = HttpClientConfig.getInstanceHttpClient();
 		HttpService httpService = new HttpServiceImpl(null, client, requestConfig, 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
-				600000);
-		gsonService = new GsonServiceImpl(gson, fileService, httpService);
-		downloader = new DownloaderImpl(eventBus, client, requestConfig);
+				600000, new InternetServerMap());
+		gsonService = new GsonServiceImpl(gson, fileService, httpService, new InternetServerMap());
+		downloader = new DownloaderImpl(eventBus, client, requestConfig, new InternetServerMap());
 	}
 
 	@AfterClass
@@ -94,7 +99,7 @@ public class DownloadTest {
 	@Test
 	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException,
 			ExecutionException, StatusExeption {
-		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
+		Repo repo = gsonService.getObjectByUrls(Lists.newArrayList(url), "dependencises.json", Repo.class, false);
 		AccessHandler accesHandler = new AccessHandler();
 		DownloaderContainer container = new DownloaderContainer();
 		container.setDestinationRepositories("target/test_folder/");
@@ -110,7 +115,7 @@ public class DownloadTest {
 	@Test(expected = StatusExeption.class)
 	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException,
 			ExecutionException, StatusExeption {
-		Repo repo = gsonService.getObject("http://127.0.0.1:34631/dependencises.json", Repo.class, false);
+		Repo repo = gsonService.getObjectByUrls(Lists.newArrayList(url), "dependencises.json", Repo.class, false);
 		AccessHandler accesHandler = new AccessHandler();
 		DownloaderContainer container = new DownloaderContainer();
 		container.setDestinationRepositories("target/test_folder/");

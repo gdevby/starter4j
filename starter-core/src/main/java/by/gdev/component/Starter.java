@@ -52,6 +52,7 @@ import by.gdev.process.JavaProcessHelper;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.UpdateFrame;
 import by.gdev.util.DesktopUtil;
+import by.gdev.util.InternetServerMap;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
@@ -74,7 +75,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Starter {
-
 	private EventBus eventBus;
 	private StarterAppConfig starterConfig;
 	private OSType osType;
@@ -93,6 +93,7 @@ public class Starter {
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 	private JvmRepo java;
+	private InternetServerMap workedServers;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException, InterruptedException {
@@ -105,15 +106,15 @@ public class Starter {
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
-		int maxAttepmts = DesktopUtil.numberOfAttempts(starterConfig.getUrlConnection(), starterConfig.getMaxAttempts(),
-				RequestConfig.custom().setConnectTimeout(10000).setSocketTimeout(10000).build(), Main.client);
-		hasInternet = maxAttepmts == 1 ? false : true;
-		log.trace("Max attempts from download = " + maxAttepmts);
-		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, maxAttepmts);
+		workedServers = DesktopUtil.testServers(starterConfig.getTestURLs()
+				, Main.client);
+		hasInternet = workedServers.values().stream().anyMatch(e -> e) ? true : false;
+		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
+		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, starterConfig.getMaxAttempts());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife());
-		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService);
-		updateCore = new UpdateCore(bundle, gsonService, Main.client, requestConfig);
+				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), workedServers);
+		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, workedServers);
+		updateCore = new UpdateCore(bundle, gsonService, Main.client, requestConfig, starterConfig);
 
 	}
 
@@ -148,36 +149,37 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig);
+		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, workedServers);
 		DownloaderContainer container = new DownloaderContainer();
-		List<String> serverFile = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
+		String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
 		if (hasInternet) {
-			log.info("app remote config: {}", serverFile.toString());
-			remoteAppConfig = gsonService.getObjectByUrls(serverFile, AppConfig.class, false);
+			log.info("app remote config: {}", serverFileUrn);
+			remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn, AppConfig.class,
+					false);
 			updateApp(gsonService, fileMapperService);
 			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
-					remoteAppConfig.getAppDependencies().getResources(), Repo.class, false);
+					remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
 			resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
-					remoteAppConfig.getAppResources().getResources(), Repo.class, false);
+					remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
 			jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
-					remoteAppConfig.getJavaRepo().getResources(), JVMConfig.class, false);
+					remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 		} else {
 			log.info("No Internet connection");
-			remoteAppConfig = gsonService.getLocalObject(Lists.newArrayList(serverFile), AppConfig.class);
+			remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn, AppConfig.class);
 			if (Objects.isNull(remoteAppConfig)) {
 				eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
 				System.exit(-1);
 			}
 			Repo dep = remoteAppConfig.getAppDependencies();
-			List<String> d = DesktopUtil.generatePath(dep.getRepositories(), dep.getResources());
-			dependencis = gsonService.getLocalObject(d, Repo.class);
+			dependencis = gsonService.getLocalObject(dep.getRepositories(), dep.getResources().get(0).getRelativeUrl(),
+					Repo.class);
 			Repo res = remoteAppConfig.getAppResources();
-			List<String> r = DesktopUtil.generatePath(res.getRepositories(), res.getResources());
-			resources = gsonService.getLocalObject(r, Repo.class);
+			resources = gsonService.getLocalObject(res.getRepositories(), res.getResources().get(0).getRelativeUrl(),
+					Repo.class);
 			Repo javaRepo = remoteAppConfig.getJavaRepo();
-			List<String> j = DesktopUtil.generatePath(javaRepo.getRepositories(), javaRepo.getResources());
-			jvm = gsonService.getLocalObject(j, JVMConfig.class);
+			jvm = gsonService.getLocalObject(javaRepo.getRepositories(),
+					javaRepo.getResources().get(0).getRelativeUrl(), JVMConfig.class);
 		}
 		try {
 			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
@@ -225,14 +227,14 @@ public class Starter {
 			if (!GraphicsEnvironment.isHeadless()) {
 				// used old config without update
 				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
-					remoteAppConfig = gsonService.getObjectByUrls(
+					remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
 				} else {
 					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig,
 							starterConfig, fileMapperService, osType);
 					if (frame.getUserChoose() == 1) {
-						remoteAppConfig = gsonService.getObjectByUrls(
+						remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
 								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 								AppConfig.class, true);
 					} else {
@@ -276,7 +278,7 @@ public class Starter {
 
 	public void updateApplication() {
 		try {
-			updateCore.checkUpdates(osType, starterConfig.getStarterUpdateConfig());
+			updateCore.checkUpdates(osType);
 		} catch (Exception e) {
 			log.error("promlem with update application ", e);
 		}
