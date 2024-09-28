@@ -20,7 +20,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
-import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.download.handler.PostHandler;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloadFile;
@@ -64,19 +63,23 @@ public class DownloadRunnableImpl implements Runnable {
 			} else {
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
+					Throwable ex = null;
 					for (String repo : element.getRepo().getRepositories()) {
 						try {
 							if (workedServers.isSkippedURL(repo))
 								continue;
+							ex = null;
 							download(element, repo);
 							for (PostHandler h : element.getHandlers())
 								h.postProcessDownloadElement(element);
+
 							break;
 						} catch (Throwable e1) {
-							element.setError(new UploadFileException(repo + element.getMetadata().getRelativeUrl(),
-									element.getMetadata().getPath(), e1.getLocalizedMessage()));
+							ex = e1;
 						}
 					}
+					if (Objects.nonNull(ex))
+						element.setError(ex);
 				} else {
 //					DesktopUtil.sleep(1000);
 					break;

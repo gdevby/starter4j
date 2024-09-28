@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {
-
 	@Override
 	public void postProcessDownloadElement(DownloadElement element) throws NoSuchAlgorithmException, IOException {
 
@@ -31,19 +30,19 @@ public class PostHandlerImpl implements PostHandler {
 		String shaLocalFile = DesktopUtil.getChecksum(localeFile.toFile(), Headers.SHA1.getValue());
 		long sizeLocalFile = localeFile.toFile().length();
 		if (sizeLocalFile != element.getMetadata().getSize() && StringUtils.isEmpty(element.getMetadata().getLink())) {
-			element.setError(new HashSumAndSizeError(element.getMetadata().getRelativeUrl(),
-					element.getPathToDownload() + element.getMetadata().getPath(), String.format(
-							"The size should be %s, but was %s", element.getMetadata().getSize(), sizeLocalFile)));
 			Files.deleteIfExists(localeFile.toAbsolutePath());
+			throw new HashSumAndSizeError(element.getMetadata().getRelativeUrl(),
+					element.getPathToDownload() + element.getMetadata().getPath(),
+					String.format("The size should be %s, but was %s", element.getMetadata().getSize(), sizeLocalFile));
 		}
-
 		if (!shaLocalFile.equals(element.getMetadata().getSha1())
 				&& StringUtils.isEmpty(element.getMetadata().getLink())) {
-			element.setError(new HashSumAndSizeError(
+			Files.deleteIfExists(localeFile.toAbsolutePath());
+			throw new HashSumAndSizeError(
 					element.getRepo().getRepositories().get(0) + element.getMetadata().getRelativeUrl(),
 					element.getPathToDownload() + element.getMetadata().getPath(), String.format(
-							"The hash sum should be %s, but was %s", element.getMetadata().getSha1(), shaLocalFile)));
-			Files.deleteIfExists(localeFile.toAbsolutePath());
+							"The hash sum should be %s, but was %s", element.getMetadata().getSha1(), shaLocalFile));
+
 		}
 	}
 }
