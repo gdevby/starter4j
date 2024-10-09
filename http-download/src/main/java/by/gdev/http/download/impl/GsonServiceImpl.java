@@ -60,7 +60,7 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
 			throws IOException, NoSuchAlgorithmException {
-		Path pathFile = fileService.getRawObject(uris, urn, true);
+		Path pathFile = fileService.getLocalRawObject(uris, urn);
 		if (Objects.isNull(pathFile))
 			return null;
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
@@ -80,10 +80,12 @@ public class GsonServiceImpl implements GsonService {
 			return gson.fromJson(read, class1);
 		}
 	}
+
 	@Override
 	public <T> T getLocalObject(String uri, Class<T> class1) throws IOException, NoSuchAlgorithmException {
 		return null;
 	}
+
 	protected <T> T doRequest(List<String> urls, String urn, Class<T> class1, Type type, Map<String, String> headers)
 			throws IOException {
 		IOException ex = null;
@@ -100,5 +102,4 @@ public class GsonServiceImpl implements GsonService {
 		throw ex;
 	}
 
-	
 }
