@@ -89,19 +89,17 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	@Override
-	public Path getLocalRawObject(List<String> urls, Metadata metadata, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+	public Path getLocalRawObject(List<String> urls, Metadata metadata) throws IOException, NoSuchAlgorithmException {
 		return readLocalRawObject(urls, metadata.getRelativeUrl());
 	}
 
 	@Override
-	public Path getLocalRawObject(List<String> urls, String urn, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+	public Path getLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException {
 		return readLocalRawObject(urls, urn);
 	}
 
 	protected Path readLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException {
-		Path savedPath = buildPath(urls.get(0)  + urn).toAbsolutePath();
+		Path savedPath = buildPath(urls.get(0) + urn).toAbsolutePath();
 		Path metaFile = Paths.get(String.valueOf(savedPath).concat(".metadata")).toAbsolutePath();
 		if (savedPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);

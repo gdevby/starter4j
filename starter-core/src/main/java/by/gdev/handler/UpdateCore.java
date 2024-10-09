@@ -26,6 +26,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.reflect.TypeToken;
 
+import by.gdev.Main;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterUpdate;
@@ -50,8 +51,10 @@ public class UpdateCore {
 		if (map == null || !map.containsKey(osType))
 			return;
 		StarterUpdate update = map.get(osType);
-		File jarFile = new File(URLDecoder
-				.decode(FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+		File jarFile = new File(
+				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+		if (jarFile.toString().endsWith("classes"))
+			return;
 		String localeSha1 = DesktopUtil.getChecksum(jarFile, "SHA-1");
 		File temp = new File(jarFile.toString() + ".temp");
 		if (!update.getSha1().equals(localeSha1)) {

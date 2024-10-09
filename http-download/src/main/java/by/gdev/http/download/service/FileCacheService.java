@@ -40,11 +40,11 @@ public interface FileCacheService {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	Path getLocalRawObject(List<String> urls, Metadata metadata, boolean cache)
-			throws IOException, NoSuchAlgorithmException;
+	Path getLocalRawObject(List<String> urls, Metadata metadata) throws IOException, NoSuchAlgorithmException;
+
 	/**
 	 * @see FileCacheService#getLocalRawObject(List, Metadata, boolean)
 	 */
-	Path getLocalRawObject(List<String> urls, String urn, boolean cache) throws IOException, NoSuchAlgorithmException;
+	Path getLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException;
 
 }
