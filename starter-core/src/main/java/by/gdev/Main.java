@@ -1,8 +1,11 @@
 package by.gdev;
 
 import java.awt.GraphicsEnvironment;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
@@ -10,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.IOExceptionList;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -44,6 +49,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
+		checkOnInvalidPath();
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
@@ -120,5 +126,20 @@ public class Main {
 		configurator.doConfigure(configStream); // loads logback file
 		configStream.close();
 		log.info("logs directory {}", System.getProperty("logs_dir") + "/logs/starter/");
+	}
+	
+	
+	private static void checkOnInvalidPath() throws UnsupportedEncodingException {
+		String jarFile = new File(
+				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8")).toString();
+	    if (jarFile.contains("!")) {
+	    	 String message = String.format("Java can't work with path that contains symbol '!', "
+	                  + "create new local user without characters '!'(use new local user for game) and use path without '!' characters \r\n"
+	                  + "current: %1$s\r\n\r\n"
+	                  + "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
+	                  + " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
+	                  jarFile);
+	    	JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+	    }
 	}
 }
