@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -280,17 +281,20 @@ public class DesktopUtil {
 	 * @param alertError
 	 */
 	public static void openLink(OSType type, String uri) {
-		try {
-			Desktop.getDesktop().browse(new URI(uri));
-		} catch (IOException | URISyntaxException e) {
-			log.warn("can't open link", e);
-			if (type.equals(OSType.LINUX))
-				try {
-					Runtime.getRuntime().exec("gnome-open " + uri);
-				} catch (IOException e1) {
-					log.warn("can't open link for linix", e);
-				}
-		}
+		// TOD there is some problem with swing app. is is hanging in swing thread.
+		CompletableFuture.runAsync(() -> {
+			try {
+				Desktop.getDesktop().browse(new URI(uri));
+			} catch (IOException | URISyntaxException e) {
+				log.warn("can't open link", e);
+				if (type.equals(OSType.LINUX))
+					try {
+						Runtime.getRuntime().exec("gnome-open " + uri);
+					} catch (IOException e1) {
+						log.warn("can't open link for linix", e);
+					}
+			}
+		});
 	}
 
 	/**
