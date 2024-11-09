@@ -19,6 +19,7 @@ import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.util.InternetServerMap;
 import lombok.AllArgsConstructor;
+import util.Util;
 
 /**
  * {@inheritDoc}
@@ -99,7 +100,7 @@ public class GsonServiceImpl implements GsonService {
 				ex = e;
 			}
 		}
-		throw ex;
+		throw Util.throwException(urls, urn, ex);
 	}
 
 }
