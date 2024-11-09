@@ -24,4 +24,8 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 			return false;
 	}
 
+	public boolean hasInternet() {
+		return values().stream().anyMatch(e -> e) ? true : false;
+	}
+
 }
