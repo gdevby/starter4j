@@ -106,9 +106,9 @@ public class Starter {
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
-		workedServers = DesktopUtil.testServers(starterConfig.getTestURLs()
-				, Main.client);
-		hasInternet = workedServers.values().stream().anyMatch(e -> e) ? true : false;
+		workedServers = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
+		hasInternet = workedServers.hasInternet();
+		workedServers.setAvailableInternet(hasInternet);
 		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
 		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, starterConfig.getMaxAttempts());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
