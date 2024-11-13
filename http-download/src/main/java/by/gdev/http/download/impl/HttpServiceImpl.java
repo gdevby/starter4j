@@ -55,7 +55,7 @@ public class HttpServiceImpl implements HttpService {
 	 */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
-		log.debug("do request {}, saved to ", url, path.toAbsolutePath().toString());
+		log.debug("do request {}, saved to {}", url, path.toAbsolutePath().toString());
 		RequestMetadata request = null;
 		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
 			try {
