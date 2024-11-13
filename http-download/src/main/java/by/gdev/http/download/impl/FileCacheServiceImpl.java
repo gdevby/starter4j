@@ -22,7 +22,6 @@ import by.gdev.util.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
-import util.Util;
 
 @Slf4j
 public class FileCacheServiceImpl implements FileCacheService {
@@ -71,16 +70,14 @@ public class FileCacheServiceImpl implements FileCacheService {
 			throws NoSuchAlgorithmException, IOException {
 		IOException ex = null;
 		Path savedPath = buildPath(urls.get(0) + urn);
-		for (String url : urls) {
+		for (String url : workedServers.getAliveDomainsOrUseAll(urls)) {
 			try {
-				if (workedServers.isSkippedURL(url))
-					continue;
 				return getRawObject(url + urn, cache, savedPath);
 			} catch (IOException e) {
 				ex = e;
 			}
 		}
-		throw Util.throwException(urls, urn, ex);
+		throw ex;
 	}
 
 	@Override
