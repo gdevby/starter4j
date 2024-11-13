@@ -64,11 +64,8 @@ public class DownloadRunnableImpl implements Runnable {
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
 					Throwable ex = null;
-					for (String repo : element.getRepo().getRepositories()) {
+					for (String repo : workedServers.getAliveDomainsOrUseAll(element.getRepo().getRepositories())) {
 						try {
-							if (workedServers.isSkippedURL(repo))
-								continue;
-							ex = null;
 							download(element, repo);
 							for (PostHandler h : element.getHandlers())
 								h.postProcessDownloadElement(element);

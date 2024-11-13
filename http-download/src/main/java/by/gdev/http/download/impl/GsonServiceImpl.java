@@ -19,7 +19,6 @@ import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.util.InternetServerMap;
 import lombok.AllArgsConstructor;
-import util.Util;
 
 /**
  * {@inheritDoc}
@@ -90,17 +89,15 @@ public class GsonServiceImpl implements GsonService {
 	protected <T> T doRequest(List<String> urls, String urn, Class<T> class1, Type type, Map<String, String> headers)
 			throws IOException {
 		IOException ex = null;
-		for (String url : urls) {
+		for (String url : workedServers.getAliveDomainsOrUseAll(urls)) {
 			try {
-				if (workedServers.isSkippedURL(url))
-					continue;
 				String s = httpService.getRequestByUrl(url + urn, headers);
 				return Objects.nonNull(class1) ? gson.fromJson(s, class1) : gson.fromJson(s, type);
 			} catch (IOException e) {
 				ex = e;
 			}
 		}
-		throw Util.throwException(urls, urn, ex);
+		throw ex;
 	}
 
 }

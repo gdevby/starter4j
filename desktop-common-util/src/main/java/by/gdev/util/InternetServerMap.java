@@ -1,6 +1,8 @@
 package by.gdev.util;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,19 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 			return true;
 		} else
 			return false;
+	}
+
+	/**
+	 * Tried find proper service for request or return all domains
+	 * 
+	 * @param list will analyze proxies
+	 * @return find worked servers
+	 */
+	public List<String> getAliveDomainsOrUseAll(List<String> list) {
+		List<String> l1 = list.stream().filter(s -> !isSkippedURL(s)).collect(Collectors.toList());
+		if (l1.isEmpty())
+			return list;
+		return l1;
 	}
 
 	public boolean hasInternet() {
