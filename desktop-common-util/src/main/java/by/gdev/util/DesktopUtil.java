@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -186,28 +187,34 @@ public class DesktopUtil {
 		}
 	}
 
+	@SneakyThrows
 	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
-		ism.putAll(urls.stream().parallel().map(link -> {
-			int time = 2000;
-			IOException e = null;
-			for (int i = 0; i < 2; i++) {
-				try {
-					HttpHead http = new HttpHead(link);
-					http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
-					log.info("check internet connection {} timeout {} ms", link, time);
-					httpclient.execute(http);
-					return new AbstractMap.SimpleEntry<>(link, Boolean.TRUE);
-				} catch (IOException e1) {
-					e = e1;
+		ForkJoinPool fjp = new ForkJoinPool(10);
+		fjp.submit(() -> {
+			ism.putAll(urls.stream().parallel().map(link -> {
+				int time = 2000;
+				IOException e = null;
+				String host = "";
+				for (int i = 0; i < 2; i++) {
+					try {
+						HttpHead http = new HttpHead(link);
+						host = http.getURI().getHost();
+						http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
+						log.info("check internet connection {} timeout {} ms", link, time);
+						httpclient.execute(http);
+						return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
+					} catch (IOException e1) {
+						e = e1;
+					}
+					DesktopUtil.sleep(1000);
+					time *= 3;
 				}
-				DesktopUtil.sleep(1000);
-				time *= 3;
-			}
-			log.info("error during test net {} {}", link, e.getMessage());
-			return new AbstractMap.SimpleEntry<>(link, Boolean.FALSE);
-		}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
-
+				log.info("error during test net {} {}", link, e.getMessage());
+				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
+		}).get();
+		fjp.shutdown();
 		return ism;
 	}
 
