@@ -47,7 +47,7 @@ public class HttpServiceImpl implements HttpService {
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 	private int maxAttepmts;
-	
+
 	private final Map<Path, Lock> fileLocks = new ConcurrentHashMap<>();
 
 	/**
@@ -143,7 +143,6 @@ public class HttpServiceImpl implements HttpService {
 		CloseableHttpResponse response;
 		Lock lock = fileLocks.computeIfAbsent(temp, key -> new ReentrantLock());
 		lock.lock();
-		System.out.println("-----------------------" + temp);
 		try {
 			response = getResponse(httpGet);
 			StatusLine st = response.getStatusLine();
