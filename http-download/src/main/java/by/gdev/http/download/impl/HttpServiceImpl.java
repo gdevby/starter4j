@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,10 +47,9 @@ public class HttpServiceImpl implements HttpService {
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 	private int maxAttepmts;
-
-	private final Lock stringByUrlLock = new ReentrantLock();
-	private final Lock resourseByUrlLock = new ReentrantLock();
 	
+	private final Map<Path, Lock> fileLocks = new ConcurrentHashMap<>();
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -104,7 +104,6 @@ public class HttpServiceImpl implements HttpService {
 	private String getStringByUrl(String url, Map<String, String> headers) throws IOException {
 		InputStream in = null;
 		HttpGet httpGet = null;
-		stringByUrlLock.lock();
 		try {
 			httpGet = new HttpGet(url);
 			if (Objects.nonNull(headers)) {
@@ -124,7 +123,6 @@ public class HttpServiceImpl implements HttpService {
 			if (Objects.nonNull(httpGet))
 				httpGet.abort();
 			IOUtils.closeQuietly(in);
-			stringByUrlLock.unlock();
 		}
 	}
 
@@ -143,7 +141,9 @@ public class HttpServiceImpl implements HttpService {
 			path.toFile().getParentFile().mkdirs();
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
 		CloseableHttpResponse response;
-		resourseByUrlLock.lock();
+		Lock lock = fileLocks.computeIfAbsent(temp, key -> new ReentrantLock());
+		lock.lock();
+		System.out.println("-----------------------" + temp);
 		try {
 			response = getResponse(httpGet);
 			StatusLine st = response.getStatusLine();
@@ -164,7 +164,7 @@ public class HttpServiceImpl implements HttpService {
 				httpGet.abort();
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
-			resourseByUrlLock.unlock();
+			lock.unlock();
 		}
 		Files.move(Paths.get(temp.toString()), path.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
 		RequestMetadata requestMetadata = generateRequestMetadata(response);
