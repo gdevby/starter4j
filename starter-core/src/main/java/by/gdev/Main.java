@@ -50,13 +50,13 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		boolean flag = true;
 		checkOnInvalidPath();
-		log.info("starter was run");
-		log.info("starter created {}", DesktopUtil.getTime(Main.class));
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
 		loadLogbackConfig(starterConfig);
+		log.info("starter was run");
+		log.info("starter created {}", DesktopUtil.getTime(Main.class));
 		// fix for new and old client without /
 		starterConfig.setServerFile(starterConfig.getServerFile().stream().map(e -> {
 			if (!e.endsWith("/")) {
