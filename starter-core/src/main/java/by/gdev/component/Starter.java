@@ -93,7 +93,7 @@ public class Starter {
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 	private JvmRepo java;
-	private InternetServerMap workedServers;
+	private InternetServerMap domainAvailability;
 
 	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
 			throws UnsupportedOperationException, IOException, InterruptedException {
@@ -106,14 +106,14 @@ public class Starter {
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
-		workedServers = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
-		hasInternet = workedServers.hasInternet();
-		workedServers.setAvailableInternet(hasInternet);
+		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
+		hasInternet = domainAvailability.hasInternet();
+		domainAvailability.setAvailableInternet(hasInternet);
 		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
 		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, starterConfig.getMaxAttempts());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), workedServers);
-		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, workedServers);
+				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), domainAvailability);
+		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
 		updateCore = new UpdateCore(bundle, gsonService, Main.client, requestConfig, starterConfig);
 
 	}
@@ -149,7 +149,7 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, workedServers);
+		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability);
 		DownloaderContainer container = new DownloaderContainer();
 		String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
@@ -267,6 +267,9 @@ public class Starter {
 		javaProcess.addCommands(remoteAppConfig.getAppArguments());
 		Map<String, String> map = new HashMap<>();
 		map.put("currentAppVersion", appLocalConfig.getCurrentAppVersion());
+		fileMapperService.write(domainAvailability, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY);
+		map.put("domainAvailability",
+				Paths.get(workDir, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY).toAbsolutePath().toString());
 		StringSubstitutor substitutor = new StringSubstitutor(map);
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
 				.collect(Collectors.toList()));
