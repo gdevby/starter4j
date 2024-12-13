@@ -68,7 +68,8 @@ public class Main {
 		ResourceBundle bundle = null;
 
 		try {
-			client = HttpClientConfig.getInstanceHttpClient();
+			client = HttpClientConfig.getInstanceHttpClient(starterConfig.getConnectTimeout(),
+					starterConfig.getSocketTimeout(), 5, 20);
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 			StarterStatusFrame starterStatusFrame = null;
 			if (!GraphicsEnvironment.isHeadless()) {
@@ -127,19 +128,19 @@ public class Main {
 		configStream.close();
 		log.info("logs directory {}", System.getProperty("logs_dir") + "/logs/starter/");
 	}
-	
-	
+
 	private static void checkOnInvalidPath() throws UnsupportedEncodingException {
 		String jarFile = new File(
-				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8")).toString();
-	    if (jarFile.contains("!")) {
-	    	 String message = String.format("Java can't work with path that contains symbol '!', "
-	                  + "create new local user without characters '!'(use new local user for game) and use path without '!' characters \r\n"
-	                  + "current: %1$s\r\n\r\n"
-	                  + "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
-	                  + " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
-	                  jarFile);
-	    	JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
-	    }
+				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"))
+				.toString();
+		if (jarFile.contains("!")) {
+			String message = String.format("Java can't work with path that contains symbol '!', "
+					+ "create new local user without characters '!'(use new local user for game) and use path without '!' characters \r\n"
+					+ "current: %1$s\r\n\r\n"
+					+ "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
+					+ " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
+					jarFile);
+			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

@@ -17,14 +17,20 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
  *
  */
 public class HttpClientConfig {
-	public static CloseableHttpClient getInstanceHttpClient() {
+	public static CloseableHttpClient getInstanceHttpClient(int connectTimeout, int socketTimeout, int maxPerRoute,
+			int maxTotalPool) {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-		cm.setDefaultMaxPerRoute(5);
-		cm.setMaxTotal(20);
-		RequestConfig config = RequestConfig.custom().setConnectTimeout(60 * 1000).setSocketTimeout(60 * 1000).build();
+		cm.setDefaultMaxPerRoute(maxPerRoute);
+		cm.setMaxTotal(maxTotalPool);
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout)
+				.build();
 		CloseableHttpClient builder = HttpClients.custom()
 				.setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE).setConnectionManager(cm)
 				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).build();
 		return builder;
+	}
+
+	public static CloseableHttpClient getInstanceHttpClient() {
+		return getInstanceHttpClient(60 * 1000, 60 * 1000, 5, 20);
 	}
 }
