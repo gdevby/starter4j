@@ -95,9 +95,7 @@ public class ViewSubscriber {
 					String s = String.format(bundle.getString("upload.error.hash.sum"), t1.getUri(), t1.getMessage());
 					message(new ExceptionMessage(s, t1.getUri()));
 				} else if (t instanceof UploadFileException) {
-					UploadFileException t1 = (UploadFileException) t;
-					String s = String.format(bundle.getString("upload.error"), t1.getUri(), t1.getMessage());
-					message(new ExceptionMessage(s));
+					message(new ExceptionMessage(bundle.getString("net.problem")));
 				}
 			}
 		}

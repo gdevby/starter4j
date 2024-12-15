@@ -144,7 +144,7 @@ public class DownloadRunnableImpl implements Runnable {
 					IOUtils.close(in);
 				}
 			} catch (Exception e) {
-				if (attempt == DEFAULT_MAX_ATTEMPTS)
+				if (attempt == DEFAULT_MAX_ATTEMPTS -1)
 					throw e;
 			}
 		}
