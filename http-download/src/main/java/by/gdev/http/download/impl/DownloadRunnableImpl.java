@@ -20,6 +20,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
+import by.gdev.http.download.exeption.UploadFileException;
 import by.gdev.http.download.handler.PostHandler;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloadFile;
@@ -96,12 +97,13 @@ public class DownloadRunnableImpl implements Runnable {
 	private void download(DownloadElement element, String repo) throws IOException, InterruptedException {
 		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
+		String url = null;
 		for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
 			try {
 				BufferedInputStream in = null;
 				BufferedOutputStream out = null;
 				boolean resume = false;
-				String url = repo + element.getMetadata().getRelativeUrl();
+				url = repo + element.getMetadata().getRelativeUrl();
 				log.trace(url);
 				HttpGet httpGet = new HttpGet(url);
 				try {
@@ -144,8 +146,8 @@ public class DownloadRunnableImpl implements Runnable {
 					IOUtils.close(in);
 				}
 			} catch (Exception e) {
-				if (attempt == DEFAULT_MAX_ATTEMPTS -1)
-					throw e;
+				if (attempt == DEFAULT_MAX_ATTEMPTS - 1)
+					throw new UploadFileException(url, file.toString(), e.getMessage());
 			}
 		}
 	}
