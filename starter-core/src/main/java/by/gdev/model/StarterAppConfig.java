@@ -74,7 +74,7 @@ public class StarterAppConfig {
 	private boolean stop;
 	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. "
 			+ "Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest")
-	private String logURIService;
+	private List<String> logURIService;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
 			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
