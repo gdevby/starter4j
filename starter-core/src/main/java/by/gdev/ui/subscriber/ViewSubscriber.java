@@ -147,44 +147,47 @@ public class ViewSubscriber {
 
 	private void doRequest(JPanel p, JLabel l, JTextPane tp) {
 		CompletableFuture.runAsync(() -> {
-			HttpPost method = new HttpPost(starterConfig.getLogURIService());
-			CloseableHttpResponse response = null;
-			Pair<String, byte[]> pair = null;
-			try {
-				pair = CoreUtil.readFileLog();
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				GZIPOutputStream g = new GZIPOutputStream(out);
-				g.write(pair.getValue());
-				g.close();
-				byte[] body = out.toByteArray();
-				method.setEntity(new ByteArrayEntity(body));
-				method.setConfig(RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build());
-				response = Main.client.execute(method);
-				if (response.getStatusLine().getStatusCode() >= 300) {
-					log.info("not proper code " + response.getStatusLine().toString());
+			for (String s : starterConfig.getLogURIService()) {
+				HttpPost method = new HttpPost(s);
+				CloseableHttpResponse response = null;
+				Pair<String, byte[]> pair = null;
+				try {
+					pair = CoreUtil.readFileLog();
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					GZIPOutputStream g = new GZIPOutputStream(out);
+					g.write(pair.getValue());
+					g.close();
+					byte[] body = out.toByteArray();
+					method.setEntity(new ByteArrayEntity(body));
+					method.setConfig(RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(60000).build());
+					response = Main.client.execute(method);
+					if (response.getStatusLine().getStatusCode() >= 300) {
+						log.info("not proper code " + response.getStatusLine().toString());
+						showError(p, pair);
+					} else {
+						LogResponse lr = Main.GSON.fromJson(
+								IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
+								LogResponse.class);
+						SwingUtilities.invokeLater(() -> {
+							tp.setText(String.format("<html>%s</html>", lr.getLink()));
+							StringSelection selection = new StringSelection(lr.getLink());
+							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+							clipboard.setContents(selection, selection);
+							l.setVisible(false);
+							tp.setVisible(true);
+							JOptionPane.showMessageDialog(frame, bundle.getString("clipboard.copy"), "",
+									JOptionPane.INFORMATION_MESSAGE);
+						});
+					}
+					return;
+				} catch (Exception e1) {
+					log.error("exception", e1);
 					showError(p, pair);
-				} else {
-					LogResponse lr = Main.GSON.fromJson(
-							IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
-							LogResponse.class);
-					SwingUtilities.invokeLater(() -> {
-						tp.setText(String.format("<html>%s</html>", lr.getLink()));
-						StringSelection selection = new StringSelection(lr.getLink());
-						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-						clipboard.setContents(selection, selection);
-						l.setVisible(false);
-						tp.setVisible(true);
-						JOptionPane.showMessageDialog(frame, bundle.getString("clipboard.copy"), "",
-								JOptionPane.INFORMATION_MESSAGE);
-					});
-				}
-			} catch (Exception e1) {
-				log.error("exception", e1);
-				showError(p, pair);
-			} finally {
-				if (Objects.nonNull(response)) {
-					method.abort();
-					EntityUtils.consumeQuietly(response.getEntity());
+				} finally {
+					if (Objects.nonNull(response)) {
+						method.abort();
+						EntityUtils.consumeQuietly(response.getEntity());
+					}
 				}
 			}
 		});
