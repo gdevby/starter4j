@@ -268,7 +268,7 @@ public class Starter {
 		Map<String, String> map = new HashMap<>();
 		map.put("currentAppVersion", appLocalConfig.getCurrentAppVersion());
 		fileMapperService.write(domainAvailability, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY);
-		map.put("domainAvailability",
+		map.put("starterDomainAvailability",
 				Paths.get(workDir, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY).toAbsolutePath().toString());
 		StringSubstitutor substitutor = new StringSubstitutor(map);
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
