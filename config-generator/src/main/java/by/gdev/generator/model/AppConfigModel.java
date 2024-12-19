@@ -51,7 +51,8 @@ public class AppConfigModel {
 
 	public static final AppConfigModel DEFAULT_APP_CONFIG_MODEL = new AppConfigModel("starter-app", "1.0",
 			"desktop.starter.app.Main",
-			Arrays.asList("currentAppVersion={currentAppVersion}", "domainAvailabilityFile={domainAvailability}"),
+			Arrays.asList("currentAppVersion={currentAppVersion}",
+					"starterDomainAvailability={starterDomainAvailability}"),
 			Arrays.asList("-Xmx512m", "-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true"), "starter-app-1.0.jar",
 			"../../starter-app/example-compiled-app/jres_default", "src/test/resources",
 			"../../starter-app/src/main/resources", "../../starter-app/example-compiled-app/target/dependencies",
