@@ -74,8 +74,8 @@ public class UpdateCore {
 				}
 			} finally {
 				httpGet.abort();
-				IOUtils.close(out);
-				IOUtils.close(in);
+				IOUtils.closeQuietly(out);
+				IOUtils.closeQuietly(in);
 			}
 			JLabelHtmlWrapper label = new JLabelHtmlWrapper(bundle.getString("update.message"));
 			JOptionPane.showMessageDialog(new JFrame(), label, "", JOptionPane.INFORMATION_MESSAGE);

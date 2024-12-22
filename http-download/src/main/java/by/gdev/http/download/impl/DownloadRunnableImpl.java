@@ -142,8 +142,8 @@ public class DownloadRunnableImpl implements Runnable {
 					return;
 				} finally {
 					httpGet.abort();
-					IOUtils.close(out);
-					IOUtils.close(in);
+					IOUtils.closeQuietly(out);
+					IOUtils.closeQuietly(in);
 				}
 			} catch (Exception e) {
 				if (attempt == DEFAULT_MAX_ATTEMPTS - 1)
