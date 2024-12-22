@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.HttpHostConnectException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -45,7 +44,7 @@ public class GsonServiceImplTest1 {
 	static ClientAndServer mockServer;
 	public static String host = "http://127.0.0.1";
 	public static Integer port = 34631;
-	public static String url = host + ":" + port;
+	public static String url = host + ":" + port + "/";
 
 	@BeforeClass
 	public static void init() throws IOException {
@@ -73,8 +72,7 @@ public class GsonServiceImplTest1 {
 
 	private static void initialization(Path testFolder) {
 		Gson gson = new Gson();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(2000).setSocketTimeout(2000).build();
-		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), requestConfig, 3);
+		HttpService httpService = new HttpServiceImpl(null, HttpClientConfig.getInstanceHttpClient(), 3);
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000, new InternetServerMap());
 		gsonService = new GsonServiceImpl(gson, fileService, httpService, new InternetServerMap());

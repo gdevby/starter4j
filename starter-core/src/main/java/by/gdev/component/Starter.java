@@ -89,7 +89,6 @@ public class Starter {
 	@Getter
 	private FileMapperService fileMapperService;
 	private String workDir;
-	private boolean hasInternet;
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
 	private JvmRepo java;
@@ -107,14 +106,13 @@ public class Starter {
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
-		hasInternet = domainAvailability.hasInternet();
-		domainAvailability.setAvailableInternet(hasInternet);
+		domainAvailability.setAvailableInternet(domainAvailability.hasInternet());
 		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
-		HttpService httpService = new HttpServiceImpl(null, Main.client, requestConfig, starterConfig.getMaxAttempts());
+		HttpService httpService = new HttpServiceImpl(null, Main.client, starterConfig.getMaxAttempts());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
-		updateCore = new UpdateCore(bundle, gsonService, Main.client, requestConfig, starterConfig);
+		updateCore = new UpdateCore(bundle, gsonService, Main.client, starterConfig, domainAvailability);
 
 	}
 
@@ -153,8 +151,8 @@ public class Starter {
 		DownloaderContainer container = new DownloaderContainer();
 		String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 		Repo resources;
-		if (hasInternet) {
-			log.info("app remote config: {}", serverFileUrn);
+		if (domainAvailability.hasInternetForDomains(starterConfig.getServerFile())) {
+			log.info("app remote config: {}", starterConfig.getServerFile());
 			remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn, AppConfig.class,
 					false);
 			updateApp(gsonService, fileMapperService);
