@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,6 +31,7 @@ import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterUpdate;
 import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.util.DesktopUtil;
+import by.gdev.util.InternetServerMap;
 import by.gdev.util.OSInfo.OSType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +43,8 @@ public class UpdateCore {
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private CloseableHttpClient httpclient;
-	private RequestConfig requestConfig;
 	private StarterAppConfig starterConfig;
+	private InternetServerMap domainAvailability;
 
 	public void checkUpdates(OSType osType) throws IOException, NoSuchAlgorithmException {
 		Map<OSType, StarterUpdate> map = getUpdateFile();
@@ -62,7 +62,6 @@ public class UpdateCore {
 			BufferedOutputStream out = null;
 			HttpGet httpGet = new HttpGet(update.getUri());
 			try {
-				httpGet.setConfig(requestConfig);
 				CloseableHttpResponse response = httpclient.execute(httpGet);
 				HttpEntity entity = response.getEntity();
 				in = new BufferedInputStream(entity.getContent());
@@ -89,10 +88,13 @@ public class UpdateCore {
 	}
 
 	private Map<OSType, StarterUpdate> getUpdateFile() throws IOException {
-		return gsonService.getObjectWithoutSaving(starterConfig.getServerFile(),
-				StarterAppConfig.APP_STARTER_UPDATE_CONFIG, new TypeToken<Map<OSType, StarterUpdate>>() {
-					private static final long serialVersionUID = 1L;
-				}.getType());
+		if (domainAvailability.hasInternetForDomains(starterConfig.getServerFile())) {
+			return gsonService.getObjectWithoutSaving(starterConfig.getServerFile(),
+					StarterAppConfig.APP_STARTER_UPDATE_CONFIG, new TypeToken<Map<String, StarterUpdate>>() {
+						private static final long serialVersionUID = 1L;
+					}.getType());
+		}
+		return null;
 	}
 
 	public static void deleteTmpFileIfExist() {

@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -45,7 +44,6 @@ public class HttpServiceImpl implements HttpService {
 	 */
 	private String proxy;
 	private CloseableHttpClient httpclient;
-	private RequestConfig requestConfig;
 	private int maxAttepmts;
 
 	private final Map<Path, Lock> fileLocks = new ConcurrentHashMap<>();
@@ -172,7 +170,6 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
-		http.setConfig(requestConfig);
 		return httpclient.execute(http);
 	}
 

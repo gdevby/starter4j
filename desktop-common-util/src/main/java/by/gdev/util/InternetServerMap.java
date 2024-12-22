@@ -33,14 +33,24 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 	 * @return find worked servers
 	 */
 	public List<String> getAliveDomainsOrUseAll(List<String> list) {
-		List<String> l1 = list.stream().filter(s -> !isSkippedURL(s)).collect(Collectors.toList());
+		List<String> l1 = filter(list);
 		if (l1.isEmpty())
 			return list;
 		return l1;
 	}
 
+	private List<String> filter(List<String> list) {
+		List<String> l1 = list.stream().filter(s -> !isSkippedURL(s)).collect(Collectors.toList());
+		return l1;
+	}
+
 	public boolean hasInternet() {
 		return values().stream().anyMatch(e -> e) ? true : false;
+	}
+
+	public boolean hasInternetForDomains(List<String> domains) {
+		List<String> l1 = filter(domains);
+		return !l1.isEmpty();
 	}
 
 }
