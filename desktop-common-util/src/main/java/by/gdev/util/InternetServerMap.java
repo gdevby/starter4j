@@ -49,6 +49,8 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 	}
 
 	public boolean hasInternetForDomains(List<String> domains) {
+		if (!availableInternet)
+			return false;
 		List<String> l1 = filter(domains);
 		return !l1.isEmpty();
 	}
