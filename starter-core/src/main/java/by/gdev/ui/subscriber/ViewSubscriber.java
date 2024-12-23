@@ -147,10 +147,11 @@ public class ViewSubscriber {
 
 	private void doRequest(JPanel p, JLabel l, JTextPane tp) {
 		CompletableFuture.runAsync(() -> {
+			Exception e2 = null;
+			Pair<String, byte[]> pair = null;
 			for (String s : starterConfig.getLogURIService()) {
 				HttpPost method = new HttpPost(s);
 				CloseableHttpResponse response = null;
-				Pair<String, byte[]> pair = null;
 				try {
 					pair = CoreUtil.readFileLog();
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -181,8 +182,7 @@ public class ViewSubscriber {
 					}
 					return;
 				} catch (Exception e1) {
-					log.error("exception", e1);
-					showError(p, pair);
+					e2 = e1;
 				} finally {
 					if (Objects.nonNull(response)) {
 						method.abort();
@@ -190,6 +190,8 @@ public class ViewSubscriber {
 					}
 				}
 			}
+			log.error("exception", e2);
+			showError(p, pair);
 		});
 	}
 
