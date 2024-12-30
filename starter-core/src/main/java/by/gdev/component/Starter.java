@@ -146,74 +146,77 @@ public class Starter {
 		log.info("Start loading");
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
-		DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-		Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability);
-		DownloaderContainer container = new DownloaderContainer();
-		String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
-		Repo resources;
-		if (domainAvailability.hasInternetForDomains(starterConfig.getServerFile())) {
-			log.info("app remote config: {}", starterConfig.getServerFile());
-			remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn, AppConfig.class,
-					false);
-			updateApp(gsonService, fileMapperService);
-			dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
-					remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
-			resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
-					remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
-			jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
-					remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
-		} else {
-			log.info("No Internet connection");
-			remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn, AppConfig.class);
-			if (Objects.isNull(remoteAppConfig)) {
-				eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
-				System.exit(-1);
-			}
-			Repo dep = remoteAppConfig.getAppDependencies();
-			dependencis = gsonService.getLocalObject(dep.getRepositories(), dep.getResources().get(0).getRelativeUrl(),
-					Repo.class);
-			Repo res = remoteAppConfig.getAppResources();
-			resources = gsonService.getLocalObject(res.getRepositories(), res.getResources().get(0).getRelativeUrl(),
-					Repo.class);
-			Repo javaRepo = remoteAppConfig.getJavaRepo();
-			jvm = gsonService.getLocalObject(javaRepo.getRepositories(),
-					javaRepo.getResources().get(0).getRelativeUrl(), JVMConfig.class);
-		}
 		try {
-			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
-		} catch (Exception e) {
-			log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
+			DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability);
+			DownloaderContainer container = new DownloaderContainer();
+			String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
+			Repo resources;
+			if (domainAvailability.hasInternetForDomains(starterConfig.getServerFile())) {
+				log.info("app remote config: {}", starterConfig.getServerFile());
+				remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn, AppConfig.class,
+						false);
+				updateApp(gsonService, fileMapperService);
+				dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
+						remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
+				resources = gsonService.getObjectByUrls(remoteAppConfig.getAppResources().getRepositories(),
+						remoteAppConfig.getAppResources().getResources().get(0).getRelativeUrl(), Repo.class, false);
+				jvm = gsonService.getObjectByUrls(remoteAppConfig.getJavaRepo().getRepositories(),
+						remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
+			} else {
+				log.info("No Internet connection");
+				remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn, AppConfig.class);
+				if (Objects.isNull(remoteAppConfig)) {
+					eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
+					System.exit(-1);
+				}
+				Repo dep = remoteAppConfig.getAppDependencies();
+				dependencis = gsonService.getLocalObject(dep.getRepositories(), dep.getResources().get(0).getRelativeUrl(),
+						Repo.class);
+				Repo res = remoteAppConfig.getAppResources();
+				resources = gsonService.getLocalObject(res.getRepositories(), res.getResources().get(0).getRelativeUrl(),
+						Repo.class);
+				Repo javaRepo = remoteAppConfig.getJavaRepo();
+				jvm = gsonService.getLocalObject(javaRepo.getRepositories(),
+						javaRepo.getResources().get(0).getRelativeUrl(), JVMConfig.class);
+			}
+			try {
+				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+			} catch (Exception e) {
+				log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
+			}
+			if (appLocalConfig == null) {
+				appLocalConfig = new AppLocalConfig();
+				appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+			}
+			if (Objects.nonNull(starterConfig.getVersion())) {
+				appLocalConfig.setCurrentAppVersion(starterConfig.getVersion());
+				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+			}
+			Repo fileRepo = remoteAppConfig.getAppFileRepo();
+			java = jvm.getJvms().get(osType).get(osArc).get(DownloaderJavaContainer.JRE_DEFAULT);
+			List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
+			PostHandlerImpl postHandler = new PostHandlerImpl();
+			for (Repo repo : list) {
+				container.containerAllSize(repo);
+				container.filterNotExistResoursesAndSetRepo(repo, workDir);
+				container.setDestinationRepositories(workDir);
+				container.setHandlers(Arrays.asList(postHandler));
+				downloader.addContainer(container);
+			}
+			DownloaderJavaContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
+					DownloaderJavaContainer.JRE_CONFIG);
+			ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, DownloaderJavaContainer.JRE_CONFIG);
+			jreContainer.containerAllSize(java);
+			jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
+			jreContainer.setDestinationRepositories(workDir);
+			jreContainer.setHandlers(Arrays.asList(postHandler, archiveHandler));
+			downloader.addContainer(jreContainer);
+			downloader.startDownload(true);
+		} finally {
+			DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		}
-		if (appLocalConfig == null) {
-			appLocalConfig = new AppLocalConfig();
-			appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-		}
-		if (Objects.nonNull(starterConfig.getVersion())) {
-			appLocalConfig.setCurrentAppVersion(starterConfig.getVersion());
-			fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-		}
-		Repo fileRepo = remoteAppConfig.getAppFileRepo();
-		java = jvm.getJvms().get(osType).get(osArc).get(DownloaderJavaContainer.JRE_DEFAULT);
-		List<Repo> list = Lists.newArrayList(fileRepo, dependencis, resources);
-		PostHandlerImpl postHandler = new PostHandlerImpl();
-		for (Repo repo : list) {
-			container.containerAllSize(repo);
-			container.filterNotExistResoursesAndSetRepo(repo, workDir);
-			container.setDestinationRepositories(workDir);
-			container.setHandlers(Arrays.asList(postHandler));
-			downloader.addContainer(container);
-		}
-		DownloaderJavaContainer jreContainer = new DownloaderJavaContainer(fileMapperService, workDir,
-				DownloaderJavaContainer.JRE_CONFIG);
-		ArchiveHandler archiveHandler = new ArchiveHandler(fileMapperService, DownloaderJavaContainer.JRE_CONFIG);
-		jreContainer.containerAllSize(java);
-		jreContainer.filterNotExistResoursesAndSetRepo(java, workDir);
-		jreContainer.setDestinationRepositories(workDir);
-		jreContainer.setHandlers(Arrays.asList(postHandler, archiveHandler));
-		downloader.addContainer(jreContainer);
-		downloader.startDownload(true);
-		DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		log.info("loading is complete");
 	}
 
