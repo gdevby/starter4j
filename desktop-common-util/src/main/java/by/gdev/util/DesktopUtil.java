@@ -250,13 +250,16 @@ public class DesktopUtil {
 	public static void activeDoubleDownloadingResourcesLock(String container) throws IOException {
 		File f = new File(container, PROTECTION);
 		createDirectory(f);
-		if (f.exists()) {
-			FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-			lock = ch.tryLock();
-			if (Objects.isNull(lock)) {
-				log.warn("Lock could not be acquired ");
-				System.exit(4);
-			}
+		if (!f.exists()) {
+			f.createNewFile();
+		}
+		FileChannel ch = FileChannel.open(f.toPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		lock = ch.tryLock();
+		if (Objects.isNull(lock)) {
+			log.warn("Lock could not be acquired ");
+			System.exit(4);
+		} else {
+			log.info("Locked by file {}", f.toString());
 		}
 	}
 
