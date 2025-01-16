@@ -167,9 +167,11 @@ public class Starter {
 				log.info("No Internet connection");
 				// when user runs after updaterDelay is overdue. We need to allow run old
 				// version, New version we had installed yet
-				remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(),
-						starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-						AppConfig.class);
+				if (Objects.nonNull(appLocalConfig)) {
+					remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(),
+							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+							AppConfig.class);
+				}
 				if (Objects.isNull(remoteAppConfig)) {
 					remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn,
 							AppConfig.class);
