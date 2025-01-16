@@ -154,8 +154,8 @@ public class Starter {
 			Repo resources;
 			if (domainAvailability.hasInternetForDomains(starterConfig.getServerFile())) {
 				log.info("app remote config: {}", starterConfig.getServerFile());
-				remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn, AppConfig.class,
-						false);
+				remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(), serverFileUrn,
+						AppConfig.class, false);
 				updateApp(gsonService, fileMapperService);
 				dependencis = gsonService.getObjectByUrls(remoteAppConfig.getAppDependencies().getRepositories(),
 						remoteAppConfig.getAppDependencies().getResources().get(0).getRelativeUrl(), Repo.class, false);
@@ -165,23 +165,32 @@ public class Starter {
 						remoteAppConfig.getJavaRepo().getResources().get(0).getRelativeUrl(), JVMConfig.class, false);
 			} else {
 				log.info("No Internet connection");
-				remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn, AppConfig.class);
+				// when user runs after updaterDelay is overdue. We need to allow run old
+				// version, New version we had installed yet
+				remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(),
+						starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+						AppConfig.class);
+				if (Objects.isNull(remoteAppConfig)) {
+					remoteAppConfig = gsonService.getLocalObject(starterConfig.getServerFile(), serverFileUrn,
+							AppConfig.class);
+				}
 				if (Objects.isNull(remoteAppConfig)) {
 					eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
 					System.exit(-1);
 				}
 				Repo dep = remoteAppConfig.getAppDependencies();
-				dependencis = gsonService.getLocalObject(dep.getRepositories(), dep.getResources().get(0).getRelativeUrl(),
-						Repo.class);
+				dependencis = gsonService.getLocalObject(dep.getRepositories(),
+						dep.getResources().get(0).getRelativeUrl(), Repo.class);
 				Repo res = remoteAppConfig.getAppResources();
-				resources = gsonService.getLocalObject(res.getRepositories(), res.getResources().get(0).getRelativeUrl(),
-						Repo.class);
+				resources = gsonService.getLocalObject(res.getRepositories(),
+						res.getResources().get(0).getRelativeUrl(), Repo.class);
 				Repo javaRepo = remoteAppConfig.getJavaRepo();
 				jvm = gsonService.getLocalObject(javaRepo.getRepositories(),
 						javaRepo.getResources().get(0).getRelativeUrl(), JVMConfig.class);
 			}
 			try {
-				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
+						AppLocalConfig.class);
 			} catch (Exception e) {
 				log.error("can't read default config {}", StarterAppConfig.APP_STARTER_LOCAL_CONFIG, e);
 			}
