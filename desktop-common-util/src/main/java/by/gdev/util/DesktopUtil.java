@@ -40,6 +40,7 @@ import javax.swing.UIManager;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -120,8 +121,9 @@ public class DesktopUtil {
 		complete.update(array);
 		byte[] b = complete.digest();
 		StringBuilder result = new StringBuilder();
-		for (byte cb : b)
+		for (byte cb : b) {
 			result.append(Integer.toString((cb & 0xff) + 0x100, 16).substring(1));
+		}
 		return result.toString();
 	}
 
@@ -138,8 +140,9 @@ public class DesktopUtil {
 		StringBuilder b = new StringBuilder(path);
 		b.append(separator);
 		b.append("bin").append(separator).append("java");
-		if (OSInfo.getOSType().equals(OSType.WINDOWS))
+		if (OSInfo.getOSType().equals(OSType.WINDOWS)) {
 			b.append("w.exe");
+		}
 		return b.toString();
 	}
 
@@ -202,8 +205,10 @@ public class DesktopUtil {
 						host = http.getURI().getHost();
 						http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
 						log.info("check internet connection {} timeout {} ms", link, time);
-						httpclient.execute(http);
-						return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
+						HttpResponse hr =  httpclient.execute(http);
+						if(hr.getStatusLine().getStatusCode() == 200)
+							return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
+						else new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
 					} catch (IOException e1) {
 						e = e1;
 					}
@@ -219,15 +224,18 @@ public class DesktopUtil {
 	}
 
 	private static void createDirectory(File file) throws IOException {
-		if (file.isFile())
+		if (file.isFile()) {
 			return;
-		if (file.getParentFile() != null)
+		}
+		if (file.getParentFile() != null) {
 			file.getParentFile().mkdirs();
+		}
 	}
 
 	public static void diactivateDoubleDownloadingResourcesLock() throws IOException {
-		if (Objects.nonNull(lock))
+		if (Objects.nonNull(lock)) {
 			lock.release();
+		}
 	}
 
 	/**
@@ -297,12 +305,13 @@ public class DesktopUtil {
 				Desktop.getDesktop().browse(new URI(uri));
 			} catch (IOException | URISyntaxException e) {
 				log.warn("can't open link", e);
-				if (type.equals(OSType.LINUX))
+				if (type.equals(OSType.LINUX)) {
 					try {
 						Runtime.getRuntime().exec("gnome-open " + uri);
 					} catch (IOException e1) {
 						log.warn("can't open link for linix", e);
 					}
+				}
 			}
 		});
 	}
@@ -318,12 +327,13 @@ public class DesktopUtil {
 			new JFileChooser();
 		} catch (Throwable t) {
 			log.warn("problem with ", t);
-			if (Objects.nonNull(defaultLookAndFeel))
+			if (Objects.nonNull(defaultLookAndFeel)) {
 				try {
 					UIManager.setLookAndFeel(defaultLookAndFeel);
 				} catch (Throwable e) {
 					log.warn("coudn't set defualt look and feel", e);
 				}
+			}
 		}
 	}
 
