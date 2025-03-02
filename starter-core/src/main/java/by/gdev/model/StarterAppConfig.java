@@ -1,6 +1,5 @@
 package by.gdev.model;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,10 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.internal.Lists;
 
-import by.gdev.Main;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
-import by.gdev.utils.service.FileMapperService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,7 +43,8 @@ public class StarterAppConfig {
 	public static final List<String> URI_APP_CONFIG = Lists.newArrayList(
 			"https://raw.githubusercontent.com/gdevby/starter-app/master/example-compiled-app/server/starter-app/");
 	private final boolean prod = false;
-
+	@Parameter(names = "-appName", description = "The application name, use to create directory inside home, should be in lower case")
+	private String appName;
 	@Parameter(names = "-memory", description = "The size of the required free disk space to download the application")
 	private long minMemorySize;
 	@Parameter(names = "-uriAppConfig", description = "URI of the directory in which appConfig.json is located, which contains all information about the application being launched, this config is used by all applications by default. URI must be specified without version, see version parameter description, should be end with /")
@@ -76,7 +74,7 @@ public class StarterAppConfig {
 			+ "Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest")
 	private List<String> logURIService;
 
-	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig(500, URI_APP_CONFIG, "starter",
+	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig("starter",500, URI_APP_CONFIG, null,
 			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
 			60000, 600000, false, null);
 
@@ -85,18 +83,10 @@ public class StarterAppConfig {
 	}
 
 	/**
-	 * This method returns the working directory.
+	 * This method builds the working directory.
 	 */
 
-	public String workDir(String workDirectory, OSType osType) throws IOException {
-		File starterFile = new File(
-				String.join("/", Paths.get(workDirectory).toAbsolutePath().toString(), APP_STARTER_LOCAL_CONFIG));
-		if (starterFile.exists()) {
-			AppLocalConfig app = new FileMapperService(Main.GSON, Main.charset, "").read(starterFile.toString(),
-					AppLocalConfig.class);
-			if (Objects.nonNull(app) && !StringUtils.isEmpty(app.getDir()))
-				return Paths.get(app.getDir()).toAbsolutePath().toString();
-		}
+	public void buildAbsoluteWorkDirectory(OSType osType) throws IOException {
 		Path installer = Paths.get("installer.properties").toAbsolutePath();
 		String dir = "";
 		if (Files.exists(installer)) {
@@ -106,10 +96,11 @@ public class StarterAppConfig {
 			dir = property.getProperty("work.dir");
 		}
 		if (!StringUtils.isEmpty(workDirectory)) {
-			return Paths.get(workDirectory).toAbsolutePath().toString();
-		} else if (!StringUtils.isEmpty(dir))
-			return Paths.get(dir).toAbsolutePath().toString();
-		else
-			return DesktopUtil.getSystemPath(osType, "starter").getAbsolutePath().toString();
+			workDirectory = Paths.get(workDirectory).toAbsolutePath().toString().concat("/");
+		} else if (!StringUtils.isEmpty(dir)) {
+			workDirectory = Paths.get(dir).toAbsolutePath().toString().concat("/");
+		} else {
+			workDirectory = DesktopUtil.getSystemPath(osType, "."+appName + "/starter").getAbsolutePath().toString().concat("/");
+		}
 	}
 }

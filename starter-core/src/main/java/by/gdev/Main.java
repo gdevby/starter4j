@@ -54,6 +54,12 @@ public class Main {
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
+		if(Objects.isNull(starterConfig.getWorkDirectory())){
+			starterConfig.buildAbsoluteWorkDirectory(OSInfo.getOSType());
+		}
+		if(Objects.isNull(starterConfig.getCacheDirectory())){
+			starterConfig.setCacheDirectory(Paths.get(starterConfig.getWorkDirectory(), "cache"));
+		}
 		loadLogbackConfig(starterConfig);
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));

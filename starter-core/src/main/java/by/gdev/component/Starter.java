@@ -113,6 +113,7 @@ public class Starter {
 				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
 		updateCore = new UpdateCore(bundle, gsonService, Main.client, starterConfig, domainAvailability);
+		workDir = starterConfig.getWorkDirectory();
 
 	}
 
@@ -120,7 +121,6 @@ public class Starter {
 	 * Validate files,java and return what we need to download
 	 */
 	public void validateEnvironmentAndAppRequirements() throws Exception {
-		workDir = starterConfig.workDir(starterConfig.getWorkDirectory(), osType).concat("/");
 		List<ValidateEnvironment> validateEnvironment = new ArrayList<ValidateEnvironment>();
 		validateEnvironment.add(new ValidatedPartionSize(starterConfig.getMinMemorySize(), new File(workDir), bundle));
 		validateEnvironment.add(new ValidateWorkDir(workDir, bundle));
