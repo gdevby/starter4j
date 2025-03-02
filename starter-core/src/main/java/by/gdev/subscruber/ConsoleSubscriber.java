@@ -1,6 +1,5 @@
 package by.gdev.subscruber;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -12,7 +11,6 @@ import com.google.common.eventbus.Subscribe;
 import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
-import by.gdev.model.AppLocalConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterAppProcess;
@@ -24,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ConsoleSubscriber {
 	private ResourceBundle bundle;
+	@SuppressWarnings("unused")
 	private FileMapperService fileMapperService;
 	private StarterAppConfig starterConfig;
 
@@ -74,18 +73,19 @@ public class ConsoleSubscriber {
 		if (!StringUtils.isEmpty(status.getLine())
 				&& status.getLine().equals("java.lang.UnsatisfiedLinkError: no zip in java.library.path")) {
 			String newWorkDir = "C:\\" + starterConfig.getWorkDirectory();
-			log.error(String.format(bundle.getString("unsatisfied.link.error"),
+			log.error(String.format(bundle.getString("unidentified.error"),
 					Paths.get(starterConfig.getWorkDirectory()).toAbsolutePath().toString(), newWorkDir));
-			try {
-				AppLocalConfig appLocalConfig = new AppLocalConfig();
-				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
-						AppLocalConfig.class);
-				appLocalConfig.setDir(newWorkDir);
-				log.info(appLocalConfig.toString());
-				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-			} catch (IOException e) {
-				log.error("Error ", e);
-			}
+//			log.error(String.format(bundle.getString("unsatisfied.link.error"),
+//					Paths.get(starterConfig.getWorkDirectory()).toAbsolutePath().toString(), newWorkDir));
+//			try {
+//				AppLocalConfig appLocalConfig = new AppLocalConfig();
+//				appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
+//						AppLocalConfig.class);
+//				log.info(appLocalConfig.toString());
+//				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+//			} catch (IOException e) {
+//				log.error("Error ", e);
+//			}
 		}
 	}
 }

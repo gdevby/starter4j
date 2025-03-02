@@ -12,7 +12,6 @@ import lombok.Data;
 public class AppLocalConfig {
 
 	private String currentAppVersion;
-	private String dir;
 	private String skipUpdateVersion;
 
 	public boolean isSkippedVersion(String newVersion) {
