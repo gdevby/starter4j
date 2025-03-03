@@ -267,7 +267,7 @@ public class Starter {
 	 * @throws InterruptedException
 	 */
 	public void runApp() throws IOException, InterruptedException {
-		log.info("Start application");
+		log.info("Start application {} ",workDir);
 		Path jre = DesktopUtil
 				.getJavaRun(Paths.get(workDir, DownloaderJavaContainer.JRE_DEFAULT, java.getJreDirectoryName()));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);
