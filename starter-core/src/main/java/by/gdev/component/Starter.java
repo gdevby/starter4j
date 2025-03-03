@@ -109,8 +109,8 @@ public class Starter {
 		domainAvailability.setAvailableInternet(domainAvailability.hasInternet());
 		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
 		HttpService httpService = new HttpServiceImpl(null, Main.client, starterConfig.getMaxAttempts());
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
-				starterConfig.getCacheDirectory(), starterConfig.getTimeToLife(), domainAvailability);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,Paths.get(starterConfig.getWorkDirectory(),"cache"), 
+				starterConfig.getTimeToLife(), domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
 		updateCore = new UpdateCore(bundle, gsonService, Main.client, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
