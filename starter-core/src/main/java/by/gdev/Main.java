@@ -57,9 +57,6 @@ public class Main {
 		if(Objects.isNull(starterConfig.getWorkDirectory())){
 			starterConfig.buildAbsoluteWorkDirectory(OSInfo.getOSType());
 		}
-		if(Objects.isNull(starterConfig.getCacheDirectory())){
-			starterConfig.setCacheDirectory(Paths.get(starterConfig.getWorkDirectory(), "cache"));
-		}
 		loadLogbackConfig(starterConfig);
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));
@@ -68,8 +65,9 @@ public class Main {
 			if (!e.endsWith("/")) {
 				log.warn("does't end with /, will add, {}", e);
 				return e + "/";
-			} else
+			} else {
 				return e;
+			}
 		}).collect(Collectors.toList()));
 		ResourceBundle bundle = null;
 
@@ -111,9 +109,9 @@ public class Main {
 			String message = t.getMessage();
 			if ("file doesn't exist".equals(message)) {
 				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
-			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable"))
+			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable")) {
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
-			else {
+			} else {
 				String s1 = Objects.nonNull(starterConfig.getLogURIService()) ? "unidentified.error"
 						: "unidentified.error.1";
 				eventBus.post(new ExceptionMessage(bundle.getString(s1), t, true));

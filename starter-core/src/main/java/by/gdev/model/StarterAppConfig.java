@@ -53,8 +53,6 @@ public class StarterAppConfig {
 			+ "The second way is to put in file with installer.  The file name is installer.properties which contains work.dir=... This is for production. "
 			+ "The default method is DesktopUtil.getSystemPath defined with by.gdev.Main. The priority: StarterAppConfig.workDirectory, file installer.properties and default method")
 	private String workDirectory;
-	@Parameter(names = "-cacheDirectory", description = "Directory for storing caching configs")
-	private Path cacheDirectory;
 	@Parameter(names = "-version", description = "Specifies the version of the application to launch. Therefore, the config http://localhost:81/app/1.0/appConfig.json for version 1.0 will be used. "
 			+ "This way we can install old versions of the application. For this you need set exactly version.")
 	private String version;
@@ -74,9 +72,8 @@ public class StarterAppConfig {
 			+ "Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest")
 	private List<String> logURIService;
 
-	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig("starter",500, URI_APP_CONFIG, null,
-			Paths.get("starter/cache"), null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000,
-			60000, 600000, false, null);
+	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig("starter", 500, URI_APP_CONFIG, null,
+			null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false, null);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);
@@ -100,7 +97,8 @@ public class StarterAppConfig {
 		} else if (!StringUtils.isEmpty(dir)) {
 			workDirectory = Paths.get(dir).toAbsolutePath().toString().concat("/");
 		} else {
-			workDirectory = DesktopUtil.getSystemPath(osType, "."+appName + "/starter").getAbsolutePath().toString().concat("/");
+			workDirectory = DesktopUtil.getSystemPath(osType, "." + appName + "/starter").getAbsolutePath().toString()
+					.concat("/");
 		}
 	}
 }
