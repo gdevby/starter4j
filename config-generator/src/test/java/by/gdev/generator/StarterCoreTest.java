@@ -36,7 +36,7 @@ public class StarterCoreTest {
 			FileUtils.deleteDirectory(jre);
 		}
 
-		Path testFolder = Paths.get(testWorkDirectory);
+		Path testFolder = Paths.get(testWorkDirectory).toAbsolutePath();
 		if (testFolder.toFile().exists()) {
 			FileUtils.deleteDirectory(testFolder.toFile());
 		}
@@ -55,7 +55,7 @@ public class StarterCoreTest {
 		by.gdev.generator.Main.main(configGenerator);
 		FileUtils.copyDirectory(new File(acm.getJavaFolder()), jre);
 		String[] starterCoreArg = { "-uriAppConfig", "http://127.0.0.1:65079/test-core/", "-version", "0.9",
-				"-workDirectory", testWorkDirectory, "-cacheDirectory", testWorkDirectory + "/cache", "-stop" };
+				"-workDirectory", Paths.get(testWorkDirectory).toAbsolutePath().toString().concat("/"), "-stop" };
 		by.gdev.Main.main(starterCoreArg);
 	}
 }
