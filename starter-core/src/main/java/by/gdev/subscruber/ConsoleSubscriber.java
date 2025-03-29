@@ -66,7 +66,7 @@ public class ConsoleSubscriber {
 
 	@Subscribe
 	public void downloadedFile(DownloadFile entity) {
-		log.info("downloaded file: {} -> {}", entity.getUri(), entity.getFile());
+		log.info("downloaded file: {} -> {} size {}", entity.getUri(), entity.getFile(), entity.getSize());
 	}
 
 	private void checkUnsatisfiedLinkError(StarterAppProcess status) {

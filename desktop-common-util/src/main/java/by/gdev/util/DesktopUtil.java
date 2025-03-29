@@ -20,14 +20,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -42,8 +47,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.download.Metadata;
@@ -194,32 +200,59 @@ public class DesktopUtil {
 	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
 		ForkJoinPool fjp = new ForkJoinPool(10);
+		int time = 2000;
+		List<HttpGet> list = Collections.synchronizedList(new ArrayList<>());
+		AtomicBoolean stopTasks = new AtomicBoolean();
+		Timer t = new Timer(true);
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				log.info("stop checking requests");
+				stopTasks.set(true);
+				list.forEach(e -> e.abort());
+			}
+		};
+		// added to for 1 second delay and 1 for additional time wait
+		t.schedule(task, time * 3 + time + 2000);
 		fjp.submit(() -> {
 			ism.putAll(urls.stream().parallel().map(link -> {
-				int time = 2000;
+
 				IOException e = null;
 				String host = "";
+				int time1 = time;
+				long l = System.currentTimeMillis();
 				for (int i = 0; i < 2; i++) {
 					try {
-						HttpHead http = new HttpHead(link);
+						if (stopTasks.get()) {
+							log.info("check failed {} within {} ms", host, System.currentTimeMillis() - l);
+							return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+						}
+						HttpGet http = new HttpGet(link);
+						list.add(http);
 						host = http.getURI().getHost();
-						http.setConfig(RequestConfig.custom().setConnectTimeout(time).setSocketTimeout(time).build());
-						log.info("check internet connection {} timeout {} ms", link, time);
-						HttpResponse hr =  httpclient.execute(http);
-						if(hr.getStatusLine().getStatusCode() == 200)
+						http.setConfig(RequestConfig.custom().setConnectTimeout(time1).setSocketTimeout(time1).build());
+						log.info("check internet connection {} timeout {} ms", link, time1);
+						HttpResponse hr = httpclient.execute(http);
+						if (hr.getStatusLine().getStatusCode() == 200) {
+							EntityUtils.consumeQuietly(hr.getEntity());
+							log.info("check passed {} within {} ms", host, System.currentTimeMillis() - l);
 							return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
-						else new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+						} else {
+							log.info("check failed {} within {} ms", host, System.currentTimeMillis() - l);
+							new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+						}
 					} catch (IOException e1) {
 						e = e1;
 					}
 					DesktopUtil.sleep(1000);
-					time *= 3;
+					time1 *= 3;
 				}
 				log.info("error during test net {} {}", link, e.getMessage());
 				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
 			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
 		}).get();
-		fjp.shutdown();
+		t.cancel();
+		fjp.close();
 		return ism;
 	}
 
@@ -298,6 +331,7 @@ public class DesktopUtil {
 	 * @param uri
 	 * @param alertError
 	 */
+	@SuppressWarnings("deprecation")
 	public static void openLink(OSType type, String uri) {
 		// TOD there is some problem with swing app. is is hanging in swing thread.
 		CompletableFuture.runAsync(() -> {

@@ -73,7 +73,10 @@ public class StarterAppConfig {
 	private List<String> logURIService;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig("starter", 500, URI_APP_CONFIG, null,
-			null, Arrays.asList("http://www.google.com", "http://www.baidu.com"), 3, 60000, 60000, 600000, false, null);
+			null,
+			Arrays.asList("http://www.google.com", "http://www.baidu.com",
+					"https://github.com/gdevby/starter-app/blob/master/example-compiled-app/server/starter-app/appConfig.json"),
+			3, 10000, 20000, 600000, false, null);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);
