@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @AllArgsConstructor
 public class DownloaderImpl implements Downloader {
+	private int downloadMaxAttemps = 1;
 	/**
 	 * Path to download file
 	 */
@@ -76,7 +77,7 @@ public class DownloaderImpl implements Downloader {
 		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
 		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus,
-				workedServers);
+				workedServers, downloadMaxAttemps);
 	}
 
 	@Override

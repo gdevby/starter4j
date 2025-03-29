@@ -9,4 +9,5 @@ public class DownloadFile {
 
 	private String uri;
 	private String file;
+	private long size;
 }

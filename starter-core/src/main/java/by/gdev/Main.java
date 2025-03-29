@@ -27,7 +27,6 @@ import com.google.gson.GsonBuilder;
 
 import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
-import by.gdev.handler.UpdateCore;
 import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
@@ -54,9 +53,10 @@ public class Main {
 		EventBus eventBus = new EventBus();
 		StarterAppConfig starterConfig = StarterAppConfig.DEFAULT_CONFIG;
 		JCommander.newBuilder().addObject(starterConfig).build().parse(args);
-		if(Objects.isNull(starterConfig.getWorkDirectory())){
+		if (Objects.isNull(starterConfig.getWorkDirectory())) {
 			starterConfig.buildAbsoluteWorkDirectory(OSInfo.getOSType());
 		}
+		
 		loadLogbackConfig(starterConfig);
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));
@@ -95,7 +95,6 @@ public class Main {
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();
 			s.runApp();
-			UpdateCore.deleteTmpFileIfExist();
 
 		} catch (FileSystemException | IOExceptionList ex) {
 			log.error("error", ex);

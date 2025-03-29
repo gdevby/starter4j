@@ -31,6 +31,7 @@ import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
 import by.gdev.handler.ValidateWorkDir;
 import by.gdev.handler.ValidatedPartionSize;
+import by.gdev.http.download.exeption.HashSumAndSizeError;
 import by.gdev.http.download.handler.ArchiveHandler;
 import by.gdev.http.download.handler.PostHandlerImpl;
 import by.gdev.http.download.impl.DownloaderImpl;
@@ -112,7 +113,7 @@ public class Starter {
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,Paths.get(starterConfig.getWorkDirectory(),"cache"), 
 				starterConfig.getTimeToLife(), domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
-		updateCore = new UpdateCore(bundle, gsonService, Main.client, starterConfig, domainAvailability);
+		updateCore = new UpdateCore(bundle, gsonService, fileService, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
 
 	}
@@ -294,6 +295,9 @@ public class Starter {
 	public void updateApplication() {
 		try {
 			updateCore.checkUpdates(osType);
+		} catch (HashSumAndSizeError t1) {
+			String s = String.format(bundle.getString("upload.error.hash.sum"), t1.getUri(), t1.getLocalPath());
+			eventBus.post(new ExceptionMessage(s, t1.getUri()));
 		} catch (Exception e) {
 			log.error("promlem with update application ", e);
 		}

@@ -11,11 +11,15 @@ import java.util.Objects;
 import java.util.Queue;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
@@ -42,18 +46,20 @@ public class DownloadRunnableImpl implements Runnable {
 	private CloseableHttpClient httpclient;
 	private RequestConfig requestConfig;
 	private EventBus eventBus;
-	private int DEFAULT_MAX_ATTEMPTS = 3;
+
 	private InternetServerMap workedServers;
+	private int downloadMaxAttemps;
 
 	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements,
 			CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus,
-			InternetServerMap workedServers) {
+			InternetServerMap workedServers, int downloadMaxAttemps) {
 		this.downloadElements = downloadElements;
 		this.processedElements = processedElements;
 		this.httpclient = httpclient;
 		this.requestConfig = requestConfig;
 		this.eventBus = eventBus;
 		this.workedServers = workedServers;
+		this.downloadMaxAttemps = downloadMaxAttemps;
 	}
 
 	@Override
@@ -65,19 +71,22 @@ public class DownloadRunnableImpl implements Runnable {
 				DownloadElement element = downloadElements.poll();
 				if (Objects.nonNull(element)) {
 					Throwable ex = null;
+					processedElements.add(element);
 					for (String repo : workedServers.getAliveDomainsOrUseAll(element.getRepo().getRepositories())) {
 						try {
 							download(element, repo);
-							for (PostHandler h : element.getHandlers())
+							for (PostHandler h : element.getHandlers()) {
 								h.postProcessDownloadElement(element);
-
+							}
+							ex = null;
 							break;
 						} catch (Throwable e1) {
 							ex = e1;
 						}
 					}
-					if (Objects.nonNull(ex))
+					if (Objects.nonNull(ex)) {
 						element.setError(ex);
+					}
 				} else {
 //					DesktopUtil.sleep(1000);
 					break;
@@ -95,32 +104,30 @@ public class DownloadRunnableImpl implements Runnable {
 	 */
 
 	private void download(DownloadElement element, String repo) throws IOException, InterruptedException {
-		processedElements.add(element);
 		File file = new File(element.getPathToDownload() + element.getMetadata().getPath());
 		String url = null;
-		for (int attempt = 0; attempt < DEFAULT_MAX_ATTEMPTS; attempt++) {
+		for (int attempt = 0; attempt < downloadMaxAttemps; attempt++) {
 			try {
+				element.setDownloadBytes(0L);
 				BufferedInputStream in = null;
 				BufferedOutputStream out = null;
 				boolean resume = false;
 				url = repo + element.getMetadata().getRelativeUrl();
 				log.trace(url);
 				HttpGet httpGet = new HttpGet(url);
-				try {
-					if (!file.getParentFile().exists())
-						file.getParentFile().mkdirs();
-					if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
-							&& file.length() < element.getMetadata().getSize()) {
-						httpGet.addHeader("Range", "bytes= " + file.length() + "-" + element.getMetadata().getSize());
-						resume = true;
-					}
-					httpGet.setConfig(requestConfig);
-					CloseableHttpResponse response = httpclient.execute(httpGet);
+
+				if (!file.getParentFile().exists()) {
+					file.getParentFile().mkdirs();
+				}
+				resume = tryDownloadPart(element, file, httpGet);
+				try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+
 					StatusLine sl = response.getStatusLine();
-					String responseCode = String.valueOf(sl.getStatusCode());
-					if (!responseCode.startsWith("20"))
+
+					if (sl.getStatusCode() != HttpStatus.SC_OK) {
 						throw new IOException(
-								String.format("code %s phrase %s %s", responseCode, sl.getReasonPhrase(), url));
+								String.format("code %s phrase %s %s", sl.getStatusCode(), sl.getReasonPhrase(), url));
+					}
 					HttpEntity entity = response.getEntity();
 					in = new BufferedInputStream(entity.getContent());
 					out = new BufferedOutputStream(new FileOutputStream(file, resume));
@@ -136,7 +143,7 @@ public class DownloadRunnableImpl implements Runnable {
 							element.setDownloadBytes(element.getDownloadBytes() + curread);
 						}
 					}
-					eventBus.post(new DownloadFile(url, file.toString()));
+					eventBus.post(new DownloadFile(url, file.toString(), element.getDownloadBytes()));
 					LocalTime endTime = LocalTime.now();
 					element.setEnd(endTime);
 					return;
@@ -146,9 +153,28 @@ public class DownloadRunnableImpl implements Runnable {
 					IOUtils.closeQuietly(in);
 				}
 			} catch (Exception e) {
-				if (attempt == DEFAULT_MAX_ATTEMPTS - 1)
+				if (attempt == downloadMaxAttemps - 1) {
 					throw new UploadFileException(url, file.toString(), e.getMessage());
+				}
 			}
 		}
+	}
+
+	private boolean tryDownloadPart(DownloadElement element, File file, HttpGet httpGet)
+			throws ClientProtocolException, IOException {
+		if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
+				&& file.length() < element.getMetadata().getSize()) {
+			HttpHead hh = new HttpHead(httpGet.getURI());
+			try (CloseableHttpResponse response = httpclient.execute(hh)) {
+				Header h = response.getFirstHeader("accept-ranges");
+				if (Objects.nonNull(h) && "bytes".equals(h.getValue())) {
+					log.info("download part with accept-ranges current size {}, full size {}", file.length(),
+							element.getMetadata().getSize());
+					httpGet.addHeader("Range", "bytes= " + file.length() + "-" + element.getMetadata().getSize());
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
