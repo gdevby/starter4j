@@ -88,7 +88,7 @@ public class DownloadTest {
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000, new InternetServerMap());
 		gsonService = new GsonServiceImpl(gson, fileService, httpService, new InternetServerMap());
-		downloader = new DownloaderImpl(eventBus, client, requestConfig, new InternetServerMap());
+		downloader = new DownloaderImpl(eventBus, client, requestConfig, new InternetServerMap(), false);
 	}
 
 	@AfterClass

@@ -49,10 +49,11 @@ public class DownloadRunnableImpl implements Runnable {
 
 	private InternetServerMap workedServers;
 	private int downloadMaxAttemps;
+	private boolean resumeDownload;
 
 	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements,
 			CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus,
-			InternetServerMap workedServers, int downloadMaxAttemps) {
+			InternetServerMap workedServers, int downloadMaxAttemps, boolean resumeDownloadFile) {
 		this.downloadElements = downloadElements;
 		this.processedElements = processedElements;
 		this.httpclient = httpclient;
@@ -60,6 +61,7 @@ public class DownloadRunnableImpl implements Runnable {
 		this.eventBus = eventBus;
 		this.workedServers = workedServers;
 		this.downloadMaxAttemps = downloadMaxAttemps;
+		this.resumeDownload = resumeDownloadFile;
 	}
 
 	@Override
@@ -119,7 +121,8 @@ public class DownloadRunnableImpl implements Runnable {
 				if (!file.getParentFile().exists()) {
 					file.getParentFile().mkdirs();
 				}
-				resume = tryDownloadPart(element, file, httpGet);
+				if (resumeDownload)
+					resume = tryDownloadPart(element, file, httpGet);
 				try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
 
 					StatusLine sl = response.getStatusLine();
