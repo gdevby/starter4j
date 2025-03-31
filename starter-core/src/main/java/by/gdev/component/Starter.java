@@ -149,7 +149,7 @@ public class Starter {
 		log.info(String.valueOf(osArc));
 		try {
 			DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability,false);
 			DownloaderContainer container = new DownloaderContainer();
 			String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 			Repo resources;
