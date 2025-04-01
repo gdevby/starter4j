@@ -100,7 +100,11 @@ public class StarterAppConfig {
 		} else if (!StringUtils.isEmpty(dir)) {
 			workDirectory = Paths.get(dir).toAbsolutePath().toString().concat("/");
 		} else {
-			workDirectory = DesktopUtil.getSystemPath(osType, "." + appName + "/starter").getAbsolutePath().toString()
+			String systemDir = "." + appName;
+			if(osType.equals(OSType.MACOSX)) {
+				systemDir = appName;
+			}
+			workDirectory = DesktopUtil.getSystemPath(osType, systemDir + "/starter").getAbsolutePath().toString()
 					.concat("/");
 		}
 	}
