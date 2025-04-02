@@ -30,7 +30,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -192,12 +191,10 @@ public class DesktopUtil {
 	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
 		ExecutorService ex = Executors.newCachedThreadPool();
-		int time = 2000;
-		AtomicBoolean stopTasks = new AtomicBoolean();
+		int time = 1500;
 		// added to for 1 second delay and 1 for additional time wait
 		@SuppressWarnings("resource")
 		FutureRequestExecutionService requestExecutionService = new FutureRequestExecutionService(httpclient, ex);
-		HttpClientContext hcc = HttpClientContext.create();
 		ex.submit(() -> {
 			ism.putAll(urls.stream().parallel().map(link -> {
 				String host = "";
@@ -205,31 +202,26 @@ public class DesktopUtil {
 				long l = System.currentTimeMillis();
 				for (int i = 0; i < 2; i++) {
 					try {
-						if (stopTasks.get()) {
-							log.info("check failed {} within {} ms", host, System.currentTimeMillis() - l);
-							return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
-						}
 						HttpGet http = new HttpGet(link);
 						host = http.getURI().getHost();
 						http.setConfig(RequestConfig.custom().setConnectTimeout(time1).setSocketTimeout(time1).build());
 						log.info("check internet connection {} timeout {} ms", link, time1);
 						ResponseHandler<Boolean> handler = response -> response.getStatusLine().getStatusCode() == 200;
-						HttpRequestFutureTask<Boolean> futureTask = requestExecutionService.execute(http, hcc, handler);
+						HttpRequestFutureTask<Boolean> futureTask = requestExecutionService.execute(http,
+								HttpClientContext.create(), handler);
 						Boolean isOk = futureTask.get(time1, TimeUnit.MILLISECONDS);
-
 						if (isOk) {
-							log.info("check passed {} within {} ms", host, System.currentTimeMillis() - l);
+							log.info("passed {} within {} ms", host, System.currentTimeMillis() - l);
 							return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
 						} else {
-							log.info("check failed {} within {} ms", host, System.currentTimeMillis() - l);
-							new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+							log.info("failed {} within {} ms", host, System.currentTimeMillis() - l);
 						}
 					} catch (Exception e1) {
 						DesktopUtil.sleep(1000);
 						time1 *= 3;
 					}
 				}
-				log.info("check failed {} within {} ms", host, System.currentTimeMillis() - l);
+				log.info("failed {} within {} ms", host, System.currentTimeMillis() - l);
 				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
 			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
 		}).get();
