@@ -16,7 +16,6 @@ public interface GsonService {
 	 * @return Get local object if exist or return null;
 	 */
 	<T> T getLocalObject(List<String> uris, String urn, Class<T> class1) throws IOException, NoSuchAlgorithmException;
-	<T> T getLocalObject(String uri, Class<T> class1) throws IOException, NoSuchAlgorithmException;
 
 	/**
 	 * @param <T>    type return object
@@ -35,6 +34,12 @@ public interface GsonService {
 	 * 
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+
+	/**
+	 * @see #getObjectByUrls(List, String, Class, boolean)
+	 */
+	<T> T getObjectByUrls(List<String> urls, String urn, Type type, boolean cache)
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
 
 	/**
