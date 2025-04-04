@@ -58,32 +58,40 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
+	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		return getObjectByUrls1(urls, urn, class1, null, cache);
+	}
+
+	@Override
+	public <T> T getObjectByUrls(List<String> urls, String urn, Type type, boolean cache)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+		return getObjectByUrls1(urls, urn, null, type, cache);
+	}
+
+	@Override
 	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
 			throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getLocalRawObject(uris, urn);
-		if (Objects.isNull(pathFile))
+		if (Objects.isNull(pathFile)) {
 			return null;
+		}
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
 			return gson.fromJson(read, class1);
 		}
 	}
 
-	@Override
-	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+	protected <T> T getObjectByUrls1(List<String> urls, String urn, Class<T> class1, Type type, boolean cache)
+			throws IOException, NoSuchAlgorithmException {
 		Path pathFile = fileService.getRawObject(urls, urn, cache);
-		if (Objects.isNull(pathFile))
+		if (Objects.isNull(pathFile)) {
 			return null;
+		}
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
-			return gson.fromJson(read, class1);
+			return Objects.nonNull(class1) ? gson.fromJson(read, class1) : gson.fromJson(read, type); 
 		}
-	}
-
-	@Override
-	public <T> T getLocalObject(String uri, Class<T> class1) throws IOException, NoSuchAlgorithmException {
-		return null;
 	}
 
 	protected <T> T doRequest(List<String> urls, String urn, Class<T> class1, Type type, Map<String, String> headers)
