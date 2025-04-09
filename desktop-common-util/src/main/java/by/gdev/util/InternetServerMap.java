@@ -1,14 +1,14 @@
 package by.gdev.util;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class InternetServerMap extends HashMap<String, Boolean> {
+public class InternetServerMap extends ConcurrentHashMap<String, Boolean> {
 	private static final long serialVersionUID = 1L;
 	/**
 	 * We can ignore skipped url without internet. Because it can restore.
@@ -17,13 +17,15 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 	private boolean availableInternet;
 
 	public boolean isSkippedURL(String url) {
-		if (!availableInternet)
+		if (!availableInternet) {
 			return false;
+		}
 		if (keySet().stream().filter(e -> url.contains(e) && !this.get(e)).findAny().isPresent()) {
 			log.debug("skip request to server {}", url);
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	/**
@@ -34,8 +36,9 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 	 */
 	public List<String> getAliveDomainsOrUseAll(List<String> list) {
 		List<String> l1 = filter(list);
-		if (l1.isEmpty())
+		if (l1.isEmpty()) {
 			return list;
+		}
 		return l1;
 	}
 
@@ -49,8 +52,9 @@ public class InternetServerMap extends HashMap<String, Boolean> {
 	}
 
 	public boolean hasInternetForDomains(List<String> domains) {
-		if (!availableInternet)
+		if (!availableInternet) {
 			return false;
+		}
 		List<String> l1 = filter(domains);
 		return !l1.isEmpty();
 	}
