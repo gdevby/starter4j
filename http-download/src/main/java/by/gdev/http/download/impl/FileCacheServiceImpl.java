@@ -102,8 +102,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 		if (savedPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(savedPath.toFile(), Headers.SHA1.getValue());
-			if (Objects.isNull(localMetadata) || !Objects.equals(localMetadata.getSha1(), sha))
+			if (Objects.isNull(localMetadata) || !Objects.equals(localMetadata.getSha1(), sha)) {
 				throw new IOException("sha not equals");
+			}
 			return savedPath;
 		}
 		return null;
@@ -112,8 +113,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
 			throws IOException, NoSuchAlgorithmException {
 		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
-		if (urlPath.toFile().lastModified() < purgeTime)
+		if (urlPath.toFile().lastModified() < purgeTime) {
 			Files.deleteIfExists(urlPath);
+		}
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
@@ -139,6 +141,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
+				log.info("do head request -> {} {} local file {}",url,localMetadata, urlPath);
 				if (Objects.nonNull(localMetadata) && Objects.nonNull(localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
