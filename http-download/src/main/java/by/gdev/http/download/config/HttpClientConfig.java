@@ -26,7 +26,7 @@ public class HttpClientConfig {
 				.build();
 		CloseableHttpClient builder = HttpClients.custom()
 				.setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE).setConnectionManager(cm)
-				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).build();
+				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).disableContentCompression().build();
 		return builder;
 	}
 
