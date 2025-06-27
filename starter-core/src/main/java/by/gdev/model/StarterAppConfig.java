@@ -76,7 +76,7 @@ public class StarterAppConfig {
 			null,
 			Arrays.asList("http://www.google.com", "http://www.baidu.com",
 					"https://github.com/gdevby/starter-app/blob/master/example-compiled-app/server/starter-app/appConfig.json"),
-			3, 10000, 20000, 600000, false, null);
+			3, 5000, 10000, 600000, false, null);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);
@@ -101,7 +101,7 @@ public class StarterAppConfig {
 			workDirectory = Paths.get(dir).toAbsolutePath().toString().concat("/");
 		} else {
 			String systemDir = "." + appName;
-			if(osType.equals(OSType.MACOSX)) {
+			if (osType.equals(OSType.MACOSX)) {
 				systemDir = appName;
 			}
 			workDirectory = DesktopUtil.getSystemPath(osType, systemDir + "/starter").getAbsolutePath().toString()
