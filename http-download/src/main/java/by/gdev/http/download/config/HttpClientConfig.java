@@ -26,11 +26,12 @@ public class HttpClientConfig {
 				.build();
 		CloseableHttpClient builder = HttpClients.custom()
 				.setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE).setConnectionManager(cm)
-				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).disableContentCompression().build();
+				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).disableContentCompression()
+				.build();
 		return builder;
 	}
 
 	public static CloseableHttpClient getInstanceHttpClient() {
-		return getInstanceHttpClient(60 * 1000, 60 * 1000, 5, 20);
+		return getInstanceHttpClient(5 * 1000, 10 * 1000, 5, 20);
 	}
 }
