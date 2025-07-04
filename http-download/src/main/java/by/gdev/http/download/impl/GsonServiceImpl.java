@@ -72,13 +72,23 @@ public class GsonServiceImpl implements GsonService {
 	@Override
 	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
 			throws IOException, NoSuchAlgorithmException {
+		return getLocalObject1(uris, urn, class1, null);
+	}
+
+	@Override
+	public <T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException, NoSuchAlgorithmException {
+		return getLocalObject1(uris, urn, null, type);
+	}
+
+	private <T> T getLocalObject1(List<String> uris, String urn, Class<T> class1, Type type)
+			throws IOException, NoSuchAlgorithmException, FileNotFoundException {
 		Path pathFile = fileService.getLocalRawObject(uris, urn);
 		if (Objects.isNull(pathFile)) {
 			return null;
 		}
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
-			return gson.fromJson(read, class1);
+			return Objects.nonNull(class1) ? gson.fromJson(read, class1) : gson.fromJson(read, type);
 		}
 	}
 
@@ -90,7 +100,7 @@ public class GsonServiceImpl implements GsonService {
 		}
 		try (InputStreamReader read = new InputStreamReader(new FileInputStream(pathFile.toFile()),
 				StandardCharsets.UTF_8)) {
-			return Objects.nonNull(class1) ? gson.fromJson(read, class1) : gson.fromJson(read, type); 
+			return Objects.nonNull(class1) ? gson.fromJson(read, class1) : gson.fromJson(read, type);
 		}
 	}
 
