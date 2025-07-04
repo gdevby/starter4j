@@ -18,6 +18,11 @@ public interface GsonService {
 	<T> T getLocalObject(List<String> uris, String urn, Class<T> class1) throws IOException, NoSuchAlgorithmException;
 
 	/**
+	 * @see #getLocalObject(List, String, Class)
+	 */
+	<T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException, NoSuchAlgorithmException;
+
+	/**
 	 * @param <T>    type return object
 	 * @param urls   Information about the location of the resource being loaded.
 	 *               Left side of the URI
