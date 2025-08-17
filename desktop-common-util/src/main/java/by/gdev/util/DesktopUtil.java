@@ -230,8 +230,11 @@ public class DesktopUtil {
 				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
 			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
 		}).get();
-		if (!ism.hasInternet())
+		if (!ism.hasInternet()) {
 			ism.setMaxAttemps(1);
+		} else {
+			ism.setAvailableInternet(true);
+		}
 		ex.shutdown();
 		return ism;
 	}
@@ -334,7 +337,6 @@ public class DesktopUtil {
 	 * @param uri
 	 * @param alertError
 	 */
-	@SuppressWarnings("deprecation")
 	public static void openLink(OSType type, String uri) {
 		// TOD there is some problem with swing app. is is hanging in swing thread.
 		CompletableFuture.runAsync(() -> {
