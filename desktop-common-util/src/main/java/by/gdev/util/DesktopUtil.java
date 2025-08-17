@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -189,7 +190,11 @@ public class DesktopUtil {
 
 	@SneakyThrows
 	public static InternetServerMap testServers(List<String> urls, CloseableHttpClient httpclient) {
-		InternetServerMap ism = new InternetServerMap();
+		return testServers1(urls, httpclient, new InternetServerMap());
+	}
+
+	private static InternetServerMap testServers1(List<String> urls, CloseableHttpClient httpclient,
+			InternetServerMap ism) throws InterruptedException, ExecutionException {
 		ExecutorService ex = Executors.newCachedThreadPool();
 		int time = 1500;
 		// added to for 1 second delay and 1 for additional time wait
@@ -225,7 +230,32 @@ public class DesktopUtil {
 				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
 			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
 		}).get();
+		if (!ism.hasInternet())
+			ism.setMaxAttemps(1);
 		ex.shutdown();
+		return ism;
+	}
+
+	/**
+	 * Asynchronous check internet connection
+	 * 
+	 * @param urls       - domains
+	 * @param httpclient - client
+	 * @return
+	 */
+	@SneakyThrows
+	public static InternetServerMap testServersAsync(List<String> urls, CloseableHttpClient httpclient) {
+		InternetServerMap ism = new InternetServerMap();
+		urls.stream().forEach(e -> {
+			ism.put(new HttpGet(e).getURI().getHost(), true);
+		});
+		CompletableFuture.runAsync(() -> {
+			try {
+				testServers1(urls, httpclient, ism);
+			} catch (Exception e) {
+				log.error("error", e);
+			}
+		});
 		return ism;
 	}
 
@@ -304,6 +334,7 @@ public class DesktopUtil {
 	 * @param uri
 	 * @param alertError
 	 */
+	@SuppressWarnings("deprecation")
 	public static void openLink(OSType type, String uri) {
 		// TOD there is some problem with swing app. is is hanging in swing thread.
 		CompletableFuture.runAsync(() -> {

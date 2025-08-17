@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.http.protocol.HttpService;
+
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +17,15 @@ public class InternetServerMap extends ConcurrentHashMap<String, Boolean> {
 	 * We can ignore skipped url without internet. Because it can restore.
 	 */
 	@Setter
-	private boolean availableInternet;
+	@Getter
+	private volatile boolean availableInternet;
+	/**
+	 * max attempts to do request for {@link HttpService}, when it doesn't have
+	 * connection it does only one request.
+	 */
+	@Getter
+	@Setter
+	private volatile int maxAttemps = 3;
 
 	public boolean isSkippedURL(String url) {
 		if (!availableInternet) {
