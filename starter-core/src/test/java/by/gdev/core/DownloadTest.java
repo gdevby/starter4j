@@ -84,7 +84,7 @@ public class DownloadTest {
 		EventBus eventBus = new EventBus();
 		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
 		CloseableHttpClient client = HttpClientConfig.getInstanceHttpClient();
-		HttpService httpService = new HttpServiceImpl(null, client, 3);
+		HttpService httpService = new HttpServiceImpl(null, client, new InternetServerMap());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000, new InternetServerMap());
 		gsonService = new GsonServiceImpl(gson, fileService, httpService, new InternetServerMap());
