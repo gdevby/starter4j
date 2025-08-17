@@ -107,11 +107,14 @@ public class Starter {
 				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
-		domainAvailability.setAvailableInternet(domainAvailability.hasInternet());
-		log.trace("Max attempts from download = {}", starterConfig.getMaxAttempts());
-		HttpService httpService = new HttpServiceImpl(null, Main.client, starterConfig.getMaxAttempts());
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,Paths.get(starterConfig.getWorkDirectory(),"cache"), 
-				starterConfig.getTimeToLife(), domainAvailability);
+		if (domainAvailability.hasInternet()) {
+			domainAvailability.setMaxAttemps(starterConfig.getMaxAttempts());
+		}
+		log.trace("Max attempts from download = {}", domainAvailability.getMaxAttemps());
+		HttpService httpService = new HttpServiceImpl(null, Main.client, domainAvailability);
+		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
+				Paths.get(starterConfig.getWorkDirectory(), "cache"), starterConfig.getTimeToLife(),
+				domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
 		updateCore = new UpdateCore(bundle, gsonService, fileService, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
@@ -149,7 +152,7 @@ public class Starter {
 		log.info(String.valueOf(osArc));
 		try {
 			DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
-			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability,false);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
 			DownloaderContainer container = new DownloaderContainer();
 			String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 			Repo resources;
@@ -268,7 +271,7 @@ public class Starter {
 	 * @throws InterruptedException
 	 */
 	public void runApp() throws IOException, InterruptedException {
-		log.info("Start application {} ",workDir);
+		log.info("Start application {} ", workDir);
 		Path jre = DesktopUtil
 				.getJavaRun(Paths.get(workDir, DownloaderJavaContainer.JRE_DEFAULT, java.getJreDirectoryName()));
 		JavaProcessHelper javaProcess = new JavaProcessHelper(String.valueOf(jre), new File(workDir), eventBus);

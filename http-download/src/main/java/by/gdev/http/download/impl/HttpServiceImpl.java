@@ -30,6 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import by.gdev.http.download.model.Headers;
 import by.gdev.http.download.model.RequestMetadata;
 import by.gdev.http.download.service.HttpService;
+import by.gdev.util.InternetServerMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,7 @@ public class HttpServiceImpl implements HttpService {
 	 */
 	private String proxy;
 	private CloseableHttpClient httpclient;
-	private int maxAttepmts;
+	private InternetServerMap workedServers;
 
 	private final Map<Path, Lock> fileLocks = new ConcurrentHashMap<>();
 
@@ -55,13 +56,13 @@ public class HttpServiceImpl implements HttpService {
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
 		log.debug("do request {}, saved to {}", url, path.toAbsolutePath().toString());
 		RequestMetadata request = null;
-		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+		for (int attepmts = 0; attepmts < workedServers.getMaxAttemps(); attepmts++) {
 			try {
 				request = getResourseByUrl(url, path);
 				break;
 			} catch (SocketTimeoutException e1) {
 				attepmts++;
-				if (attepmts == maxAttepmts)
+				if (attepmts == workedServers.getMaxAttemps())
 					throw new SocketTimeoutException();
 			} catch (IOException e) {
 				if (Objects.nonNull(proxy))
@@ -81,13 +82,13 @@ public class HttpServiceImpl implements HttpService {
 	@Override
 	public RequestMetadata getMetaByUrl(String url) throws IOException {
 		RequestMetadata request = null;
-		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+		for (int attepmts = 0; attepmts < workedServers.getMaxAttemps(); attepmts++) {
 			try {
 				request = getMetadata(url);
 				break;
 			} catch (SocketTimeoutException e) {
 				attepmts++;
-				if (attepmts == maxAttepmts)
+				if (attepmts == workedServers.getMaxAttemps())
 					throw new SocketTimeoutException();
 			}
 		}
@@ -186,7 +187,7 @@ public class HttpServiceImpl implements HttpService {
 	@Override
 	public String getRequestByUrl(String url, Map<String, String> map) throws IOException {
 		SocketTimeoutException ste = null;
-		for (int attepmts = 0; attepmts < maxAttepmts; attepmts++) {
+		for (int attepmts = 0; attepmts < workedServers.getMaxAttemps(); attepmts++) {
 			try {
 				return getStringByUrl(url, map);
 			} catch (SocketTimeoutException e) {
