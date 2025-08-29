@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StarterStatusFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JProgressBar progressBar;
-	private String gdevBy = "https://github.com/gdevby/desktop-starter-launch-update-bootstrap";
+	private String gdevBy = "https://github.com/gdevby/starter4j";
 	private JLabel uploadStatus = new JLabel();
 	private ResourceBundle resourceBundle;
 
