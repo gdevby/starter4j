@@ -8,9 +8,9 @@
 <ol>
 <li>Создать тестовую директорию</li>
 <li>Клонировать в тестовую директорию тестовый проект при помощи команды: git clone https://github.com/gdevby/starter-app.git</li>
-<li>Клонировать в тестовую директорию основной проект при помощи команды: git clone https://github.com/gdevby/desktop-starter-launch-update-bootstrap.git<br></li>
-<li>В директории проекта desktop-starter-launch-update-bootstrap выполнить команду mvn clean install</li>
-<li>Перейти в директорию desktop-starter-launch-update-bootstrap/config-generator</li>
+<li>Клонировать в тестовую директорию основной проект при помощи команды: git clone https://github.com/gdevby/starter4j.git<br></li>
+<li>В директории проекта starter4j выполнить команду mvn clean install</li>
+<li>Перейти в директорию starter4j/config-generator</li>
 <li>Выполнить команду java -jar target/config-generator-*.jar, где вместо * заменить на версию</li>
 
 </ol>
