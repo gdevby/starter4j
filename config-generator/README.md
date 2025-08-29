@@ -1,6 +1,6 @@
 # config-generator
 
-[Russian version](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/config-generator/README_RU.md)<br>
+[Russian version](https://github.com/gdevby/starter4j/blob/master/config-generator/README_RU.md)<br>
 This module creates json format configs to run the future java desktop application.<br>
 It configures all the necessary files, java jre to run on a different OS, as well as resources (images...), dependencies, application startup arguments and jvm.<br>
 You can try to create configs for test desktop java Hello World project.</br>
@@ -8,9 +8,9 @@ To test to functionality you need to run the following commands<br>
 <ol>
 <li>Create test directory</li>
 <li>Clone the test project to the test directory using the command: git clone https://github.com/gdevby/starter-app.git</li>
-<li>Clone the main project to the test directory using the command: git clone https://github.com/gdevby/desktop-starter-launch-update-bootstrap.git<br></li>
-<li>In the project directory desktop-starter-launch-update-bootstrap run command mvn clean install</li>
-<li>Go to directory desktop-starter-launch-update-bootstrap/config-generator</li>
+<li>Clone the main project to the test directory using the command: git clone https://github.com/gdevby/starter4j.git<br></li>
+<li>In the project directory starter4j run command mvn clean install</li>
+<li>Go to directory starter4j/config-generator</li>
 <li>Run command java -jar target/config-generator-*.jar, where instead of * replace with version</li>
 </ol>
 

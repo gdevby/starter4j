@@ -1,6 +1,6 @@
 # starter-core
 
-[Russian version](https://github.com/gdevby/desktop-starter-launch-update-bootstrap/blob/master/starter-core/README_RU.md)<br>
+[Russian version](https://github.com/gdevby/starter4j/blob/master/starter-core/README_RU.md)<br>
 
 This is the main module for running a desktop application. <br>
 The lifecycle includes the following steps during application startup:
