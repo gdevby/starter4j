@@ -42,9 +42,9 @@ curl --remote-name https://raw.githubusercontent.com/gdevby/starter-app/master/e
 ```
 
 These modules can help you develop desktop applications:
-1) Java paths, OS identification, user directories, in details [desktop-common-util]()
+1) Java paths, OS identification, user directories, in details [desktop-common-util](https://github.com/gdevby/starter4j/blob/master/desktop-common-util/README.md)
 2) Multi-threaded download files and cache configs for desktop application, in detail [http-download](https://github.com/gdevby/starter4j/blob/master/http-download/README.md )
-3) Get information on GPU, downtime and system activity, in detail [desktop-common-util-additional]()
+3) Get information on GPU, downtime and system activity, in detail [desktop-common-util-additional](https://github.com/gdevby/starter4j/blob/master/desktop-common-util-additional/README.md)
 
 This project solves similar problems as launch4j, but it solves differently:
 1) Doesn't pack jar into exe. An installer is created that will download the launcher and run your jar file
