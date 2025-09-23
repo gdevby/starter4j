@@ -118,15 +118,16 @@ public class DesktopUtil {
 		return file;
 	}
 
-	public static String getChecksum(byte[] array, String algorithm) throws IOException, NoSuchAlgorithmException {
+	public static String getChecksum(byte[] array, String algorithm) {
 		return createChecksum(array, algorithm);
 	}
 
-	public static String getChecksum(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
+	public static String getChecksum(File file, String algorithm) throws IOException {
 		return createChecksum(Files.readAllBytes(file.toPath()), algorithm);
 	}
 
-	private static String createChecksum(byte[] array, String algorithm) throws NoSuchAlgorithmException {
+	@SneakyThrows(NoSuchAlgorithmException.class)
+	private static String createChecksum(byte[] array, String algorithm) {
 		MessageDigest complete = MessageDigest.getInstance(algorithm);
 		complete.update(array);
 		byte[] b = complete.digest();

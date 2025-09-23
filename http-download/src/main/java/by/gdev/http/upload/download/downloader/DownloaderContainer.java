@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class DownloaderContainer {
 	List<PostHandler> handlers;
 
 	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory)
-			throws NoSuchAlgorithmException, IOException {
+			throws IOException {
 		this.repo = new Repo();
 		List<Metadata> listRes = new ArrayList<Metadata>();
 		for (Metadata meta : repo.getResources()) {

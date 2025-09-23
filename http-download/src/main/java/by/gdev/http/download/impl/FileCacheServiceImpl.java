@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +49,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		this.workedServers = workedServers;
 	}
 
-	private Path getRawObject(String url, boolean cache, Path savedPath) throws IOException, NoSuchAlgorithmException {
+	private Path getRawObject(String url, boolean cache, Path savedPath) throws IOException {
 		Path metaFile = Paths.get(String.valueOf(savedPath).concat(".metadata"));
 		if (cache) {
 			return getResourceWithoutHttpHead(url, metaFile, savedPath);
@@ -61,13 +60,13 @@ public class FileCacheServiceImpl implements FileCacheService {
 
 	@Override
 	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		String urn = metadata.getRelativeUrl();
 		return getRawObject1(urls, urn, cache);
 	}
 
 	protected Path getRawObject1(List<String> urls, String urn, boolean cache)
-			throws NoSuchAlgorithmException, IOException {
+			throws IOException {
 		IOException ex = null;
 		Path savedPath = buildPath(urls.get(0) + urn);
 		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls)) {
@@ -82,21 +81,21 @@ public class FileCacheServiceImpl implements FileCacheService {
 
 	@Override
 	public Path getRawObject(List<String> urls, String urn, boolean cache)
-			throws NoSuchAlgorithmException, IOException {
+			throws IOException {
 		return getRawObject1(urls, urn, cache);
 	}
 
 	@Override
-	public Path getLocalRawObject(List<String> urls, Metadata metadata) throws IOException, NoSuchAlgorithmException {
+	public Path getLocalRawObject(List<String> urls, Metadata metadata) throws IOException {
 		return readLocalRawObject(urls, metadata.getRelativeUrl());
 	}
 
 	@Override
-	public Path getLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException {
+	public Path getLocalRawObject(List<String> urls, String urn) throws IOException {
 		return readLocalRawObject(urls, urn);
 	}
 
-	protected Path readLocalRawObject(List<String> urls, String urn) throws IOException, NoSuchAlgorithmException {
+	protected Path readLocalRawObject(List<String> urls, String urn) throws IOException {
 		Path savedPath = buildPath(urls.get(0) + urn).toAbsolutePath();
 		Path metaFile = Paths.get(String.valueOf(savedPath).concat(".metadata")).toAbsolutePath();
 		if (savedPath.toFile().exists() && Files.exists(metaFile)) {
@@ -111,7 +110,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
 		if (urlPath.toFile().lastModified() < purgeTime) {
 			Files.deleteIfExists(urlPath);
@@ -135,7 +134,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	private Path getResourceWithHttpHead(String url, Path metaFile, Path urlPath)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		boolean fileExists = urlPath.toFile().exists();
 		try {
 			if (fileExists) {
@@ -161,7 +160,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	private Path generateRequestMetadata(String url, Path urlPath, Path metaFile)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		RequestMetadata requestMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 		requestMetadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		fileMapperService.write(requestMetadata, metaFile.toString());

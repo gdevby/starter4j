@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.io.FileUtils;
 
@@ -27,7 +26,7 @@ public class Main {
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static FileMapperService fileMapperService = new FileMapperService(GSON, charset, "");
 	
-	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+	public static void main(String[] args) throws IOException {
 		log.info("run config generator");
 		AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
 		JCommander jc = JCommander.newBuilder().addObject(acm).build();

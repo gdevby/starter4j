@@ -3,7 +3,6 @@ package by.gdev.http.download.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +14,12 @@ public interface GsonService {
 	/**
 	 * @return Get local object if exist or return null;
 	 */
-	<T> T getLocalObject(List<String> uris, String urn, Class<T> class1) throws IOException, NoSuchAlgorithmException;
+	<T> T getLocalObject(List<String> uris, String urn, Class<T> class1) throws IOException;
 
 	/**
 	 * @see #getLocalObject(List, String, Class)
 	 */
-	<T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException, NoSuchAlgorithmException;
+	<T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException;
 
 	/**
 	 * @param <T>    type return object
@@ -35,17 +34,16 @@ public interface GsonService {
 	 *               to do http head request to check version in the cache with ETag
 	 * @return T
 	 * @throws IOException
-	 * @throws NoSuchAlgorithmException
 	 * 
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+			throws FileNotFoundException, IOException;
 
 	/**
 	 * @see #getObjectByUrls(List, String, Class, boolean)
 	 */
 	<T> T getObjectByUrls(List<String> urls, String urn, Type type, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException;
+			throws FileNotFoundException, IOException;
 
 	/**
 	 * Do request to server and return

@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import by.gdev.util.DesktopUtil;
@@ -44,7 +43,7 @@ public class Metadata {
      */
     private String link;
 
-    public static Metadata createMetadata (Path config) throws NoSuchAlgorithmException, IOException {
+    public static Metadata createMetadata (Path config) throws IOException {
 		Metadata metadata = new Metadata();
 		metadata.setPath(config.toString().replace("\\", "/"));
 		metadata.setRelativeUrl(config.toString().replace("\\", "/"));

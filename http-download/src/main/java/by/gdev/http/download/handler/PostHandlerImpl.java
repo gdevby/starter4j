@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,7 +23,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PostHandlerImpl implements PostHandler {
 	@Override
-	public void postProcessDownloadElement(DownloadElement element) throws NoSuchAlgorithmException, IOException {
+	public void postProcessDownloadElement(DownloadElement element) throws IOException {
 
 		Path localeFile = Paths.get(element.getPathToDownload(), element.getMetadata().getPath());
 		String shaLocalFile = DesktopUtil.getChecksum(localeFile.toFile(), Headers.SHA1.getValue());
