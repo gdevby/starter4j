@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,29 +58,29 @@ public class GsonServiceImpl implements GsonService {
 
 	@Override
 	public <T> T getObjectByUrls(List<String> urls, String urn, Class<T> class1, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			throws FileNotFoundException, IOException {
 		return getObjectByUrls1(urls, urn, class1, null, cache);
 	}
 
 	@Override
 	public <T> T getObjectByUrls(List<String> urls, String urn, Type type, boolean cache)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			throws FileNotFoundException, IOException {
 		return getObjectByUrls1(urls, urn, null, type, cache);
 	}
 
 	@Override
 	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		return getLocalObject1(uris, urn, class1, null);
 	}
 
 	@Override
-	public <T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException, NoSuchAlgorithmException {
+	public <T> T getLocalObject(List<String> uris, String urn, Type type) throws IOException {
 		return getLocalObject1(uris, urn, null, type);
 	}
 
 	private <T> T getLocalObject1(List<String> uris, String urn, Class<T> class1, Type type)
-			throws IOException, NoSuchAlgorithmException, FileNotFoundException {
+			throws IOException, FileNotFoundException {
 		Path pathFile = fileService.getLocalRawObject(uris, urn);
 		if (Objects.isNull(pathFile)) {
 			return null;
@@ -93,7 +92,7 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	protected <T> T getObjectByUrls1(List<String> urls, String urn, Class<T> class1, Type type, boolean cache)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		Path pathFile = fileService.getRawObject(urls, urn, cache);
 		if (Objects.isNull(pathFile)) {
 			return null;

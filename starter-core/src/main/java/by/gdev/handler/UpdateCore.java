@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
@@ -39,7 +38,7 @@ public class UpdateCore {
 	private StarterAppConfig starterConfig;
 	private InternetServerMap domainAvailability;
 
-	public void checkUpdates(OSType osType) throws IOException, NoSuchAlgorithmException {
+	public void checkUpdates(OSType osType) throws IOException {
 		UpdateApp ua = getUpdateFile();
 		if (ua == null || ua.getMap() == null || !ua.getMap().containsKey(osType))
 			return;
