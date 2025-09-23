@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +85,7 @@ public class GsonServiceImplTest1 {
 	}
 
 	@Test
-	public void test1() throws NoSuchAlgorithmException, IOException {
+	public void test1() throws IOException {
 		MyTestType type1 = gsonService.getObjectByUrls(Lists.newArrayList(url), "repo/test.json", MyTestType.class,
 				false);
 		MyTestType type2 = new MyTestType();
@@ -95,7 +94,7 @@ public class GsonServiceImplTest1 {
 	}
 
 	@Test
-	public void test2() throws NoSuchAlgorithmException, IOException {
+	public void test2() throws IOException {
 		MyTestType type1 = gsonService.getObjectByUrls(Lists.newArrayList(url), "repo/test.json", MyTestType.class,
 				true);
 		MyTestType type2 = new MyTestType();
@@ -104,24 +103,24 @@ public class GsonServiceImplTest1 {
 	}
 
 	@Test(expected = IOException.class)
-	public void test3() throws NoSuchAlgorithmException, IOException {
+	public void test3() throws IOException {
 		gsonService.getObjectByUrls(Lists.newArrayList(host), "repo/testnotwxisrt.json", MyTestType.class, true);
 	}
 
 	@Test(expected = UnknownHostException.class)
-	public void test4() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
+	public void test4() throws FileNotFoundException, IOException {
 		gsonService.getObjectByUrls(Lists.newArrayList("https://domennotexistgdev.by"), "repo/testnotwxisrt.json",
 				MyTestType.class, false);
 	}
 
 	@Test(expected = HttpHostConnectException.class)
-	public void test5Timeout() throws NoSuchAlgorithmException, IOException {
+	public void test5Timeout() throws IOException {
 		gsonService.getObjectByUrls(Lists.newArrayList("http://127.0.0.1:12346"), "/repo/test78.json", MyTestType.class,
 				true);
 	}
 
 	@Test
-	public void test7() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
+	public void test7() throws FileNotFoundException, IOException {
 		MyTestType test = gsonService.getObjectByUrls(Arrays.asList("https://domennotexistgdev.by/", url),
 				"repo/test.json", MyTestType.class, false);
 		System.out.println(test);

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class AppConfigCreatorTest {
 	}
 
 	@Test
-	public void test1() throws NoSuchAlgorithmException, IOException {
+	public void test1() throws IOException {
 		JVMConfig jvmProper = new JVMConfig();
 		Map<OSType, Map<Arch, Map<String, JvmRepo>>> jvms = new HashMap<OSInfo.OSType, Map<Arch, Map<String, JvmRepo>>>();
 		Map<Arch, Map<String, JvmRepo>> arch = new HashMap<OSInfo.Arch, Map<String, JvmRepo>>();

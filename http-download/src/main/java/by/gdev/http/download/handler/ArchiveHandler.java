@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -43,7 +42,7 @@ public class ArchiveHandler implements PostHandler {
 	private String jreConfig;
 
 	@Override
-	public void postProcessDownloadElement(DownloadElement e) throws IOException, NoSuchAlgorithmException {
+	public void postProcessDownloadElement(DownloadElement e) throws IOException {
 		Path p = Paths.get(e.getPathToDownload(), e.getMetadata().getPath());
 		String jrePath = Paths.get(DownloaderJavaContainer.JRE_DEFAULT, ((JvmRepo) e.getRepo()).getJreDirectoryName())
 				.toString();
@@ -79,7 +78,7 @@ public class ArchiveHandler implements PostHandler {
 	}
 
 	private void unTarGz(File zip, File folder, boolean replace, boolean deleteEmptyFile)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		try (TarArchiveInputStream zis = new TarArchiveInputStream(
 				new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(zip))))) {
 			TarArchiveEntry ze;
@@ -94,7 +93,7 @@ public class ArchiveHandler implements PostHandler {
 	}
 
 	private void unZip(File zip, File folder, boolean replace, boolean deleteEmptyFile)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(zip)),
 				StandardCharsets.UTF_8)) {
 			ZipEntry ze;
@@ -109,7 +108,7 @@ public class ArchiveHandler implements PostHandler {
 	}
 
 	private void unZipAndTarGz(String fileName, File folder, boolean replace, InputStream zis, boolean deleteEmptyFile)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException {
 		byte[] buffer = new byte[1024];
 		File newFile = new File(folder, fileName);
 		if (!replace && newFile.isFile()) {

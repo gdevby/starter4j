@@ -7,7 +7,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +49,7 @@ public class AppConfigCreator {
 
 	}
 
-	public AppConfig createConfig(AppConfigModel configFile) throws IOException, NoSuchAlgorithmException {
+	public AppConfig createConfig(AppConfigModel configFile) throws IOException {
 		AppConfig appConfig = new AppConfig();
 		String version = Paths.get(configFile.getAppName(), String.valueOf(configFile.getAppVersion())).toString();
 		Path appFolder = Paths.get(configFile.getAppFolder());
@@ -131,7 +130,7 @@ public class AppConfigCreator {
 		return Files.walk(p, 1).filter(entry -> !entry.equals(p)).collect(Collectors.toList());
 	}
 
-	JVMConfig createJreConfig(AppConfigModel configFile) throws IOException, NoSuchAlgorithmException {
+	JVMConfig createJreConfig(AppConfigModel configFile) throws IOException {
 		JVMConfig jvm = new JVMConfig();
 		jvm.setJvms(new HashMap<OSInfo.OSType, Map<Arch, Map<String, JvmRepo>>>());
 		for (Path pathTypeOS : listPath(Paths.get(configFile.getJavaFolder()))) {

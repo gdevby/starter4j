@@ -8,7 +8,6 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -238,7 +237,7 @@ public class Starter {
 	}
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+			throws FileNotFoundException, IOException {
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
 				remoteAppConfig.getAppVersion()) == -1) {

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +42,7 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 
 	@Override
 	public void filterNotExistResoursesAndSetRepo(Repo repo, String workDirectory)
-			throws NoSuchAlgorithmException, IOException {
+			throws IOException {
 		JvmRepo jvm = new JvmRepo();
 		jvm.setJreDirectoryName(((JvmRepo) repo).getJreDirectoryName());
 		this.repo = jvm;
@@ -61,7 +60,7 @@ public class DownloaderJavaContainer extends DownloaderContainer {
 		}
 	}
 
-	private void validateJre(JvmRepo repo) throws IOException, NoSuchAlgorithmException {
+	private void validateJre(JvmRepo repo) throws IOException {
 		boolean notExistJre = true;
 		if (Files.exists(Paths.get(workDir, JRE_DEFAULT, repo.getJreDirectoryName(), JRE_CONFIG))) {
 			notExistJre = false;

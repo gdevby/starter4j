@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -97,7 +96,7 @@ public class DownloadTest {
 	}
 
 	@Test
-	public void test1() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException,
+	public void test1() throws FileNotFoundException, IOException, InterruptedException,
 			ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObjectByUrls(Lists.newArrayList(url), "dependencises.json", Repo.class, false);
 		AccessHandler accesHandler = new AccessHandler();
@@ -113,7 +112,7 @@ public class DownloadTest {
 	}
 
 	@Test(expected = StatusExeption.class)
-	public void test2() throws FileNotFoundException, NoSuchAlgorithmException, IOException, InterruptedException,
+	public void test2() throws FileNotFoundException, IOException, InterruptedException,
 			ExecutionException, StatusExeption {
 		Repo repo = gsonService.getObjectByUrls(Lists.newArrayList(url), "dependencises.json", Repo.class, false);
 		AccessHandler accesHandler = new AccessHandler();
