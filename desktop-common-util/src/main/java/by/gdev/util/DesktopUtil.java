@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -337,6 +339,7 @@ public class DesktopUtil {
 	 * @param uri
 	 * @param alertError
 	 */
+	@SuppressWarnings("deprecation")
 	public static void openLink(OSType type, String uri) {
 		// TOD there is some problem with swing app. is is hanging in swing thread.
 		CompletableFuture.runAsync(() -> {
@@ -422,5 +425,36 @@ public class DesktopUtil {
 		} catch (Exception e) {
 			return "dev";
 		}
+	}
+
+	/**
+	 * 
+	 * * Allow to restart after updating application starter core
+	 * 
+	 * @return process build when we can run new application
+	 * @param cl - class which we can find base jar or exe file.
+	 * @throws UnsupportedEncodingException
+	 * 
+	 */
+	/**
+	 * Allow to restart after updating application starter core or only restart
+	 * application with starter core
+	 * 
+	 * @param jarFile      - file which contains main class
+	 * @param workDir      -working directory
+	 * @param jvm          - path to jvm, can be null
+	 * @param fileEncoding - file encoding, can be null
+	 * @return {@link ProcessBuilder} which can use to restart after replace base
+	 *         jar or exe file
+	 */
+	@SneakyThrows
+	public static ProcessBuilder preparedRestart(String jarFile, File workDir, String jvm, String fileEncoding) {
+		jvm = Objects.nonNull(jvm) ? jvm : getJavaPathByHome(true);
+		fileEncoding = Objects.nonNull(fileEncoding) ? fileEncoding : Charset.defaultCharset().toString();
+		ProcessBuilder b = new ProcessBuilder(Arrays.asList(jvm, "-Dfile.encoding=" + fileEncoding, "-jar", jarFile));
+		log.info("execute command {}", b.command().stream().collect(Collectors.joining(" ")));
+		b.directory(workDir);
+		b.inheritIO();
+		return b;
 	}
 }
