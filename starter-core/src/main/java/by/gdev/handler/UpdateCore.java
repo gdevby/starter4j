@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ResourceBundle;
 
@@ -49,7 +50,10 @@ public class UpdateCore {
 		if (jarFile.toString().endsWith("classes"))
 			return;
 		String localeSha1 = DesktopUtil.getChecksum(jarFile, "SHA-1");
+		ProcessBuilder pb = null;
 		if (!m.getSha1().equals(localeSha1)) {
+			pb = DesktopUtil.preparedRestart(jarFile.getAbsolutePath(), Paths.get("").toAbsolutePath().toFile(), null,
+					null);
 			Path temp = fileCacheService.getRawObject(ua.getUrls(), m, false);
 			JLabelHtmlWrapper label = new JLabelHtmlWrapper(bundle.getString("update.message"));
 			JOptionPane.showMessageDialog(new JFrame(), label, "", JOptionPane.INFORMATION_MESSAGE);
@@ -61,6 +65,7 @@ public class UpdateCore {
 			try (OutputStream outputStream = new FileOutputStream(jarFile)) {
 				IOUtils.copy(new FileInputStream(temp.toFile()), outputStream);
 			}
+			pb.start();
 			System.exit(0);
 		}
 	}

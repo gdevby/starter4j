@@ -4,6 +4,8 @@ import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
@@ -286,6 +288,14 @@ public class Starter {
 		fileMapperService.write(domainAvailability, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY);
 		map.put("starterDomainAvailability",
 				Paths.get(workDir, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY).toAbsolutePath().toString());
+
+		File jarFile = new File(
+				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+		map.put("starterJVM", DesktopUtil.getJavaPathByHome(true));
+		map.put("starterWorkingDirectory", Paths.get("").toFile().getAbsolutePath());
+		map.put("starterJarFile", jarFile.getAbsolutePath());
+		map.put("starterFileEncoding", Charset.defaultCharset().toString());
+
 		StringSubstitutor substitutor = new StringSubstitutor(map);
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
 				.collect(Collectors.toList()));
