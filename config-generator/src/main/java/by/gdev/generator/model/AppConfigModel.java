@@ -52,7 +52,7 @@ public class AppConfigModel {
 	public static final AppConfigModel DEFAULT_APP_CONFIG_MODEL = new AppConfigModel("starter-app", "1.0",
 			"desktop.starter.app.Main",
 			Arrays.asList("currentAppVersion=${currentAppVersion}",
-					"starterDomainAvailability=${starterDomainAvailability}", "starterJVM=${starterJVM}",
+					"starterDomainAvailabilityV1=${starterDomainAvailabilityV1}", "starterJVM=${starterJVM}",
 					"starterWorkingDirectory=${starterWorkingDirectory}", "starterJarFile=${starterJarFile}",
 					"starterFileEncoding=${starterFileEncoding}"),
 			Arrays.asList("-Xmx512m", "-Dfile.encoding=UTF8", "-Djava.net.preferIPv4Stack=true"), "starter-app-1.0.jar",

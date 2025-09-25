@@ -29,7 +29,7 @@ import by.gdev.http.download.handler.PostHandler;
 import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloadFile;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +74,8 @@ public class DownloadRunnableImpl implements Runnable {
 				if (Objects.nonNull(element)) {
 					Throwable ex = null;
 					processedElements.add(element);
-					for (String repo : workedServers.getAliveDomainsOrUseAll(element.getRepo().getRepositories())) {
+					for (String repo : workedServers
+							.getAliveDomainsOrUseAllWithSort(element.getRepo().getRepositories())) {
 						try {
 							download(element, repo);
 							for (PostHandler h : element.getHandlers()) {

@@ -26,7 +26,7 @@ import by.gdev.http.upload.download.downloader.DownloadElement;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatus;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

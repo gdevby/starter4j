@@ -55,11 +55,11 @@ import by.gdev.process.JavaProcessHelper;
 import by.gdev.ui.StarterStatusFrame;
 import by.gdev.ui.UpdateFrame;
 import by.gdev.util.DesktopUtil;
-import by.gdev.util.InternetServerMap;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.StringVersionComparator;
+import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.JvmRepo;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
@@ -286,7 +286,7 @@ public class Starter {
 		Map<String, String> map = new HashMap<>();
 		map.put("currentAppVersion", appLocalConfig.getCurrentAppVersion());
 		fileMapperService.write(domainAvailability, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY);
-		map.put("starterDomainAvailability",
+		map.put("starterDomainAvailabilityV1",
 				Paths.get(workDir, StarterAppConfig.APP_STARTER_DOMAIN_AVAILABILITY).toAbsolutePath().toString());
 
 		File jarFile = new File(
