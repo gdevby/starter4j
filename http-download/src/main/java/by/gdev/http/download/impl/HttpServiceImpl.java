@@ -30,7 +30,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import by.gdev.http.download.model.Headers;
 import by.gdev.http.download.model.RequestMetadata;
 import by.gdev.http.download.service.HttpService;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

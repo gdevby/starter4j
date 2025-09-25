@@ -54,6 +54,8 @@ import org.apache.http.impl.client.FutureRequestExecutionService;
 import org.apache.http.impl.client.HttpRequestFutureTask;
 
 import by.gdev.util.OSInfo.OSType;
+import by.gdev.util.model.InternetServer;
+import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -218,8 +220,9 @@ public class DesktopUtil {
 								HttpClientContext.create(), handler);
 						Boolean isOk = futureTask.get(time1, TimeUnit.MILLISECONDS);
 						if (isOk) {
-							log.info("passed {} within {} ms", host, System.currentTimeMillis() - l);
-							return new AbstractMap.SimpleEntry<>(host, Boolean.TRUE);
+							long l1 = System.currentTimeMillis() - l;
+							log.info("passed {} within {} ms", host, l1);
+							return new AbstractMap.SimpleEntry<>(host, new InternetServer(true, l1));
 						} else {
 							log.info("failed {} within {} ms", host, System.currentTimeMillis() - l);
 						}
@@ -228,8 +231,9 @@ public class DesktopUtil {
 						time1 *= 3;
 					}
 				}
-				log.info("failed {} within {} ms", host, System.currentTimeMillis() - l);
-				return new AbstractMap.SimpleEntry<>(host, Boolean.FALSE);
+				long l1 = System.currentTimeMillis() - l;
+				log.info("failed {} within {} ms", host, l1);
+				return new AbstractMap.SimpleEntry<>(host, new InternetServer(false, l1));
 			}).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));
 		}).get();
 		if (!ism.hasInternet()) {
@@ -252,7 +256,7 @@ public class DesktopUtil {
 	public static InternetServerMap testServersAsync(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
 		urls.stream().forEach(e -> {
-			ism.put(new HttpGet(e).getURI().getHost(), true);
+			ism.put(new HttpGet(e).getURI().getHost(), new InternetServer(true, 0));
 		});
 		CompletableFuture.runAsync(() -> {
 			try {

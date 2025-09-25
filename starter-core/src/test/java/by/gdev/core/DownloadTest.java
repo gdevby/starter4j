@@ -40,7 +40,7 @@ import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.http.upload.download.downloader.DownloaderStatusEnum;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Repo;
 import by.gdev.utils.service.FileMapperService;
 

@@ -18,7 +18,7 @@ import by.gdev.http.download.model.RequestMetadata;
 import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.util.DesktopUtil;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import by.gdev.utils.service.FileMapperService;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			throws NoSuchAlgorithmException, IOException {
 		IOException ex = null;
 		Path savedPath = buildPath(urls.get(0) + urn);
-		for (String url : workedServers.getAliveDomainsOrUseAll(urls)) {
+		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls)) {
 			try {
 				return getRawObject(url + urn, cache, savedPath);
 			} catch (IOException e) {
@@ -141,7 +141,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			if (fileExists) {
 				RequestMetadata serverMetadata = httpService.getMetaByUrl(url);
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
-				log.info("do head request -> {} {} local file {}",url,localMetadata, urlPath);
+				log.info("do head request -> {} {} local file {}", url, localMetadata, urlPath);
 				if (Objects.nonNull(localMetadata) && Objects.nonNull(localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())

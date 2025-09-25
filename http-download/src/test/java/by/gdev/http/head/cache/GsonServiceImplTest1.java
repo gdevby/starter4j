@@ -34,7 +34,7 @@ import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.http.download.service.HttpService;
 import by.gdev.http.head.cache.model.MyTestType;
-import by.gdev.util.InternetServerMap;
+import by.gdev.util.model.InternetServerMap;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -37,7 +37,7 @@ public class StarterAppConfig {
 	private static final String APP_CONFIG = "appConfig.json";
 	public static final String APP_CHANGES_LOG = "changes.log";
 	public static final String APP_STARTER_LOCAL_CONFIG = "starter.json";
-	public static final String APP_STARTER_DOMAIN_AVAILABILITY = "domainAvailability.json";
+	public static final String APP_STARTER_DOMAIN_AVAILABILITY = "domainAvailabilityV1.json";
 	public static final String APP_STARTER_UPDATE_CONFIG = "starterUpdate.json";
 
 	public static final List<String> URI_APP_CONFIG = Lists.newArrayList(
