@@ -54,7 +54,6 @@ public class HttpServiceImpl implements HttpService {
 	 */
 	@Override
 	public RequestMetadata getRequestByUrlAndSave(String url, Path path) throws IOException {
-		log.debug("do request {}, saved to {}", url, path.toAbsolutePath().toString());
 		RequestMetadata request = null;
 		for (int attepmts = 0; attepmts < workedServers.getMaxAttemps(); attepmts++) {
 			try {
@@ -101,6 +100,7 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	private String getStringByUrl(String url, Map<String, String> headers) throws IOException {
+		log.info("do get request {}", url);
 		InputStream in = null;
 		HttpGet httpGet = null;
 		try {
@@ -133,6 +133,7 @@ public class HttpServiceImpl implements HttpService {
 	}
 
 	private RequestMetadata getResourseByUrl(String url, Path path) throws IOException, SocketTimeoutException {
+		log.info("do get request {}, saved to {}", url, path.toAbsolutePath().toString());
 		HttpGet httpGet = new HttpGet(url);
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
