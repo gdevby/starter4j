@@ -44,4 +44,8 @@ public interface FileCacheService {
 	 */
 	Path getLocalRawObject(List<String> urls, String urn) throws IOException;
 
+	/**
+	 * Perform cache maintenance: remove outdated cached data and their metadata files
+	 */
+	void cleanOldCache();
 }

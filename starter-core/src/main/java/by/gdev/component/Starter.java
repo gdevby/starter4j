@@ -8,6 +8,7 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -90,6 +91,7 @@ public class Starter {
 	private RequestConfig requestConfig;
 	@Getter
 	private FileMapperService fileMapperService;
+	private FileCacheService fileService;
 	private String workDir;
 	private UpdateCore updateCore;
 	private AppLocalConfig appLocalConfig;
@@ -113,7 +115,7 @@ public class Starter {
 		}
 		log.trace("Max attempts from download = {}", domainAvailability.getMaxAttemps());
 		HttpService httpService = new HttpServiceImpl(null, Main.client, domainAvailability);
-		FileCacheService fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
+		fileService = new FileCacheServiceImpl(httpService, Main.GSON, Main.charset,
 				Paths.get(starterConfig.getWorkDirectory(), "cache"), starterConfig.getTimeToLife(),
 				domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
@@ -314,4 +316,30 @@ public class Starter {
 			log.error("promlem with update application ", e);
 		}
 	}
+
+	public void cleanCache() {
+		try {
+			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
+
+			if (appLocalConfig == null) {
+				return;
+			}
+
+			String lastCacheCleaningDate = appLocalConfig.getLastCacheCleaningDate();
+			int cleaningInterval = starterConfig.getCleaningOldCacheFiles();
+			LocalDate cleaningDate = null;
+
+			if (lastCacheCleaningDate != null) {
+				cleaningDate = LocalDate.parse(lastCacheCleaningDate).plusDays(cleaningInterval - 1);
+			}
+
+			if (Objects.isNull(cleaningDate) || LocalDate.now().isAfter(cleaningDate)) {
+				fileService.cleanOldCache();
+				appLocalConfig.setLastCacheCleaningDate(LocalDate.now().toString());
+				fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+			}
+		} catch (IOException e) {
+            log.error("clean cache failed", e);
+        }
+    }
 }
