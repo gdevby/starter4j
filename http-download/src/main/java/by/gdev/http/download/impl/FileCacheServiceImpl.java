@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -111,15 +112,13 @@ public class FileCacheServiceImpl implements FileCacheService {
 
 	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
 			throws IOException {
-		long purgeTime = System.currentTimeMillis() - (timeToLife * 1000);
-		if (urlPath.toFile().lastModified() < purgeTime) {
-			Files.deleteIfExists(urlPath);
-		}
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
 			if (Objects.nonNull(localMetadata) && Objects.equals(localMetadata.getSha1(), sha)) {
 				log.trace("use local file -> " + url);
+				localMetadata.setLastAccessAt(System.currentTimeMillis());
+				fileMapperService.write(localMetadata, metaFile.toString());
 				return urlPath;
 			} else {
 				log.trace("not proper hashsum HTTP GET -> " + url);
@@ -146,6 +145,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
 						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
 								localMetadata.getSha1())) {
+					localMetadata.setLastAccessAt(System.currentTimeMillis());
+					fileMapperService.write(localMetadata, metaFile.toString());
 					return urlPath;
 				} else {
 					return generateRequestMetadata(url, urlPath, metaFile);
@@ -163,6 +164,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 			throws IOException {
 		RequestMetadata requestMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 		requestMetadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
+		requestMetadata.setLastAccessAt(System.currentTimeMillis());
 		fileMapperService.write(requestMetadata, metaFile.toString());
 		return urlPath;
 	}
@@ -171,5 +173,42 @@ public class FileCacheServiceImpl implements FileCacheService {
 		Path urlPath = Paths.get(directory.toString(), url.replaceAll("://", "_").replaceAll("[:?=]", "_"));
 		return urlPath;
 	}
+
+	@Override
+	public void cleanOldCache() {
+
+		long now = System.currentTimeMillis();
+		long ttlMillis = timeToLife * 1000L;
+
+        try (Stream<Path> stream = Files.walk(directory)) {
+
+			stream.filter(Files::isRegularFile)
+					.filter(path -> path.getFileName().toString().endsWith(".metadata"))
+					.filter(path -> {
+
+						RequestMetadata metadata = fileMapperService.read(path.toString(), RequestMetadata.class);
+						if (metadata == null) {
+							return false;
+						}
+						long lastAccessAt = metadata.getLastAccessAt();
+
+                        return now - lastAccessAt > ttlMillis;
+
+                    }).toList().forEach(path -> {
+						Path dataFile = Paths.get(path.toString().replace(".metadata", ""));
+						try {
+							Files.deleteIfExists(path);
+							Files.deleteIfExists(dataFile);
+							log.info("delete old file {}", path);
+						} catch (IOException e) {
+							log.error("Failed to delete old file {} error: {}", path, e.getMessage());
+						}
+
+					});
+
+		} catch (IOException e) {
+            log.error("Failed to walk cache directory {}: {}", directory, e.getMessage());
+        }
+    }
 
 }

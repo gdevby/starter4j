@@ -11,4 +11,5 @@ public class RequestMetadata {
 	private String lastModified;
 	private String eTag;
 	private String sha1;
+	private long lastAccessAt;
 }

@@ -28,6 +28,7 @@ The by.dgev.Main class has the following arguments that can be changed:<br>
 |-connectTimeout| 60000  |setting a value setConnectTimeout|
 |-socketTimeout| 60000  |setting a value setSocketTimeout|
 |-timeToLife| 600000 | File update time in seconds. After the expiration of this time, the file is not relevant|
+|-cleaningOldCacheFiles| 10 | Number of days between automatic clearing of outdated cache files|
 |-stop|false| Argument to automatically close the application after installation. Used for tests|
 |-logURIService| null | Log service which can save logs and return code. User can send code for support. Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest|
 

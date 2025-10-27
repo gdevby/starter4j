@@ -91,6 +91,7 @@ public class Main {
 			}
 			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusFrame);
 			eventBus.register(new ConsoleSubscriber(bundle, s.getFileMapperService(), starterConfig));
+			s.cleanCache();
 			s.updateApplication();
 			s.validateEnvironmentAndAppRequirements();
 			s.prepareResources();

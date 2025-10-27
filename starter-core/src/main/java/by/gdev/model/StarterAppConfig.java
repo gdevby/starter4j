@@ -66,6 +66,8 @@ public class StarterAppConfig {
 	private int socketTimeout;
 	@Parameter(names = "-timeToLife", description = "The time that the file is up-to-date")
 	private int timeToLife;
+	@Parameter(names = "-cleaningOldCacheFiles", description = "Interval between cleaning old files in cache")
+	private int cleaningOldCacheFiles;
 	@Parameter(names = "-stop", description = "Argument to stop the application")
 	private boolean stop;
 	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. "
@@ -76,7 +78,7 @@ public class StarterAppConfig {
 			null,
 			Arrays.asList("http://www.google.com", "http://www.baidu.com",
 					"https://github.com/gdevby/starter-app/blob/master/example-compiled-app/server/starter-app/appConfig.json"),
-			3, 5000, 10000, 600000, false, null);
+			3, 5000, 10000, 600000, 10, false, null);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);
