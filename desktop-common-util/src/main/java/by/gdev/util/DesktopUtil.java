@@ -56,6 +56,7 @@ import org.apache.http.impl.client.HttpRequestFutureTask;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.InternetServer;
 import by.gdev.util.model.InternetServerMap;
+import by.gdev.util.model.SafeRunnable;
 import by.gdev.util.model.download.Metadata;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +72,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DesktopUtil {
 	private static final String PROTECTION = "protection.txt";
 	private static FileLock lock;
-	@SuppressWarnings("serial")
 	public static Set<PosixFilePermission> PERMISSIONS = new HashSet<PosixFilePermission>() {
 		{
 			add(PosixFilePermission.OWNER_READ);
@@ -183,6 +183,19 @@ public class DesktopUtil {
 				throw new RuntimeException(e);
 			}
 		};
+	}
+
+	/**
+	 * Used to run without checked exception.
+	 *
+	 * @param runnable
+	 */
+	public static void uncheckRunnable(SafeRunnable runnable) {
+		try {
+			runnable.run();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void sleep(int milliSeconds) {
@@ -344,7 +357,6 @@ public class DesktopUtil {
 	 * @param uri
 	 * @param alertError
 	 */
-	@SuppressWarnings("deprecation")
 	public static void openLink(OSType type, String uri) {
 		// TOD there is some problem with swing app. is is hanging in swing thread.
 		CompletableFuture.runAsync(() -> {
