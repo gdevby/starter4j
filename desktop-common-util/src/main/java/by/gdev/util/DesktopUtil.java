@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -197,6 +198,16 @@ public class DesktopUtil {
 			throw new RuntimeException(e);
 		}
 	}
+	/**
+	 * Used to run without checked exception in async manner.
+	 *
+	 * @param runnable
+	 */
+	public static void uncheckRunnableAsync(SafeRunnable runnable, Consumer<Throwable> handleException) {
+		CompletableFuture.runAsync(() -> uncheckRunnable(runnable))
+                .whenComplete((r, t) -> handleException.accept(t));
+	}
+
 
 	public static void sleep(int milliSeconds) {
 		try {
