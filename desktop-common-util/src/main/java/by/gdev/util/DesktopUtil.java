@@ -27,12 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -198,14 +193,53 @@ public class DesktopUtil {
 			throw new RuntimeException(e);
 		}
 	}
+
+	/**
+	 * Used to run without checked exception in async manner with simple handle unchecked.
+	 *
+	 * @param runnable
+	 * @param handleExceptionConsumer
+	 */
+	public static void handledUncheckRunnableAsync(SafeRunnable runnable, Consumer<Throwable> handleExceptionConsumer) {
+		uncheckRunnableAsync(runnable).exceptionally(handleFunction(handleExceptionConsumer));
+	}
+
+	/**
+	 * Used to run without checked exception in async manner in the given executor with simple handle unchecked.
+	 *
+	 * @param runnable
+	 * @param handleExceptionConsumer
+	 */
+	public static void handledUncheckRunnableAsync(SafeRunnable runnable, Consumer<Throwable> handleExceptionConsumer, Executor executor) {
+		uncheckRunnableAsync(runnable, executor).exceptionally(handleFunction(handleExceptionConsumer));
+	}
+
+	private static Function<Throwable, ? extends Void> handleFunction (Consumer<Throwable> handleExceptionConsumer) {
+		return (q) -> {
+			handleExceptionConsumer.accept(q);
+			return null;
+		};
+	}
+
 	/**
 	 * Used to run without checked exception in async manner.
 	 *
 	 * @param runnable
+	 * @return the new CompletableFuture
 	 */
-	public static void uncheckRunnableAsync(SafeRunnable runnable, Consumer<Throwable> handleException) {
-		CompletableFuture.runAsync(() -> uncheckRunnable(runnable))
-                .whenComplete((r, t) -> handleException.accept(t));
+	public static CompletableFuture<Void> uncheckRunnableAsync(SafeRunnable runnable) {
+		return CompletableFuture.runAsync(() -> uncheckRunnable(runnable));
+	}
+
+	/**
+	 * Used to run without checked exception in async manner in the given executor.
+	 *
+	 * @param runnable
+	 * @param executor
+	 * @return the new CompletableFuture
+	 */
+	public static CompletableFuture<Void> uncheckRunnableAsync(SafeRunnable runnable, Executor executor) {
+		return CompletableFuture.runAsync(() -> uncheckRunnable(runnable), executor);
 	}
 
 
