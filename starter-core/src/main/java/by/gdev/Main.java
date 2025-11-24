@@ -104,6 +104,7 @@ public class Main {
 						String.format(bundle.getString("file.delete.problem"), ex.getLocalizedMessage()),
 						"https://gdev.by/help/java/check-disk"));
 			}
+			
 		} catch (Throwable t) {
 			log.error("error", t);
 			String message = t.getMessage();
@@ -111,6 +112,10 @@ public class Main {
 				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
 			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable")) {
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
+			} else if (Objects.nonNull(message) && message.contains("CRC")) {
+				eventBus.post(new ExceptionMessage(
+						String.format(bundle.getString("file.delete.problem"), t.getLocalizedMessage()),
+						"https://gdev.by/help/java/check-disk"));
 			} else {
 				String s1 = Objects.nonNull(starterConfig.getLogURIService()) ? "unidentified.error"
 						: "unidentified.error.1";
