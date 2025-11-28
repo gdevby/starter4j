@@ -112,7 +112,7 @@ public class Main {
 				eventBus.post(new ExceptionMessage(bundle.getString("download.error")));
 			} else if (Objects.nonNull(message) && message.contains("GetIpAddrTable")) {
 				eventBus.post(new ExceptionMessage(bundle.getString("get.ip.addr.table")));
-			} else if (Objects.nonNull(message) && message.contains("CRC")) {
+			} else if (Objects.nonNull(message) && (message.contains("CRC") && message.contains("cyclic redundancy check"))) {
 				eventBus.post(new ExceptionMessage(
 						String.format(bundle.getString("file.delete.problem"), t.getLocalizedMessage()),
 						"https://gdev.by/help/java/check-disk"));
