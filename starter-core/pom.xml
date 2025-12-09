@@ -49,6 +49,16 @@
 			<artifactId>mockserver-netty-no-dependencies</artifactId>
 			<version>5.14.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>21.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>21.0.8</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -70,7 +80,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Main-Class>by.gdev.Main</Main-Class>
+										<Main-Class>by.gdev.MainJFX</Main-Class>
 									</manifestEntries>
 								</transformer>
 							</transformers>

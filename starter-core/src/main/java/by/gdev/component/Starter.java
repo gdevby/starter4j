@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.client.config.RequestConfig;
 
@@ -52,8 +55,8 @@ import by.gdev.model.ExceptionMessage;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcessHelper;
-import by.gdev.ui.StarterStatusFrame;
-import by.gdev.ui.UpdateFrame;
+import by.gdev.ui.StarterStatusStage;
+import by.gdev.ui.UpdateStage;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -85,7 +88,7 @@ public class Starter {
 	private AppConfig remoteAppConfig;
 	private JVMConfig jvm;
 	private Repo dependencis;
-	private StarterStatusFrame starterStatusFrame;
+	private StarterStatusStage starterStatusStage;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private RequestConfig requestConfig;
@@ -98,12 +101,12 @@ public class Starter {
 	private JvmRepo java;
 	private InternetServerMap domainAvailability;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusStage stage)
 			throws UnsupportedOperationException, IOException, InterruptedException {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		this.eventBus = eventBus;
-		starterStatusFrame = frame;
+		starterStatusStage = stage;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
 		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
@@ -236,10 +239,11 @@ public class Starter {
 			DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		}
 		log.info("loading is complete");
+		Platform.runLater(Platform::exit);
 	}
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
-			throws FileNotFoundException, IOException {
+            throws FileNotFoundException, IOException, ExecutionException, InterruptedException {
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
 				remoteAppConfig.getAppVersion()) == -1) {
@@ -250,13 +254,17 @@ public class Starter {
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 							AppConfig.class, false);
 				} else {
-					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig,
-							starterConfig, fileMapperService, osType);
-					if (frame.getUserChoose() == 1) {
+					CompletableFuture<Integer> userChoice = new CompletableFuture<>();
+					Platform.runLater(() -> {
+						UpdateStage stage = new UpdateStage(starterStatusStage, bundle, appLocalConfig, remoteAppConfig,
+								starterConfig, fileMapperService, osType);
+						userChoice.complete(stage.getUserChoose());
+					});
+					if (userChoice.get() == 1) {
 						remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
 								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
 								AppConfig.class, true);
-					} else {
+					} else if (userChoice.get() == 2) {
 						appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
 						fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 					}
