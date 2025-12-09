@@ -9,10 +9,10 @@ import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.apache.commons.io.IOUtils;
 
 import by.gdev.Main;
@@ -21,7 +21,6 @@ import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.UpdateApp;
-import by.gdev.ui.JLabelHtmlWrapper;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.InternetServerMap;
@@ -54,8 +53,19 @@ public class UpdateCore {
 			pb = DesktopUtil.preparedRestart(jarFile.getAbsolutePath(), Paths.get("").toAbsolutePath().toFile(), null,
 					null);
 			Path temp = fileCacheService.getRawObject(ua.getUrls(), m, false);
-			JLabelHtmlWrapper label = new JLabelHtmlWrapper(bundle.getString("update.message"));
-			JOptionPane.showMessageDialog(new JFrame(), label, "", JOptionPane.INFORMATION_MESSAGE);
+			String message = bundle.getString("update.message");
+			CountDownLatch latch = new CountDownLatch(1);
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setHeaderText(message);
+				alert.showAndWait();
+				latch.countDown();
+			});
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 			String hash = DesktopUtil.getChecksum(temp.toFile(), "SHA-1");
 			if (!hash.equals(m.getSha1())) {
 				throw new HashSumAndSizeError(ua.getUrls().toString(), m.toString() + " " + hash, "");

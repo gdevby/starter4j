@@ -12,10 +12,12 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import org.apache.commons.io.IOExceptionList;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
-import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.StarterStatusStage;
 import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
@@ -75,13 +77,19 @@ public class Main {
 			client = HttpClientConfig.getInstanceHttpClient(starterConfig.getConnectTimeout(),
 					starterConfig.getSocketTimeout(), 5, 20);
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
-			StarterStatusFrame starterStatusFrame = null;
+			StarterStatusStage starterStatusStage = null;
 			if (!GraphicsEnvironment.isHeadless()) {
-				starterStatusFrame = new StarterStatusFrame("get installed app name", true,
-						ResourceBundle.getBundle("application", new Localise().getLocal()));
-				starterStatusFrame.setVisible(true);
-				eventBus.register(starterStatusFrame);
-				eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, OSInfo.getOSType(), starterConfig));
+				ResourceBundle finalBundle = bundle;
+				CompletableFuture<StarterStatusStage> starterStatusStageFuture = new CompletableFuture<>();
+				Platform.runLater(() -> {
+					StarterStatusStage stage = new StarterStatusStage("get installed app name", true,
+							ResourceBundle.getBundle("application", new Localise().getLocal()));
+					stage.show();
+					eventBus.register(stage);
+					eventBus.register(new ViewSubscriber(stage, finalBundle, OSInfo.getOSType(), starterConfig));
+					starterStatusStageFuture.complete(stage);
+				});
+				starterStatusStage = starterStatusStageFuture.get();
 			}
 			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
 				String errorMessage = String.format(
@@ -89,7 +97,7 @@ public class Main {
 						starterConfig.getServerFile(), StarterAppConfig.URI_APP_CONFIG);
 				throw new RuntimeException(errorMessage);
 			}
-			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusFrame);
+			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusStage);
 			eventBus.register(new ConsoleSubscriber(bundle, s.getFileMapperService(), starterConfig));
 			s.cleanCache();
 			s.updateApplication();
@@ -149,7 +157,12 @@ public class Main {
 					+ "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
 					+ " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
 					jarFile);
-			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setHeaderText(null);
+				alert.getDialogPane().setContent(new Label(message));
+				alert.show();
+			});
 		}
 	}
 }

@@ -1,28 +1,28 @@
 package by.gdev.ui.subscriber;
 
-import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.GZIPOutputStream;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.SwingUtilities;
-
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -44,7 +44,7 @@ import by.gdev.model.ExceptionMessage;
 import by.gdev.model.LogResponse;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.StarterAppProcess;
-import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.StarterStatusStage;
 import by.gdev.util.CoreUtil;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ViewSubscriber {
 
-	private StarterStatusFrame frame;
+	private StarterStatusStage stage;
 	private ResourceBundle bundle;
 	private OSType osType;
 	private StarterAppConfig starterConfig;
@@ -103,49 +103,51 @@ public class ViewSubscriber {
 
 	@Subscribe
 	public void message(ExceptionMessage s) {
-		JTextPane f = getTextPaneWithMessage(s);
-
-		JPanel p = new JPanel();
-		BoxLayout bl = new BoxLayout(p, BoxLayout.Y_AXIS);
-		p.setLayout(bl);
-		p.add(f, BorderLayout.CENTER);
-		if (s.isLogButton() && Objects.nonNull(starterConfig.getLogURIService()))
-			addLogOffer(p);
-		if (Objects.nonNull(s.getLink())) {
-			f.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if (SwingUtilities.isLeftMouseButton(e)) {
+		CompletableFuture<BorderPane> borderPaneFuture = new CompletableFuture<>();
+		Platform.runLater(() -> {
+			TextArea textArea = getTextAreaWithMessage(s);
+			BorderPane borderPane = new BorderPane();
+			borderPane.setCenter(textArea);
+			if (s.isLogButton() && Objects.nonNull(starterConfig.getLogURIService()))
+				addLogOffer(borderPane);
+			if (Objects.nonNull(s.getLink())) {
+				textArea.setOnMouseClicked(event -> {
+					if (event.getButton() == MouseButton.PRIMARY) {
 						DesktopUtil.openLink(osType, s.getLink());
 					}
-				}
-			});
-		}
-		JOptionPane.showMessageDialog(frame, p, "", JOptionPane.ERROR_MESSAGE);
-
-	}
-
-	protected void addLogOffer(JPanel p) {
-		JPanel p1 = new JPanel();
-		JButton b = new JButton(bundle.getString("link.get"));
-		JLabel l = new JLabel(bundle.getString("preparing"));
-		JTextPane tp = getTextPaneWithMessage(new ExceptionMessage(""));
-		p1.add(b);
-		p1.add(l);
-		p1.add(tp);
-		tp.setVisible(false);
-		l.setVisible(false);
-		b.addActionListener(e -> {
-			b.setVisible(false);
-			l.setVisible(true);
-			doRequest(p1, l, tp);
+				});
+			}
+			borderPaneFuture.complete(borderPane);
 		});
-		tp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		p.add(p1, BorderLayout.SOUTH);
-
+		BorderPane borderPane = null;
+		try {
+			borderPane = borderPaneFuture.get();
+		} catch (InterruptedException | ExecutionException e) {
+			log.error(e.getMessage(), e);
+		}
+		showMessageDialog(stage, borderPane, "", s.getMessage(), Alert.AlertType.ERROR);
 	}
 
-	private void doRequest(JPanel p, JLabel l, JTextPane tp) {
+	protected void addLogOffer(BorderPane borderPane) {
+		StackPane stackPane = new StackPane();
+		Button button = new Button(bundle.getString("link.get"));
+		Label label = new Label(bundle.getString("preparing"));
+		TextArea textArea = getTextAreaWithMessage(new ExceptionMessage(""));
+		stackPane.getChildren().add(textArea);
+		stackPane.getChildren().add(button);
+		stackPane.getChildren().add(label);
+		textArea.setVisible(true);
+		label.setVisible(false);
+		button.setOnAction(event -> {
+			button.setVisible(false);
+			label.setVisible(true);
+			doRequest(stackPane, label, textArea);
+		});
+		textArea.setPadding(new Insets(5));
+		borderPane.setBottom(stackPane);
+	}
+
+	private void doRequest(StackPane stackPane, Label label, TextArea textArea) {
 		CompletableFuture.runAsync(() -> {
 			Exception e2 = null;
 			Pair<String, byte[]> pair = null;
@@ -164,20 +166,21 @@ public class ViewSubscriber {
 					response = Main.client.execute(method);
 					if (response.getStatusLine().getStatusCode() >= 300) {
 						log.info("not proper code " + response.getStatusLine().toString());
-						showError(p, pair);
+						showError(stackPane, pair);
 					} else {
 						LogResponse lr = Main.GSON.fromJson(
 								IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
 								LogResponse.class);
-						SwingUtilities.invokeLater(() -> {
-							tp.setText(String.format("<html>%s</html>", lr.getLink()));
-							StringSelection selection = new StringSelection(lr.getLink());
-							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-							clipboard.setContents(selection, selection);
-							l.setVisible(false);
-							tp.setVisible(true);
-							JOptionPane.showMessageDialog(frame, bundle.getString("clipboard.copy"), "",
-									JOptionPane.INFORMATION_MESSAGE);
+						Platform.runLater(() -> {
+							textArea.setText(lr.getLink());
+							Clipboard clipboard1 = Clipboard.getSystemClipboard();
+							ClipboardContent content1 = new ClipboardContent();
+							content1.putString(lr.getLink());
+							clipboard1.setContent(content1);
+							label.setVisible(false);
+							textArea.setVisible(true);
+							showMessageDialog(stage, new Label(bundle.getString("clipboard.copy")), "","",
+									Alert.AlertType.INFORMATION);
 						});
 					}
 					return;
@@ -191,27 +194,52 @@ public class ViewSubscriber {
 				}
 			}
 			log.error("exception", e2);
-			showError(p, pair);
+			showError(stackPane, pair);
 		});
 	}
 
-	private void showError(JPanel p, Pair<String, byte[]> pair) {
-		JTextPane tp = getTextPaneWithMessage(new ExceptionMessage(
-				String.format(bundle.getString("error.log.send"), Objects.isNull(pair) ? "" : pair.getKey()), ""));
-		p.setVisible(false);
-		JOptionPane.showMessageDialog(frame, tp, null, JOptionPane.ERROR_MESSAGE);
+	private void showError(StackPane stackPane, Pair<String, byte[]> pair) {
+		ExceptionMessage e = new ExceptionMessage(
+				String.format(bundle.getString("error.log.send"), Objects.isNull(pair) ? "" : pair.getKey()), "");
+		TextArea textArea = getTextAreaWithMessage(e);
+		Platform.runLater(() -> stackPane.setVisible(false));
+		showMessageDialog(stage, textArea, null, e.getMessage(), Alert.AlertType.ERROR);
 	}
 
-	protected JTextPane getTextPaneWithMessage(ExceptionMessage s) {
-		JTextPane f = new JTextPane();
-		f.setContentType("text/html");
-		f.setText(String.format("<html>%s</html>",
-				s.getMessage() + (Objects.nonNull(s.getError())
-						? "<br> <br>" + ExceptionUtils.getStackTrace(s.getError()).replaceAll("\n", "<br>")
-						: "")));
-		f.setEditable(false);
-		f.setBackground(null);
-		f.setBorder(null);
-		return f;
+	protected TextArea getTextAreaWithMessage(ExceptionMessage s) {
+		String message = ExceptionUtils.getStackTrace(s.getError());
+		int rowCount = message.split("\n").length;
+		int columnCount = message.length() / rowCount;
+
+		TextArea textArea = new TextArea(message);
+		textArea.setPrefRowCount(rowCount + 3);
+		textArea.setPrefColumnCount(columnCount);
+		textArea.setEditable(false);
+		textArea.setBackground(null);
+		textArea.setBorder(null);
+
+		return textArea;
+	}
+
+	protected void showMessageDialog(Stage stage, Node content, String title, String header, Alert.AlertType type) {
+
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Platform.runLater(() -> {
+			Alert alert = new Alert(type);
+			alert.setTitle(title);
+			alert.setHeaderText(header);
+			alert.initOwner(stage);
+			alert.getDialogPane().setContent(content);
+			alert.showAndWait();
+
+			latch.countDown();
+		});
+
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
