@@ -15,9 +15,11 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import org.apache.commons.io.IOExceptionList;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.LoggerFactory;
@@ -43,12 +45,23 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Main {
+public class Main extends Application {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static CloseableHttpClient client;
 
 	public static void main(String[] args) throws Exception {
+		new Thread(() -> {
+            try {
+                work(args);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+		launch(args);
+	}
+
+	public static void work(String[] args) throws Exception {
 		boolean flag = true;
 		checkOnInvalidPath();
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
@@ -165,4 +178,8 @@ public class Main {
 			});
 		}
 	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+    }
 }
