@@ -56,6 +56,6 @@ public class StarterCoreTest {
 		FileUtils.copyDirectory(new File(acm.getJavaFolder()), jre);
 		String[] starterCoreArg = { "-uriAppConfig", "http://127.0.0.1:65079/test-core/", "-version", "0.9",
 				"-workDirectory", Paths.get(testWorkDirectory).toAbsolutePath().toString().concat("/"), "-stop" };
-		by.gdev.MainJFX.main(starterCoreArg);
+		by.gdev.Main.main(starterCoreArg);
 	}
 }
