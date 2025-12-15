@@ -142,7 +142,7 @@ public class Main extends Application {
 						: "unidentified.error.1";
 				eventBus.post(new ExceptionMessage(bundle.getString(s1), t, true));
 			}
-			System.exit(-1);
+			Platform.runLater(() -> System.exit(-1));
 		}
 	}
 

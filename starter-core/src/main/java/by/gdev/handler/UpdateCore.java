@@ -75,7 +75,7 @@ public class UpdateCore {
 				IOUtils.copy(new FileInputStream(temp.toFile()), outputStream);
 			}
 			pb.start();
-			System.exit(0);
+			Platform.runLater(() -> System.exit(0));
 		}
 	}
 

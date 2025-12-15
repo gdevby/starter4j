@@ -80,7 +80,7 @@ public class ViewSubscriber {
 				ExceptionMessage e = new ExceptionMessage(bundle.getString(s1));
 				e.setLogButton(true);
 				message(e);
-				System.exit(0);
+				Platform.runLater(() -> System.exit(0));
 			}
 		}
 	}
