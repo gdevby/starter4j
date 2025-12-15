@@ -188,7 +188,7 @@ public class Starter {
 				}
 				if (Objects.isNull(remoteAppConfig)) {
 					eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
-					System.exit(-1);
+					Platform.runLater(() -> System.exit(-1));
 				}
 				Repo dep = remoteAppConfig.getAppDependencies();
 				dependencis = gsonService.getLocalObject(dep.getRepositories(),
@@ -239,7 +239,6 @@ public class Starter {
 			DesktopUtil.diactivateDoubleDownloadingResourcesLock();
 		}
 		log.info("loading is complete");
-		Platform.runLater(Platform::exit);
 	}
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
@@ -311,6 +310,7 @@ public class Starter {
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
+			Platform.exit();
 		}
 	}
 

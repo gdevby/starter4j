@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.eventbus.Subscribe;
@@ -36,7 +37,7 @@ public class ConsoleSubscriber {
 		if (status.getDownloaderStatusEnum().equals(DownloaderStatusEnum.DONE))
 			if (status.getThrowables().size() != 0) {
 				log.error("error", status.getThrowables().get(0));
-				System.exit(-1);
+				Platform.runLater(() -> System.exit(-1));
 			}
 	}
 
@@ -50,10 +51,10 @@ public class ConsoleSubscriber {
 				log.error(bundle.getString("msi.afterburner.error"));
 			else if (status.getErrorCode() != 0) {
 				log.error(bundle.getString("unidentified.error"));
-				System.exit(0);
+				Platform.runLater(() -> System.exit(0));
 			}
 		} else if (status.getLine().contains("starter can be closed"))
-			System.exit(0);
+			Platform.runLater(() -> System.exit(0));
 		else
 			log.info(String.valueOf(status.getLine()));
 	}
@@ -61,7 +62,7 @@ public class ConsoleSubscriber {
 	@Subscribe
 	public void validateMessage(ExceptionMessage message) {
 		log.error(message.printValidationMessage());
-		System.exit(-1);
+		Platform.runLater(() -> System.exit(-1));
 	}
 
 	@Subscribe
