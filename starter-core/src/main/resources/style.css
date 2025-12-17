@@ -1,0 +1,27 @@
+.label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.progress-bar {
+    -fx-accent: #B9FF66;
+}
+
+.progress-bar .bar {
+    -fx-padding: 5px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+}
+
+.progress-bar > .track {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.root-status {
+    -fx-background-color: #22221F;
+    -fx-border-radius: 35px;
+    -fx-background-radius: 35px;
+}
