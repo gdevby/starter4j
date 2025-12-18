@@ -18,11 +18,15 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,19 +42,22 @@ public class UpdateStage extends Stage {
 
         progressStage.hide();
         setResizable(false);
+        initStyle(StageStyle.TRANSPARENT);
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getBounds();
-        double width = bounds.getWidth() * screen.getOutputScaleX();
-        double height = bounds.getHeight() * screen.getOutputScaleY();
-        setX(width / 2 - width / 4);
-        setY(height / 2 - height / 5);
+        double width = bounds.getWidth();
+        double height = bounds.getHeight();
+
+        setOnShown(event -> {
+            setX(width / 2 - getWidth() / 2);
+            setY(height / 2 - getHeight() / 2);
+        });
+
         VBox vBox = new VBox();
-        vBox.setStyle("-fx-background-color: rgb(215, 215, 215);");
-        vBox.setPadding(new Insets(10));
+        vBox.getStyleClass().add("root-update");
         String link = starterAppConfig.getServerFile().get(0) + StarterAppConfig.APP_CHANGES_LOG;
         Label text = new Label(String.format(resourceBundle.getString("update.app"),
                 appLocalConfig.getCurrentAppVersion(), remoteAppConfig.getAppVersion()).replace("<br>", "\n"));
-        text.setStyle("-fx-font-weight: bold");
         text.setWrapText(true);
 
         HBox buttonPanel = new HBox();
@@ -84,11 +91,14 @@ public class UpdateStage extends Stage {
         text.setOnMouseExited(event -> text.setCursor(Cursor.DEFAULT));
 
         vBox.setAlignment(Pos.CENTER);
-        vBox.setSpacing(10);
-        vBox.setPadding(new Insets(10));
+        vBox.setSpacing(20);
+        vBox.setPadding(new Insets(35));
         vBox.getChildren().addAll(text, buttonPanel, j);
 
-        Scene scene = new Scene(vBox);
+        Scene scene = new Scene(vBox, Color.TRANSPARENT);
+        URL stylesheet = getClass().getResource("/style.css");
+        if (Objects.nonNull(stylesheet))
+            scene.getStylesheets().add(stylesheet.toExternalForm());
         setScene(scene);
         showAndWait();
 

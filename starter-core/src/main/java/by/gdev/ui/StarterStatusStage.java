@@ -44,14 +44,14 @@ public class StarterStatusStage extends Stage {
 
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getBounds();
-        double width = bounds.getWidth() * screen.getOutputScaleX();
-        double height = bounds.getHeight() * screen.getOutputScaleY();
-        setMinWidth(width / 5);
-        setMinHeight(height / 5);
+        double width = bounds.getWidth();
+        double height = bounds.getHeight();
+        setMinWidth(width * screen.getOutputScaleX() / 5);
+        setMinHeight(height * screen.getOutputScaleY() / 5);
 
         setOnShown(event -> {
-            setX(width / 2 - getWidth());
-            setY(height / 2 - getHeight());
+            setX(width / 2 - getWidth() / 2);
+            setY(height / 2 - getHeight() / 2);
         });
 
         VBox root = new VBox();
