@@ -25,3 +25,26 @@
     -fx-border-radius: 35px;
     -fx-background-radius: 35px;
 }
+
+.root-update {
+    -fx-background-color: #22221F;
+    -fx-border-radius: 35px;
+    -fx-background-radius: 35px;
+}
+
+.root-update * {
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 999;
+}
+
+.check-box .box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #B9FF66;
+}
