@@ -3,7 +3,7 @@ package by.gdev.ui;
 import by.gdev.model.AppConfig;
 import by.gdev.model.AppLocalConfig;
 import by.gdev.model.StarterAppConfig;
-import by.gdev.util.DesktopUtil;
+import by.gdev.util.CoreUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.utils.service.FileMapperService;
 import javafx.geometry.Insets;
@@ -83,7 +83,7 @@ public class UpdateStage extends Stage {
 
         text.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                DesktopUtil.openLink(osType, link);
+                CoreUtil.openLink(link);
             }
         });
         text.setOnMouseEntered(event -> text.setCursor(Cursor.HAND));

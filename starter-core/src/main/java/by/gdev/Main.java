@@ -1,6 +1,5 @@
 package by.gdev;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -49,6 +49,7 @@ public class Main extends Application {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static CloseableHttpClient client;
+	public static HostServices hostServices;
 
 	public static void main(String[] args) throws Exception {
 		new Thread(() -> {
@@ -71,7 +72,7 @@ public class Main extends Application {
 		if (Objects.isNull(starterConfig.getWorkDirectory())) {
 			starterConfig.buildAbsoluteWorkDirectory(OSInfo.getOSType());
 		}
-		
+
 		loadLogbackConfig(starterConfig);
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));
@@ -91,19 +92,17 @@ public class Main extends Application {
 					starterConfig.getSocketTimeout(), 5, 20);
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
 			StarterStatusStage starterStatusStage = null;
-			if (!GraphicsEnvironment.isHeadless()) {
-				ResourceBundle finalBundle = bundle;
-				CompletableFuture<StarterStatusStage> starterStatusStageFuture = new CompletableFuture<>();
-				Platform.runLater(() -> {
-					StarterStatusStage stage = new StarterStatusStage("get installed app name", true,
-							ResourceBundle.getBundle("application", new Localise().getLocal()));
-					stage.show();
-					eventBus.register(stage);
-					eventBus.register(new ViewSubscriber(stage, finalBundle, OSInfo.getOSType(), starterConfig));
-					starterStatusStageFuture.complete(stage);
-				});
-				starterStatusStage = starterStatusStageFuture.get();
-			}
+			ResourceBundle finalBundle = bundle;
+			CompletableFuture<StarterStatusStage> starterStatusStageFuture = new CompletableFuture<>();
+			Platform.runLater(() -> {
+				StarterStatusStage stage = new StarterStatusStage("get installed app name", true,
+						ResourceBundle.getBundle("application", new Localise().getLocal()));
+				stage.show();
+				eventBus.register(stage);
+				eventBus.register(new ViewSubscriber(stage, finalBundle, OSInfo.getOSType(), starterConfig));
+				starterStatusStageFuture.complete(stage);
+			});
+			starterStatusStage = starterStatusStageFuture.get();
 			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
 				String errorMessage = String.format(
 						"The prod parameter is true. You don't need to change the value of the field. Current: %s, should be: %s",
@@ -181,5 +180,6 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		hostServices = getHostServices();
     }
 }

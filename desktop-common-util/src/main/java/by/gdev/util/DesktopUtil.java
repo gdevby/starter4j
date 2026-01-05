@@ -1,13 +1,10 @@
 package by.gdev.util;
 
-import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
@@ -389,31 +386,6 @@ public class DesktopUtil {
 			b.append("Contents").append(File.separatorChar).append("Home").append(File.separatorChar);
 		}
 		return appendToJVM(new File(b.toString()).getPath());
-	}
-
-	/**
-	 * For JavaFX used Application.getHostServices().showDocument
-	 * 
-	 * @param type
-	 * @param uri
-	 * @param alertError
-	 */
-	public static void openLink(OSType type, String uri) {
-		// TOD there is some problem with swing app. is is hanging in swing thread.
-		CompletableFuture.runAsync(() -> {
-			try {
-				Desktop.getDesktop().browse(new URI(uri));
-			} catch (IOException | URISyntaxException e) {
-				log.warn("can't open link", e);
-				if (type.equals(OSType.LINUX)) {
-					try {
-						Runtime.getRuntime().exec("gnome-open " + uri);
-					} catch (IOException e1) {
-						log.warn("can't open link for linix", e);
-					}
-				}
-			}
-		});
 	}
 
 	public static List<String> generatePath(List<String> repositories, List<Metadata> resources) {
