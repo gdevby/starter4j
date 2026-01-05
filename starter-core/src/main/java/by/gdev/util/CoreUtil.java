@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import by.gdev.Main;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
@@ -21,5 +22,9 @@ public class CoreUtil {
 		FileAppender appender = (FileAppender) lc.getLogger(Logger.ROOT_LOGGER_NAME).getAppender("FILE_APPENDER");
 		log.info("path {}", appender.getFile());
 		return Pair.of(appender.getFile(), Files.readAllBytes(Paths.get(appender.getFile())));
+	}
+
+	public static void openLink(String uri) {
+		Main.hostServices.showDocument(uri);
 	}
 }

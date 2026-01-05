@@ -1,6 +1,5 @@
 package by.gdev.component;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -244,27 +243,25 @@ public class Starter {
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
 				remoteAppConfig.getAppVersion()) == -1) {
-			if (!GraphicsEnvironment.isHeadless()) {
-				// used old config without update
-				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
+			// used old config without update
+			if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
+				remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
+						starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+						AppConfig.class, false);
+			} else {
+				CompletableFuture<Integer> userChoice = new CompletableFuture<>();
+				Platform.runLater(() -> {
+					UpdateStage stage = new UpdateStage(starterStatusStage, bundle, appLocalConfig, remoteAppConfig,
+							starterConfig, fileMapperService, osType);
+					userChoice.complete(stage.getUserChoose());
+				});
+				if (userChoice.get() == 1) {
 					remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-							AppConfig.class, false);
-				} else {
-					CompletableFuture<Integer> userChoice = new CompletableFuture<>();
-					Platform.runLater(() -> {
-						UpdateStage stage = new UpdateStage(starterStatusStage, bundle, appLocalConfig, remoteAppConfig,
-								starterConfig, fileMapperService, osType);
-						userChoice.complete(stage.getUserChoose());
-					});
-					if (userChoice.get() == 1) {
-						remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
-								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-								AppConfig.class, true);
-					} else if (userChoice.get() == 2) {
-						appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-						fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-					}
+							AppConfig.class, true);
+				} else if (userChoice.get() == 2) {
+					appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+					fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 				}
 
 			}

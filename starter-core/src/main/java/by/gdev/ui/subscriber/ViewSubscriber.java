@@ -113,7 +113,7 @@ public class ViewSubscriber {
 			if (Objects.nonNull(s.getLink())) {
 				textArea.setOnMouseClicked(event -> {
 					if (event.getButton() == MouseButton.PRIMARY) {
-						DesktopUtil.openLink(osType, s.getLink());
+						CoreUtil.openLink(s.getLink());
 					}
 				});
 			}
