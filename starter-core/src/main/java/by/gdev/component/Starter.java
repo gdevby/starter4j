@@ -30,7 +30,6 @@ import com.google.common.eventbus.EventBus;
 import by.gdev.Main;
 import by.gdev.handler.UpdateCore;
 import by.gdev.handler.ValidateEnvironment;
-import by.gdev.handler.ValidateFont;
 import by.gdev.handler.ValidateTempDir;
 import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
@@ -136,7 +135,6 @@ public class Starter {
 		validateEnvironment.add(new ValidateWorkDir(workDir, bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
-		validateEnvironment.add(new ValidateFont(bundle));
 		validateEnvironment.add(new ValidateUpdate(bundle));
 		for (ValidateEnvironment val : validateEnvironment) {
 			if (!val.validate()) {

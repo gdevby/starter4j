@@ -34,10 +34,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.swing.JFileChooser;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -418,27 +414,6 @@ public class DesktopUtil {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Some windows has problem with JFileChooser when you use look and feel
-	 */
-	public static void initLookAndFeel() {
-		LookAndFeel defaultLookAndFeel = null;
-		try {
-			defaultLookAndFeel = UIManager.getLookAndFeel();
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			new JFileChooser();
-		} catch (Throwable t) {
-			log.warn("problem with ", t);
-			if (Objects.nonNull(defaultLookAndFeel)) {
-				try {
-					UIManager.setLookAndFeel(defaultLookAndFeel);
-				} catch (Throwable e) {
-					log.warn("coudn't set defualt look and feel", e);
-				}
-			}
-		}
 	}
 
 	public static List<String> generatePath(List<String> repositories, List<Metadata> resources) {
