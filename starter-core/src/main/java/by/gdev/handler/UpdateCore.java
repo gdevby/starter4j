@@ -8,16 +8,25 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
+import by.gdev.http.download.exeption.StatusExeption;
+import by.gdev.http.download.handler.PostHandlerImpl;
+import by.gdev.http.download.impl.DownloaderImpl;
+import by.gdev.http.download.service.Downloader;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
+import by.gdev.util.model.download.Repo;
+import com.google.common.eventbus.EventBus;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.commons.io.IOUtils;
 
 import by.gdev.Main;
 import by.gdev.http.download.exeption.HashSumAndSizeError;
-import by.gdev.http.download.service.FileCacheService;
 import by.gdev.http.download.service.GsonService;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.UpdateApp;
@@ -27,18 +36,20 @@ import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.config.RequestConfig;
 
 @AllArgsConstructor
 @Slf4j
 public class UpdateCore {
 
+	private EventBus eventBus;
+	private RequestConfig requestConfig;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
-	private FileCacheService fileCacheService;
 	private StarterAppConfig starterConfig;
 	private InternetServerMap domainAvailability;
 
-	public void checkUpdates(OSType osType) throws IOException {
+	public void checkUpdates(OSType osType) throws IOException, StatusExeption, ExecutionException, InterruptedException {
 		UpdateApp ua = getUpdateFile();
 		if (ua == null || ua.getMap() == null || !ua.getMap().containsKey(osType))
 			return;
@@ -52,7 +63,21 @@ public class UpdateCore {
 		if (!m.getSha1().equals(localeSha1)) {
 			pb = DesktopUtil.preparedRestart(jarFile.getAbsolutePath(), Paths.get("").toAbsolutePath().toFile(), null,
 					null);
-			Path temp = fileCacheService.getRawObject(ua.getUrls(), m, false);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
+			DownloaderContainer container = new DownloaderContainer();
+			PostHandlerImpl postHandler = new PostHandlerImpl();
+			String workDir = starterConfig.getWorkDirectory();
+			Repo repo = new Repo();
+			repo.setRepositories(ua.getUrls());
+			repo.setResources(List.of(m));
+			repo.setRemoteServerSHA1(false);
+			container.containerAllSize(repo);
+			container.filterNotExistResoursesAndSetRepo(repo, workDir);
+			container.setDestinationRepositories(workDir);
+			container.setHandlers(Arrays.asList(postHandler));
+			downloader.addContainer(container);
+			downloader.startDownload(true);
+			Path temp = Paths.get(workDir, m.getPath());
 			String message = bundle.getString("update.message");
 			CountDownLatch latch = new CountDownLatch(1);
 			Platform.runLater(() -> {

@@ -120,7 +120,7 @@ public class Starter {
 				Paths.get(starterConfig.getWorkDirectory(), "cache"), starterConfig.getTimeToLife(),
 				domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
-		updateCore = new UpdateCore(bundle, gsonService, fileService, starterConfig, domainAvailability);
+		updateCore = new UpdateCore(eventBus, requestConfig, bundle, gsonService, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
 
 	}
