@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -96,9 +97,11 @@ public class UpdateCore {
 				throw new HashSumAndSizeError(ua.getUrls().toString(), m.toString() + " " + hash, "");
 			}
 			log.info("from {} to {}", temp.toString(), jarFile.toPath().toString());
-			try (OutputStream outputStream = new FileOutputStream(jarFile)) {
-				IOUtils.copy(new FileInputStream(temp.toFile()), outputStream);
+			try (OutputStream outputStream = new FileOutputStream(jarFile);
+				 FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
+				IOUtils.copy(fileInputStream, outputStream);
 			}
+			Files.deleteIfExists(temp);
 			pb.start();
 			Platform.runLater(() -> System.exit(0));
 		}
