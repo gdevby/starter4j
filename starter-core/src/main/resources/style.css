@@ -1,9 +1,3 @@
-.label {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-}
-
 .progress-bar {
     -fx-accent: #B9FF66;
 }
@@ -24,6 +18,13 @@
     -fx-background-color: #22221F;
     -fx-border-radius: 35px;
     -fx-background-radius: 35px;
+}
+
+.root-status .label,
+.root-update .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
 }
 
 .root-update {
