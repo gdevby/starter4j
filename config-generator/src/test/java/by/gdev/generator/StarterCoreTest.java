@@ -28,7 +28,8 @@ public class StarterCoreTest {
 	@BeforeClass
 	public static void init() throws IOException {
 		SocketConfig config = SocketConfig.copy(SocketConfig.DEFAULT).setSoReuseAddress(true).build();
-		server = ServerBootstrap.bootstrap().setListenerPort(65079).setSocketConfig(config)
+		server = ServerBootstrap.bootstrap().setListenerPort(65079).setCanonicalHostName("127.0.0.1")
+				.setSocketConfig(config)
 				.register("*", new HttpRequestHandlerServer(acm)).create();
 		server.start();
 
