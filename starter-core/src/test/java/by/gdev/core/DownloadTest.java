@@ -12,8 +12,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.util.Timeout;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -81,7 +82,8 @@ public class DownloadTest {
 
 	private static void initialization(Path testFolder, Gson gson) {
 		EventBus eventBus = new EventBus();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(60000).build();
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(60000))
+				.setResponseTimeout(Timeout.ofMilliseconds(60000)).build();
 		CloseableHttpClient client = HttpClientConfig.getInstanceHttpClient();
 		HttpService httpService = new HttpServiceImpl(null, client, new InternetServerMap());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,

@@ -5,22 +5,21 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
@@ -126,11 +125,11 @@ public class DownloadRunnableImpl implements Runnable {
 					resume = tryDownloadPart(element, file, httpGet);
 				try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
 
-					StatusLine sl = response.getStatusLine();
+					int statusCode = response.getCode();
 
-					if (sl.getStatusCode() != HttpStatus.SC_OK) {
+					if (statusCode != HttpStatus.SC_OK) {
 						throw new IOException(
-								String.format("code %s phrase %s %s", sl.getStatusCode(), sl.getReasonPhrase(), url));
+								String.format("code %s phrase %s %s", statusCode, response.getReasonPhrase(), url));
 					}
 					HttpEntity entity = response.getEntity();
 					in = new BufferedInputStream(entity.getContent());
@@ -165,10 +164,10 @@ public class DownloadRunnableImpl implements Runnable {
 	}
 
 	private boolean tryDownloadPart(DownloadElement element, File file, HttpGet httpGet)
-			throws ClientProtocolException, IOException {
+			throws URISyntaxException, IOException {
 		if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
 				&& file.length() < element.getMetadata().getSize()) {
-			HttpHead hh = new HttpHead(httpGet.getURI());
+			HttpHead hh = new HttpHead(httpGet.getUri());
 			try (CloseableHttpResponse response = httpclient.execute(hh)) {
 				Header h = response.getFirstHeader("accept-ranges");
 				if (Objects.nonNull(h) && "bytes".equals(h.getValue())) {

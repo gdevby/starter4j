@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.apache.http.protocol.HttpService;
+import org.apache.hc.core5.http.impl.io.HttpService;
 
 import lombok.Getter;
 import lombok.Setter;

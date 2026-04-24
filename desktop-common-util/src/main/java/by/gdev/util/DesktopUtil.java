@@ -41,13 +41,13 @@ import javax.swing.UIManager;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.FutureRequestExecutionService;
-import org.apache.http.impl.client.HttpRequestFutureTask;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.FutureRequestExecutionService;
+import org.apache.hc.core5.util.Timeout;
 
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.InternetServer;
@@ -271,11 +271,12 @@ public class DesktopUtil {
 				for (int i = 0; i < 2; i++) {
 					try {
 						HttpGet http = new HttpGet(link);
-						host = http.getURI().getHost();
-						http.setConfig(RequestConfig.custom().setConnectTimeout(time1).setSocketTimeout(time1).build());
+						host = http.getUri().getHost();
+						http.setConfig(RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(time1))
+								.setResponseTimeout(Timeout.ofMilliseconds(time1)).build());
 						log.info("check internet connection {} timeout {} ms", link, time1);
-						ResponseHandler<Boolean> handler = response -> response.getStatusLine().getStatusCode() == 200;
-						HttpRequestFutureTask<Boolean> futureTask = requestExecutionService.execute(http,
+						HttpClientResponseHandler<Boolean> handler = response -> response.getCode() == 200;
+						FutureTask<Boolean> futureTask = requestExecutionService.execute(http,
 								HttpClientContext.create(), handler);
 						Boolean isOk = futureTask.get(time1, TimeUnit.MILLISECONDS);
 						if (isOk) {
@@ -315,8 +316,12 @@ public class DesktopUtil {
 	public static InternetServerMap testServersAsync(List<String> urls, CloseableHttpClient httpclient) {
 		InternetServerMap ism = new InternetServerMap();
 		urls.stream().forEach(e -> {
-			ism.put(new HttpGet(e).getURI().getHost(), new InternetServer(true, 0));
-		});
+            try {
+                ism.put(new HttpGet(e).getUri().getHost(), new InternetServer(true, 0));
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 		CompletableFuture.runAsync(() -> {
 			try {
 				testServers1(urls, httpclient, ism);

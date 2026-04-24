@@ -27,11 +27,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.util.Timeout;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -159,11 +160,12 @@ public class ViewSubscriber {
 					g.write(pair.getValue());
 					g.close();
 					byte[] body = out.toByteArray();
-					method.setEntity(new ByteArrayEntity(body));
-					method.setConfig(RequestConfig.custom().setConnectTimeout(5000).setSocketTimeout(60000).build());
+					method.setEntity(new ByteArrayEntity(body, null));
+					method.setConfig(RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(5000))
+							.setResponseTimeout(Timeout.ofMilliseconds(60000)).build());
 					response = Main.client.execute(method);
-					if (response.getStatusLine().getStatusCode() >= 300) {
-						log.info("not proper code " + response.getStatusLine().toString());
+					if (response.getCode() >= 300) {
+                        log.info("not proper code {} {}", response.getCode(), response.getReasonPhrase());
 						showError(p, pair);
 					} else {
 						LogResponse lr = Main.GSON.fromJson(

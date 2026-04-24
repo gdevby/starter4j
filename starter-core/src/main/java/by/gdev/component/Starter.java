@@ -19,7 +19,8 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.util.Timeout;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -106,8 +107,8 @@ public class Starter {
 		starterStatusFrame = frame;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		requestConfig = RequestConfig.custom().setConnectTimeout(starterConfig.getConnectTimeout())
-				.setSocketTimeout(starterConfig.getSocketTimeout()).build();
+		requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(starterConfig.getConnectTimeout()))
+				.setResponseTimeout(Timeout.ofMilliseconds(starterConfig.getSocketTimeout())).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
 		if (domainAvailability.hasInternet()) {
