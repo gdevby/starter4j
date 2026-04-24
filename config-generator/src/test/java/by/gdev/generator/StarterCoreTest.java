@@ -6,9 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.impl.bootstrap.HttpServer;
-import org.apache.http.impl.bootstrap.ServerBootstrap;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.impl.bootstrap.HttpServer;
+import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class StarterCoreTest {
 	public static void init() throws IOException {
 		SocketConfig config = SocketConfig.copy(SocketConfig.DEFAULT).setSoReuseAddress(true).build();
 		server = ServerBootstrap.bootstrap().setListenerPort(65079).setSocketConfig(config)
-				.registerHandler("*", new HttpRequestHandlerServer(acm)).create();
+				.register("*", new HttpRequestHandlerServer(acm)).create();
 		server.start();
 
 		if (jre.exists()) {

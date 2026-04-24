@@ -1,12 +1,14 @@
 package by.gdev.http.download.config;
 
-import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.util.Timeout;
+
 
 /**
  * This class allows you to set the maximum number of total open connections,
@@ -22,11 +24,12 @@ public class HttpClientConfig {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setDefaultMaxPerRoute(maxPerRoute);
 		cm.setMaxTotal(maxTotalPool);
-		RequestConfig config = RequestConfig.custom().setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout)
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+				.setResponseTimeout(Timeout.ofMilliseconds(socketTimeout))
 				.build();
 		CloseableHttpClient builder = HttpClients.custom()
 				.setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE).setConnectionManager(cm)
-				.setDefaultRequestConfig(config).evictIdleConnections(10, TimeUnit.SECONDS).disableContentCompression()
+				.setDefaultRequestConfig(config).evictIdleConnections(Timeout.ofSeconds(10)).disableContentCompression()
 				.build();
 		return builder;
 	}

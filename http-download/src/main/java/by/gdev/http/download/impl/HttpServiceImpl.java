@@ -18,14 +18,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import by.gdev.http.download.model.Headers;
 import by.gdev.http.download.model.RequestMetadata;
@@ -110,13 +109,13 @@ public class HttpServiceImpl implements HttpService {
 					httpGet.addHeader(e.getKey(), e.getValue());
 			}
 			CloseableHttpResponse response = getResponse(httpGet);
-			StatusLine st = response.getStatusLine();
-			if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+			int statusCode = response.getCode();
+			if (HttpStatus.SC_OK == statusCode) {
 				in = response.getEntity().getContent();
 				return IOUtils.toString(in, StandardCharsets.UTF_8);
 			} else {
 				throw new IOException(
-						String.format("code %s phrase %s %s", st.getStatusCode(), st.getReasonPhrase(), url));
+						String.format("code %s phrase %s %s", statusCode, response.getReasonPhrase(), url));
 			}
 		} finally {
 			if (Objects.nonNull(httpGet))
@@ -145,10 +144,10 @@ public class HttpServiceImpl implements HttpService {
 		lock.lock();
 		try {
 			response = getResponse(httpGet);
-			StatusLine st = response.getStatusLine();
+			int statusCode = response.getCode();
 			HttpEntity entity = response.getEntity();
-			if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode()) {
-				throw new IOException(String.format("code %s phrase %s", st.getStatusCode(), st.getReasonPhrase()));
+			if (HttpStatus.SC_OK != statusCode) {
+				throw new IOException(String.format("code %s phrase %s", statusCode, response.getReasonPhrase()));
 			}
 			in = new BufferedInputStream(entity.getContent());
 			out = new BufferedOutputStream(new FileOutputStream(temp.toFile()));
@@ -171,7 +170,7 @@ public class HttpServiceImpl implements HttpService {
 
 	}
 
-	private CloseableHttpResponse getResponse(HttpRequestBase http) throws IOException {
+	private CloseableHttpResponse getResponse(HttpUriRequestBase http) throws IOException {
 		return httpclient.execute(http);
 	}
 
