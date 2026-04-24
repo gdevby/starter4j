@@ -1,7 +1,6 @@
 package by.gdev.generator;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,12 +23,7 @@ public class HttpRequestHandlerServer implements HttpRequestHandler{
 
 	@Override
 	public void handle(ClassicHttpRequest classicHttpRequest, ClassicHttpResponse classicHttpResponse, HttpContext httpContext) throws HttpException, IOException {
-        String decodeValue = null;
-        try {
-            decodeValue = URLDecoder.decode(classicHttpRequest.getUri().toString(), StandardCharsets.UTF_8.name());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        String decodeValue = URLDecoder.decode(classicHttpRequest.getPath(), StandardCharsets.UTF_8.name());
         String defaultPath = "target/out/" + decodeValue.substring(1);
 		if (decodeValue.substring(1).startsWith(acm.getAppName()+ "/jres_configuration_default"))
 			defaultPath = decodeValue.replaceAll(acm.getAppName(), "").substring(2);
