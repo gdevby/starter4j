@@ -1,0 +1,51 @@
+.progress-bar {
+    -fx-accent: #B9FF66;
+}
+
+.progress-bar .bar {
+    -fx-padding: 5px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+}
+
+.progress-bar > .track {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.root-status {
+    -fx-background-color: #22221F;
+    -fx-border-radius: 35px;
+    -fx-background-radius: 35px;
+}
+
+.root-status .label,
+.root-update .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.root-update {
+    -fx-background-color: #22221F;
+    -fx-border-radius: 35px;
+    -fx-background-radius: 35px;
+}
+
+.root-update * {
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 999;
+}
+
+.check-box .box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #B9FF66;
+}

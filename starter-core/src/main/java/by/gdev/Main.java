@@ -1,6 +1,5 @@
 package by.gdev;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,10 +11,15 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-
+import javafx.application.Application;
+import javafx.application.HostServices;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import org.apache.commons.io.IOExceptionList;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.slf4j.LoggerFactory;
@@ -31,7 +35,7 @@ import by.gdev.http.download.config.HttpClientConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
-import by.gdev.ui.StarterStatusFrame;
+import by.gdev.ui.StarterStatusStage;
 import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
@@ -41,12 +45,24 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Main {
+public class Main extends Application {
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static CloseableHttpClient client;
+	public static HostServices hostServices;
 
 	public static void main(String[] args) throws Exception {
+		new Thread(() -> {
+            try {
+                work(args);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+		launch(args);
+	}
+
+	public static void work(String[] args) throws Exception {
 		boolean flag = true;
 		checkOnInvalidPath();
 		System.setProperty("java.net.preferIPv4Stack", String.valueOf(flag));
@@ -56,7 +72,7 @@ public class Main {
 		if (Objects.isNull(starterConfig.getWorkDirectory())) {
 			starterConfig.buildAbsoluteWorkDirectory(OSInfo.getOSType());
 		}
-		
+
 		loadLogbackConfig(starterConfig);
 		log.info("starter was run");
 		log.info("starter created {}", DesktopUtil.getTime(Main.class));
@@ -75,21 +91,25 @@ public class Main {
 			client = HttpClientConfig.getInstanceHttpClient(starterConfig.getConnectTimeout(),
 					starterConfig.getSocketTimeout(), 5, 20);
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
-			StarterStatusFrame starterStatusFrame = null;
-			if (!GraphicsEnvironment.isHeadless()) {
-				starterStatusFrame = new StarterStatusFrame("get installed app name", true,
+			StarterStatusStage starterStatusStage = null;
+			ResourceBundle finalBundle = bundle;
+			CompletableFuture<StarterStatusStage> starterStatusStageFuture = new CompletableFuture<>();
+			Platform.runLater(() -> {
+				StarterStatusStage stage = new StarterStatusStage("get installed app name", true,
 						ResourceBundle.getBundle("application", new Localise().getLocal()));
-				starterStatusFrame.setVisible(true);
-				eventBus.register(starterStatusFrame);
-				eventBus.register(new ViewSubscriber(starterStatusFrame, bundle, OSInfo.getOSType(), starterConfig));
-			}
+				stage.show();
+				eventBus.register(stage);
+				eventBus.register(new ViewSubscriber(stage, finalBundle, OSInfo.getOSType(), starterConfig));
+				starterStatusStageFuture.complete(stage);
+			});
+			starterStatusStage = starterStatusStageFuture.get();
 			if (starterConfig.isProd() && !starterConfig.getServerFile().equals(StarterAppConfig.URI_APP_CONFIG)) {
 				String errorMessage = String.format(
 						"The prod parameter is true. You don't need to change the value of the field. Current: %s, should be: %s",
 						starterConfig.getServerFile(), StarterAppConfig.URI_APP_CONFIG);
 				throw new RuntimeException(errorMessage);
 			}
-			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusFrame);
+			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusStage);
 			eventBus.register(new ConsoleSubscriber(bundle, s.getFileMapperService(), starterConfig));
 			s.cleanCache();
 			s.updateApplication();
@@ -121,7 +141,7 @@ public class Main {
 						: "unidentified.error.1";
 				eventBus.post(new ExceptionMessage(bundle.getString(s1), t, true));
 			}
-			System.exit(-1);
+			Platform.runLater(() -> System.exit(-1));
 		}
 	}
 
@@ -149,7 +169,17 @@ public class Main {
 					+ "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
 					+ " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
 					jarFile);
-			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setHeaderText(null);
+				alert.getDialogPane().setContent(new Label(message));
+				alert.show();
+			});
 		}
 	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+		hostServices = getHostServices();
+    }
 }
