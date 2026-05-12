@@ -37,7 +37,7 @@ import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
 
 @AllArgsConstructor
 @Slf4j
