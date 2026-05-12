@@ -1,6 +1,5 @@
 package by.gdev.component;
 
-import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,8 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.util.Timeout;
@@ -28,7 +30,6 @@ import com.google.common.eventbus.EventBus;
 import by.gdev.Main;
 import by.gdev.handler.UpdateCore;
 import by.gdev.handler.ValidateEnvironment;
-import by.gdev.handler.ValidateFont;
 import by.gdev.handler.ValidateTempDir;
 import by.gdev.handler.ValidateTempNull;
 import by.gdev.handler.ValidateUpdate;
@@ -53,8 +54,8 @@ import by.gdev.model.ExceptionMessage;
 import by.gdev.model.JVMConfig;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.process.JavaProcessHelper;
-import by.gdev.ui.StarterStatusFrame;
-import by.gdev.ui.UpdateFrame;
+import by.gdev.ui.StarterStatusStage;
+import by.gdev.ui.UpdateStage;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
 import by.gdev.util.OSInfo.Arch;
@@ -86,7 +87,7 @@ public class Starter {
 	private AppConfig remoteAppConfig;
 	private JVMConfig jvm;
 	private Repo dependencis;
-	private StarterStatusFrame starterStatusFrame;
+	private StarterStatusStage starterStatusStage;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private RequestConfig requestConfig;
@@ -99,12 +100,12 @@ public class Starter {
 	private JvmRepo java;
 	private InternetServerMap domainAvailability;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusFrame frame)
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusStage stage)
 			throws UnsupportedOperationException, IOException, InterruptedException {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		this.eventBus = eventBus;
-		starterStatusFrame = frame;
+		starterStatusStage = stage;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
 		requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(starterConfig.getConnectTimeout()))
@@ -120,7 +121,7 @@ public class Starter {
 				Paths.get(starterConfig.getWorkDirectory(), "cache"), starterConfig.getTimeToLife(),
 				domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
-		updateCore = new UpdateCore(bundle, gsonService, fileService, starterConfig, domainAvailability);
+		updateCore = new UpdateCore(eventBus, requestConfig, bundle, gsonService, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
 
 	}
@@ -134,7 +135,6 @@ public class Starter {
 		validateEnvironment.add(new ValidateWorkDir(workDir, bundle));
 		validateEnvironment.add(new ValidateTempNull(bundle));
 		validateEnvironment.add(new ValidateTempDir(bundle));
-		validateEnvironment.add(new ValidateFont(bundle));
 		validateEnvironment.add(new ValidateUpdate(bundle));
 		for (ValidateEnvironment val : validateEnvironment) {
 			if (!val.validate()) {
@@ -186,7 +186,7 @@ public class Starter {
 				}
 				if (Objects.isNull(remoteAppConfig)) {
 					eventBus.post(new ExceptionMessage(bundle.getString("net.problem")));
-					System.exit(-1);
+					Platform.runLater(() -> System.exit(-1));
 				}
 				Repo dep = remoteAppConfig.getAppDependencies();
 				dependencis = gsonService.getLocalObject(dep.getRepositories(),
@@ -240,27 +240,29 @@ public class Starter {
 	}
 
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
-			throws FileNotFoundException, IOException {
+            throws FileNotFoundException, IOException, ExecutionException, InterruptedException {
 		StringVersionComparator versionComparator = new StringVersionComparator();
 		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
 				remoteAppConfig.getAppVersion()) == -1) {
-			if (!GraphicsEnvironment.isHeadless()) {
-				// used old config without update
-				if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
+			// used old config without update
+			if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
+				remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
+						starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
+						AppConfig.class, false);
+			} else {
+				CompletableFuture<Integer> userChoice = new CompletableFuture<>();
+				Platform.runLater(() -> {
+					UpdateStage stage = new UpdateStage(starterStatusStage, bundle, appLocalConfig, remoteAppConfig,
+							starterConfig, fileMapperService, osType);
+					userChoice.complete(stage.getUserChoose());
+				});
+				if (userChoice.get() == 1) {
 					remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
 							starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-							AppConfig.class, false);
-				} else {
-					UpdateFrame frame = new UpdateFrame(starterStatusFrame, bundle, appLocalConfig, remoteAppConfig,
-							starterConfig, fileMapperService, osType);
-					if (frame.getUserChoose() == 1) {
-						remoteAppConfig = gsonService.getObjectByUrls(starterConfig.getServerFile(),
-								starterConfig.getServerFileConfig(starterConfig, appLocalConfig.getCurrentAppVersion()),
-								AppConfig.class, true);
-					} else {
-						appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
-						fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
-					}
+							AppConfig.class, true);
+				} else if (userChoice.get() == 2) {
+					appLocalConfig.setCurrentAppVersion(remoteAppConfig.getAppVersion());
+					fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
 				}
 
 			}
@@ -304,6 +306,7 @@ public class Starter {
 		javaProcess.start();
 		if (starterConfig.isStop()) {
 			javaProcess.destroyProcess();
+			Platform.exit();
 		}
 	}
 

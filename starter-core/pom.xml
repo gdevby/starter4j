@@ -49,6 +49,16 @@
 			<artifactId>mockserver-netty-no-dependencies</artifactId>
 			<version>5.14.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>21.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>21.0.8</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
