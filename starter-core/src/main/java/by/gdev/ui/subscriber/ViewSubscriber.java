@@ -180,9 +180,9 @@ public class ViewSubscriber {
 							clipboard1.setContent(content1);
 							label.setVisible(false);
 							textArea.setVisible(true);
-							showMessageDialog(stage, new Label(bundle.getString("clipboard.copy")), "","",
-									Alert.AlertType.INFORMATION);
 						});
+						showMessageDialog(stage, new Label(bundle.getString("clipboard.copy")), "","",
+								Alert.AlertType.INFORMATION);
 					}
 					return;
 				} catch (Exception e1) {

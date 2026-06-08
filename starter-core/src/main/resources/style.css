@@ -1,14 +1,14 @@
-.progress-bar {
+.root-status .progress-bar {
     -fx-accent: #B9FF66;
 }
 
-.progress-bar .bar {
+.root-status .progress-bar .bar {
     -fx-padding: 5px;
     -fx-background-insets: 0;
     -fx-background-radius: 10;
 }
 
-.progress-bar > .track {
+.root-status .progress-bar > .track {
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-background-color: rgba(255, 255, 255, 0.1);
@@ -37,15 +37,15 @@
     -fx-text-fill: white;
 }
 
-.button {
+.root-update .button {
     -fx-background-color: rgba(255, 255, 255, 0.1);
     -fx-background-radius: 999;
 }
 
-.check-box .box {
+.root-update .check-box .box {
     -fx-background-color: rgba(255, 255, 255, 0.1);
 }
 
-.check-box:selected .mark {
+.root-update .check-box:selected .mark {
     -fx-background-color: #B9FF66;
 }
