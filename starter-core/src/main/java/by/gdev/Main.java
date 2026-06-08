@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
@@ -51,15 +52,26 @@ public class Main extends Application {
 	public static CloseableHttpClient client;
 	public static HostServices hostServices;
 
-	public static void main(String[] args) throws Exception {
-		new Thread(() -> {
-            try {
-                work(args);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }).start();
+	public static void init(String[] args) {
 		launch(args);
+	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+		hostServices = getHostServices();
+		CompletableFuture
+			.runAsync(() -> {
+				try {
+					work(getParameters().getRaw().toArray(new String[0]));
+				} catch (Exception e) {
+					throw new CompletionException(e);
+				}
+			})
+			.exceptionally(e -> {
+				log.error("error", e);
+				Platform.exit();
+				return null;
+			});
 	}
 
 	public static void work(String[] args) throws Exception {
@@ -178,8 +190,4 @@ public class Main extends Application {
 		}
 	}
 
-	@Override
-	public void start(Stage stage) throws Exception {
-		hostServices = getHostServices();
-    }
 }
