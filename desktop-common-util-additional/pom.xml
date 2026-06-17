@@ -12,6 +12,8 @@
 						and splited on 2 modules	
 					</description>
 	<artifactId>desktop-common-util-additional</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>https://github.com/gdevby/starter4j/tree/master/desktop-common-util-additional</url>
 	<dependencies>
 	   <dependency>
             <groupId>com.github.vatbub</groupId>

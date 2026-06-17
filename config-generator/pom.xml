@@ -10,7 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>config-generator</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
     <description>This module generates config and put them on the server.</description>
+	<url>https://github.com/gdevby/starter4j/tree/master/config-generator</url>
     <dependencies>
         <dependency>
             <groupId>commons-net</groupId>

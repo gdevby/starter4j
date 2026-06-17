@@ -8,6 +8,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>starter-core</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>This is the main module for running a desktop application.</description>
+	<url>https://github.com/gdevby/starter4j/tree/master/starter-core</url>
 	<dependencies>
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
