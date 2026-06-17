@@ -8,6 +8,9 @@
 		<version>${revision}</version>
 	</parent>
 	<artifactId>http-download</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>This module provides HTTP response caching and multi-thread file downloading.</description>
+	<url>https://github.com/gdevby/starter4j/tree/master/http-download</url>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>

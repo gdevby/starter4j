@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>${revision}</version>
 
-    <name>starter4j</name>
+    <name>${project.groupId}:${project.artifactId}</name>
     <description>Auto updating launcher for java desktop applications</description>
     <url>https://github.com/gdevby/starter4j</url>
 
@@ -124,16 +124,6 @@
         </plugins>
     </build>
     <profiles>
-         <profile>
-            <id>remote_deploy</id>
-            <distributionManagement>
-                <repository>
-                    <id>archiva1</id>
-                    <name>releases</name>
-                    <url>https://archiva.cemgame.org/repository/internal</url>
-                </repository>
-            </distributionManagement>
-        </profile>
         <profile>
             <id>deploy</id>
             <build>
