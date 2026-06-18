@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
@@ -170,7 +171,7 @@ public class Main extends Application {
 		log.info("logs directory {}", System.getProperty("logs_dir") + "/logs/starter/");
 	}
 
-	private static void checkOnInvalidPath() throws UnsupportedEncodingException {
+	private static void checkOnInvalidPath() throws UnsupportedEncodingException, InterruptedException {
 		String jarFile = new File(
 				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"))
 				.toString();
@@ -181,12 +182,15 @@ public class Main extends Application {
 					+ "Джава не работает c путями в которых содержится восклицательный знак '!' ,"
 					+ " создайте новую учетную запись без '!' знаков(используйте её для игры) и используйте путь к файлу без '!'\r\n текущий: %1$s",
 					jarFile);
+			CountDownLatch latch = new CountDownLatch(1);
 			Platform.runLater(() -> {
 				Alert alert = new Alert(Alert.AlertType.ERROR);
 				alert.setHeaderText(null);
 				alert.getDialogPane().setContent(new Label(message));
-				alert.show();
+				alert.showAndWait();
+				latch.countDown();
 			});
+			latch.await();
 		}
 	}
 
