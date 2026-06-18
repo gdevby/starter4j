@@ -8,6 +8,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>starter-core</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>This is the main module for running a desktop application.</description>
+	<url>https://github.com/gdevby/starter4j/tree/master/starter-core</url>
 	<dependencies>
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
@@ -60,34 +63,43 @@
 			<version>21.0.11</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>shade</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.4.1</version>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>by.gdev.Launcher</Main-Class>
+											</manifestEntries>
+										</transformer>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>by.gdev.Launcher</Main-Class>
-									</manifestEntries>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.mock-server</groupId>
 				<artifactId>mockserver-maven-plugin</artifactId>

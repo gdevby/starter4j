@@ -9,6 +9,32 @@
     <packaging>pom</packaging>
     <version>${revision}</version>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Auto updating launcher for java desktop applications</description>
+    <url>https://github.com/gdevby/starter4j</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>gdev</name>
+            <email>info@gdev.by</email>
+            <organization>gdevby</organization>
+            <organizationUrl>https://gdev.by/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/gdevby/starter4j.git</connection>
+        <developerConnection>scm:git:ssh://github.com:gdevby/starter4j.git</developerConnection>
+        <url>https://github.com/gdevby/starter4j/tree/master</url>
+    </scm>
+
     <modules>
         <module>starter-core</module>
         <module>desktop-common-util</module>
@@ -86,18 +112,67 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.10.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
-         <profile>
-            <id>remote_deploy</id>
-            <distributionManagement>
-                <repository>
-                    <id>archiva1</id>
-                    <name>releases</name>
-                    <url>https://archiva.cemgame.org/repository/internal</url>
-                </repository>
-            </distributionManagement>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.12.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

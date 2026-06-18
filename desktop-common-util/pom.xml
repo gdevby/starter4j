@@ -7,6 +7,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>desktop-common-util</artifactId>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>This module provides a set of tools for cross-platform development of desktop applications.</description>
+	<url>https://github.com/gdevby/starter4j/tree/master/desktop-common-util</url>
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
