@@ -107,7 +107,9 @@ public class ViewSubscriber {
 		Platform.runLater(() -> {
 			TextArea textArea = getTextAreaWithMessage(s);
 			BorderPane borderPane = new BorderPane();
-			borderPane.setCenter(textArea);
+			if (s.getError() != null) {
+				borderPane.setCenter(textArea);
+			}
 			if (s.isLogButton() && Objects.nonNull(starterConfig.getLogURIService()))
 				addLogOffer(borderPane);
 			if (Objects.nonNull(s.getLink())) {
