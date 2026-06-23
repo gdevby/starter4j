@@ -73,12 +73,14 @@ public class StarterAppConfig {
 	@Parameter(names = "-logURIService", description = "Log service which can save logs and return code. User can send code for support. "
 			+ "Doesn't implement a backend. To activate we need to use parameter ExceptionMessage#logButton=true, See ViewSubscriber#doRequest")
 	private List<String> logURIService;
+	@Parameter(names = "-ignoreExitPhraseFromChildApp", description = "Ignore exit phrase from child app. Starter continue to work and child process destoy when parent process destoy")
+	private boolean ignoreExitPhraseFromChildApp;
 
 	public static final StarterAppConfig DEFAULT_CONFIG = new StarterAppConfig("starter", 500, URI_APP_CONFIG, null,
 			null,
 			Arrays.asList("http://www.google.com", "http://www.baidu.com",
 					"https://github.com/gdevby/starter-app/blob/master/example-compiled-app/server/starter-app/appConfig.json"),
-			3, 5000, 10000, 600000, 10, false, null);
+			3, 5000, 10000, 600000, 10, false, null, false);
 
 	public String getServerFileConfig(StarterAppConfig config, String version) {
 		return Objects.isNull(version) ? String.join("/", APP_CONFIG) : String.join("/", version, APP_CONFIG);

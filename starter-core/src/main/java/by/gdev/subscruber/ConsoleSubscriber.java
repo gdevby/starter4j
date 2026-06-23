@@ -53,7 +53,7 @@ public class ConsoleSubscriber {
 				log.error(bundle.getString("unidentified.error"));
 				Platform.runLater(() -> System.exit(0));
 			}
-		} else if (status.getLine().contains("starter can be closed"))
+		} else if (status.getLine().contains("starter can be closed") && !starterConfig.isIgnoreExitPhraseFromChildApp())
 			Platform.runLater(() -> System.exit(0));
 		else
 			log.info(String.valueOf(status.getLine()));

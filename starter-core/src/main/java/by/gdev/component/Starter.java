@@ -304,10 +304,20 @@ public class Starter {
 		javaProcess.addCommands(remoteAppConfig.getAppArguments().stream().map(s -> substitutor.replace(s))
 				.collect(Collectors.toList()));
 		javaProcess.start();
-		if (starterConfig.isStop()) {
-			javaProcess.destroyProcess();
-			Platform.exit();
+		if (starterConfig.isIgnoreExitPhraseFromChildApp()) {
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				log.info("Shutdown hook: finished child process ...");
+				stopApp(javaProcess);
+			}));
 		}
+		if (starterConfig.isStop()) {
+			stopApp(javaProcess);
+		}
+	}
+
+	private void stopApp(JavaProcessHelper javaProcess) {
+		javaProcess.destroyProcess();
+		Platform.exit();
 	}
 
 	public void updateApplication() {
