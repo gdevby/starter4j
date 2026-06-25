@@ -9,6 +9,8 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -97,11 +99,23 @@ public class UpdateCore {
 				throw new HashSumAndSizeError(ua.getUrls().toString(), m.toString() + " " + hash, "");
 			}
 			log.info("from {} to {}", temp.toString(), jarFile.toPath().toString());
-			try (OutputStream outputStream = new FileOutputStream(jarFile);
-				 FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
-				IOUtils.copy(fileInputStream, outputStream);
+			if (jarFile.toString().endsWith("exe")) {
+				File oldFile = new File(jarFile.getAbsolutePath() + "." +
+						LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				if (jarFile.renameTo(oldFile)) {
+					if (!temp.toFile().renameTo(jarFile)) {
+						throw new RuntimeException("error with move " + temp);
+					}
+				} else {
+					throw new RuntimeException("error with rename " + jarFile.toPath());
+				}
+			} else {
+				try (OutputStream outputStream = new FileOutputStream(jarFile);
+					 FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
+					IOUtils.copy(fileInputStream, outputStream);
+				}
+				Files.deleteIfExists(temp);
 			}
-			Files.deleteIfExists(temp);
 			pb.start();
 			Platform.runLater(() -> System.exit(0));
 		}

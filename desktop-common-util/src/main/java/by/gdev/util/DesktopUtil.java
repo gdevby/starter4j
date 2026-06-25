@@ -130,6 +130,9 @@ public class DesktopUtil {
 
 	public static String getJavaPathByHome(boolean appendBinFolder) {
 		String path = System.getProperty("java.home");
+		if (path == null) {
+			return "";
+		}
 		if (appendBinFolder) {
 			path = appendToJVM(path);
 		}
@@ -466,7 +469,12 @@ public class DesktopUtil {
 	public static ProcessBuilder preparedRestart(String jarFile, File workDir, String jvm, String fileEncoding) {
 		jvm = Objects.nonNull(jvm) ? jvm : getJavaPathByHome(true);
 		fileEncoding = Objects.nonNull(fileEncoding) ? fileEncoding : Charset.defaultCharset().toString();
-		ProcessBuilder b = new ProcessBuilder(Arrays.asList(jvm, "-Dfile.encoding=" + fileEncoding, "-jar", jarFile));
+		ProcessBuilder b;
+		if (jvm.isEmpty()) {
+			b = new ProcessBuilder(jarFile);
+		} else {
+			b = new ProcessBuilder(Arrays.asList(jvm, "-Dfile.encoding=" + fileEncoding, "-jar", jarFile));
+		}
 		log.info("execute command {}", b.command().stream().collect(Collectors.joining(" ")));
 		b.directory(workDir);
 		b.inheritIO();
