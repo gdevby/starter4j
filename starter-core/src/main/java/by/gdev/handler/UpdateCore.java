@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -54,18 +53,22 @@ public class UpdateCore {
 
 	public void checkUpdates(OSType osType) throws IOException, StatusExeption, ExecutionException, InterruptedException {
 		UpdateApp ua = getUpdateFile();
-		if (ua == null || ua.getMap() == null || !ua.getMap().containsKey(osType))
-			return;
-		Metadata m = ua.getMap().get(osType);
 		File jarFile = new File(
 				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
-		if (jarFile.toString().endsWith("classes"))
+		if (jarFile.toString().endsWith("classes")) {
 			return;
+		}
+		String key = osType.name() + (jarFile.toString().endsWith("exe") ? "exe" : "");
+		if (ua == null || ua.getMap() == null || !ua.getMap().containsKey(key)) {
+			return;
+		}
+		Metadata m = ua.getMap().get(key);
 		String localeSha1 = DesktopUtil.getChecksum(jarFile, "SHA-1");
 		ProcessBuilder pb = null;
 		if (!m.getSha1().equals(localeSha1)) {
+			boolean downloadNative = m.getRelativeUrl().endsWith("exe");
 			pb = DesktopUtil.preparedRestart(jarFile.getAbsolutePath(), Paths.get("").toAbsolutePath().toFile(), null,
-					null);
+					null, downloadNative);
 			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
 			DownloaderContainer container = new DownloaderContainer();
 			PostHandlerImpl postHandler = new PostHandlerImpl();
@@ -114,7 +117,6 @@ public class UpdateCore {
 					 FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
 					IOUtils.copy(fileInputStream, outputStream);
 				}
-				Files.deleteIfExists(temp);
 			}
 			pb.start();
 			Platform.runLater(() -> System.exit(0));
