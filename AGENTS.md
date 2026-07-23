@@ -118,6 +118,7 @@ flowchart LR
 - Maven 3.x
 - Для полного E2E-теста: nginx на `http://localhost:81/` (GET, HEAD, resume)
 - Тестовый проект: `git clone https://github.com/gdevby/starter-app.git`
+- Для нативной сборки (`-Pnative`): GraalVM Native Image с поддержкой JavaFX; переменная окружения **`GRAALVM_HOME`** должна указывать на корень дистрибутива (например, Liberica NIK 23 на Java 21). На Windows также нужен MSVC toolchain для линковки.
 
 ### Команды
 
@@ -143,6 +144,36 @@ mvn test -pl config-generator
 # Публикация в Maven Central (нужны GPG + settings.xml)
 mvn clean deploy -P deploy
 ```
+
+### Нативная сборка (GraalVM Native Image)
+
+Профиль **`native`** в `starter-core` использует [native-maven-plugin](https://graalvm.github.io/native-build-tools/latest/maven-plugin.html) (`org.graalvm.buildtools:native-maven-plugin`) для сборки standalone-исполняемого файла вместо fat JAR.
+
+**Требования (Windows):**
+
+- Установлен GraalVM-дистрибутив **с JavaFX** (обычный GraalVM CE без JavaFX не подойдёт).
+- Переменная **`GRAALVM_HOME`** — путь к корню дистрибутива; **`JAVA_HOME`** — тот же путь (или `%GRAALVM_HOME%`).
+- Проверенный вариант: **Liberica NIK 23** (Java 21, full / с JavaFX).
+- MSVC / Windows SDK — для линковки native-image.
+
+**Команда:**
+
+```bash
+cd starter-core
+mvn clean package -Pnative
+```
+
+**Результат:** `starter-core/target/starter-core-<version>.exe` (имя задаётся `imageName` в профиле).
+
+**Конфигурация профиля** (`starter-core/pom.xml`):
+
+- `mainClass`: `by.gdev.Launcher`
+- `-march=compatibility`, `--enable-url-protocols=https`
+- Windows: `-H:NativeLinkerOption=/SUBSYSTEM:WINDOWS`, `/ENTRY:mainCRTStartup` (GUI-приложение без консоли)
+
+**Рефлексия и ресурсы:** предконфигурация native-image в `starter-core/src/main/resources/META-INF/native-image/` (`reflect-config.json`, `resource-config.json`, `proxy-config.json`, `serialization-config.json`, `jni-config.json`, `predefined-classes-config.json`). При добавлении reflection-heavy зависимостей или новых ресурсов может потребоваться обновление этих файлов.
+
+Профили **`shade`** (fat JAR) и **`native`** (exe) взаимоисключающие — активируется один из них при `package`.
 
 `starter-core` в тестах поднимает MockServer на порту **1080** (`mockserver-maven-plugin`).
 
@@ -170,7 +201,7 @@ Wiki-инструкции (EN/RU дублируют друг друга):
 | JRE через jlink + JavaFX | [Создание JRE из jdk и javafx](https://github.com/gdevby/starter4j/wiki/%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-JRE-%D0%B8%D0%B7-jdk-%D0%B8-javafx.) |
 | Maven Central | [Публикация в Central Repository](https://github.com/gdevby/starter4j/wiki/%D0%9F%D1%83%D0%B1%D0%BB%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F-%D0%B2-Central-Repository) |
 
-- **Windows:** NSIS + плагины Inetc, Nsis7z; пример скриптов в [starter-app/example-compiled-app](https://github.com/gdevby/starter-app/tree/master/example-compiled-app).
+- **Windows:** NSIS + плагины Inetc, Nsis7z; пример скриптов в [starter-app/example-compiled-app](https://github.com/gdevby/starter-app/tree/master/example-compiled-app). Альтернатива JAR-лаунчеру — нативный exe через `-Pnative` (см. раздел «Нативная сборка»).
 - **Linux:** `dpkg-deb`, структура DEB-пакета описана в wiki.
 - **macOS:** `javapackager -deploy -native dmg` (нужен JDK с javapackager).
 
@@ -183,6 +214,7 @@ Wiki-инструкции (EN/RU дублируют друг друга):
 | Задача | Куда смотреть / править |
 |---|---|
 | Логика запуска, UI лаунчера | `starter-core/src/main/java/by/gdev/` |
+| Нативная сборка, native-image | `starter-core/pom.xml` (профиль `native`), `META-INF/native-image/` |
 | CLI-параметры лаунчера | `StarterAppConfig.java` |
 | Генерация конфигов | `config-generator/` |
 | HTTP-загрузка и кэш | `http-download/` |
@@ -219,6 +251,7 @@ Wiki-инструкции (EN/RU дублируют друг друга):
 | http-download | `mvn test -pl http-download` |
 | config-generator | `mvn test -pl config-generator`; проверить `target/out/` |
 | DEFAULT_CONFIG / prod | Сборка shade JAR + smoke-тест с локальным сервером |
+| Нативная сборка (`-Pnative`) | `mvn clean package -Pnative` в `starter-core`; smoke-тест exe с `-uriAppConfig` |
 | Локализация | Проверить ключи во всех `application_*.properties` |
 
 ## Полезные файлы
