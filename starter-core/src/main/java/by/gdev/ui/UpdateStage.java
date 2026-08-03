@@ -72,10 +72,8 @@ public class UpdateStage extends Stage {
         j.setAlignment(Pos.CENTER);
         j.setOnAction(e -> {
             try {
-                AppLocalConfig app = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
-                        AppLocalConfig.class);
-                app.setSkipUpdateVersion(remoteAppConfig.getAppVersion());
-                fileMapperService.write(app, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
+                appLocalConfig.setSkipUpdateVersion(remoteAppConfig.getAppVersion());
+                fileMapperService.write(appLocalConfig, StarterAppConfig.APP_STARTER_LOCAL_CONFIG);
             } catch (IOException e1) {
                 log.error("error", e1);
             }

@@ -333,8 +333,6 @@ public class Starter {
 
 	public void cleanCache() {
 		try {
-			appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG, AppLocalConfig.class);
-
 			if (appLocalConfig == null) {
 				return;
 			}
