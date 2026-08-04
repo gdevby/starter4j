@@ -271,7 +271,7 @@
   }]},
   "bundles":[{
     "name":"application",
-    "locales":["", "de", "en", "es", "fr", "it", "pl", "pt", "ro", "ru", "ua", "zh_CN", "und"]
+    "locales":["", "de", "en", "es", "fr", "it", "pl", "pt", "ro", "ru", "ua", "zh", "und"]
   }, {
     "name":"com.sun.javafx.tk.quantum.QuantumMessagesBundle",
     "locales":["", "und"]
