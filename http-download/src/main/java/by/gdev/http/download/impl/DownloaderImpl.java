@@ -14,6 +14,8 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -42,6 +44,17 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @AllArgsConstructor
 public class DownloaderImpl implements Downloader {
+	/**
+	 * Fixed pool for download worker threads instead of {@code ForkJoinPool.commonPool()}.
+	 * {@link #startDownload} may block waiting for workers while also scheduling work on the
+	 * common pool; on 2-core machines that exhausts the pool and downloads never start.
+	 */
+	private static final ExecutorService DOWNLOAD_EXECUTOR = Executors.newFixedThreadPool(3, r -> {
+		Thread thread = new Thread(r, "download-worker");
+		thread.setDaemon(true);
+		return thread;
+	});
+
 	private int downloadMaxAttemps = 1;
 	private boolean resumeDownload = false;
 	/**
@@ -111,7 +124,7 @@ public class DownloaderImpl implements Downloader {
 			allCountElement = downloadElements.size();
 			List<CompletableFuture<Void>> listThread = new ArrayList<>();
 			for (int i = 0; i < 3; i++)
-				listThread.add(CompletableFuture.runAsync(runnable));
+				listThread.add(CompletableFuture.runAsync(runnable, DOWNLOAD_EXECUTOR));
 			if (sync) {
 				waitThreadDone(listThread);
 
@@ -122,7 +135,7 @@ public class DownloaderImpl implements Downloader {
 					} catch (InterruptedException e) {
 						log.error("Error", e);
 					}
-				}).get();
+				}, DOWNLOAD_EXECUTOR).get();
 			}
 		} else
 			throw new StatusExeption(status.toString());

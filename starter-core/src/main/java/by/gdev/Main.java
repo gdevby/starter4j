@@ -12,8 +12,9 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
@@ -48,6 +49,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Main extends Application {
+	/**
+	 * Runs {@link #work} off the JavaFX application thread on a dedicated background thread.
+	 * {@link CompletableFuture#runAsync} uses {@code ForkJoinPool.commonPool()}; on low-core CPUs
+	 * that worker can block inside the download wait loop while download tasks also need common-pool
+	 * workers, which deadlocks startup (window may flash, no download progress, process stuck).
+	 */
+	private static final ExecutorService STARTER_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+		Thread thread = new Thread(r, "starter-worker");
+		thread.setDaemon(false);
+		return thread;
+	});
+
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static Charset charset = StandardCharsets.UTF_8;
 	public static CloseableHttpClient client;
@@ -60,19 +73,15 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		hostServices = getHostServices();
-		CompletableFuture
-			.runAsync(() -> {
-				try {
-					work(getParameters().getRaw().toArray(new String[0]));
-				} catch (Exception e) {
-					throw new CompletionException(e);
-				}
-			})
-			.exceptionally(e -> {
+		// Do not use commonPool here — see STARTER_EXECUTOR comment.
+		STARTER_EXECUTOR.execute(() -> {
+			try {
+				work(getParameters().getRaw().toArray(new String[0]));
+			} catch (Exception e) {
 				log.error("error", e);
 				Platform.exit();
-				return null;
-			});
+			}
+		});
 	}
 
 	public static void work(String[] args) throws Exception {

@@ -155,7 +155,11 @@ public class Starter {
 		log.info(String.valueOf(osType));
 		log.info(String.valueOf(osArc));
 		try {
-			DesktopUtil.activeDoubleDownloadingResourcesLock(workDir);
+			if (!DesktopUtil.activeDoubleDownloadingResourcesLock(workDir)) {
+				eventBus.post(new ExceptionMessage(bundle.getString("download.lock.message")));
+				Platform.runLater(() -> System.exit(4));
+				return;
+			}
 			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
 			DownloaderContainer container = new DownloaderContainer();
 			String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());

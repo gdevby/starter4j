@@ -361,7 +361,14 @@ public class DesktopUtil {
 		return b.toString();
 	}
 
-	public static void activeDoubleDownloadingResourcesLock(String container) throws IOException {
+	/**
+	 * Acquires an exclusive file lock ({@value #PROTECTION}) so only one launcher instance
+	 * downloads at a time. On failure the caller must show UI (JavaFX) and exit — this module
+	 * has no JavaFX dependency.
+	 *
+	 * @return {@code true} if the lock was acquired, {@code false} if another instance holds it
+	 */
+	public static boolean activeDoubleDownloadingResourcesLock(String container) throws IOException {
 		File f = new File(container, PROTECTION);
 		createDirectory(f);
 		if (!f.exists()) {
@@ -371,10 +378,10 @@ public class DesktopUtil {
 		lock = ch.tryLock();
 		if (Objects.isNull(lock)) {
 			log.warn("Lock could not be acquired ");
-			System.exit(4);
-		} else {
-			log.info("Locked by file {}", f.toString());
+			return false;
 		}
+		log.info("Locked by file {}", f.toString());
+		return true;
 	}
 
 	/**
