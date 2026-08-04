@@ -55,15 +55,47 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>21.0.11</version>
+			<version>25.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
-			<version>21.0.11</version>
+			<version>25.0.4</version>
 		</dependency>
 	</dependencies>
 	<profiles>
+		<profile>
+			<id>native</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>0.10.5</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>build-native</id>
+								<goals>
+									<goal>compile-no-fork</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<mainClass>by.gdev.Launcher</mainClass>
+							<imageName>${project.artifactId}-${project.version}</imageName>
+							<buildArgs>
+								<buildArg>-march=compatibility</buildArg>
+								<buildArg>--enable-url-protocols=https</buildArg>
+								<buildArg>-H:NativeLinkerOption=/SUBSYSTEM:WINDOWS</buildArg>
+								<buildArg>-H:NativeLinkerOption=/ENTRY:mainCRTStartup</buildArg>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>shade</id>
 			<build>

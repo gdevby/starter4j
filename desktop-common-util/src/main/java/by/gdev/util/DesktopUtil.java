@@ -466,11 +466,12 @@ public class DesktopUtil {
 	 *         jar or exe file
 	 */
 	@SneakyThrows
-	public static ProcessBuilder preparedRestart(String jarFile, File workDir, String jvm, String fileEncoding) {
+	public static ProcessBuilder preparedRestart(String jarFile, File workDir, String jvm, String fileEncoding,
+												 boolean downloadNative) {
 		jvm = Objects.nonNull(jvm) ? jvm : getJavaPathByHome(true);
 		fileEncoding = Objects.nonNull(fileEncoding) ? fileEncoding : Charset.defaultCharset().toString();
 		ProcessBuilder b;
-		if (jvm.isEmpty()) {
+		if (downloadNative) {
 			b = new ProcessBuilder(jarFile);
 		} else {
 			b = new ProcessBuilder(Arrays.asList(jvm, "-Dfile.encoding=" + fileEncoding, "-jar", jarFile));
