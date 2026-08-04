@@ -10,7 +10,7 @@
 |---|---|
 | Статус | beta |
 | Лицензия | MIT |
-| Java | 21 |
+| Java | 25 |
 | Версия артефактов | `${revision}` в корневом `pom.xml` (сейчас `1.25`) |
 | groupId | `by.gdev` |
 | Платформы | Windows, Linux, macOS |
@@ -114,11 +114,11 @@ flowchart LR
 
 ### Требования
 
-- JDK 21
+- JDK 25
 - Maven 3.x
 - Для полного E2E-теста: nginx на `http://localhost:81/` (GET, HEAD, resume)
 - Тестовый проект: `git clone https://github.com/gdevby/starter-app.git`
-- Для нативной сборки (`-Pnative`): GraalVM Native Image с поддержкой JavaFX; переменная окружения **`GRAALVM_HOME`** должна указывать на корень дистрибутива (например, Liberica NIK 23 на Java 21). На Windows также нужен MSVC toolchain для линковки.
+- Для нативной сборки (`-Pnative`): GraalVM Native Image с поддержкой JavaFX; переменная окружения **`GRAALVM_HOME`** должна указывать на корень дистрибутива (например, Liberica NIK 25 на Java 25). На Windows также нужен MSVC toolchain для линковки.
 
 ### Команды
 
@@ -234,7 +234,7 @@ Wiki-инструкции (EN/RU дублируют друг друга):
 
 ### Стиль кода
 
-- Java 21, Maven, Lombok — следовать существующим паттернам.
+- Java 25, Maven, Lombok — следовать существующим паттернам.
 - Пакет: `by.gdev.*` (и подпакеты модулей).
 - CLI: JCommander (`@Parameter` в config-классах).
 - JSON: Gson (`Main.GSON`, `GsonServiceImpl`).
