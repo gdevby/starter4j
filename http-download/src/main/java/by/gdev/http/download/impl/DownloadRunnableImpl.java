@@ -32,12 +32,11 @@ import by.gdev.util.model.InternetServerMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Data
 /**
  * This class implements the launch of file downloads by URI
  */
-
+@Slf4j
+@Data
 public class DownloadRunnableImpl implements Runnable {
 	private volatile DownloaderStatusEnum status;
 	private Queue<DownloadElement> downloadElements;

@@ -33,10 +33,7 @@ public class AppConfig {
     /**
      * JVM launch arguments
      */
-    private List<String> jvmArguments;   
-    /**
-     * images and other files are used an app
-     */
+    private List<String> jvmArguments;
     /**
      * Description of the jar file to run the application
      */

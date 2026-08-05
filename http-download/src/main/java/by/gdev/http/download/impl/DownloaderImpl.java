@@ -1,6 +1,3 @@
-/**
- * 
- */
 package by.gdev.http.download.impl;
 
 import java.io.IOException;

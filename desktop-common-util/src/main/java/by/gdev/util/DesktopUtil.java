@@ -453,15 +453,6 @@ public class DesktopUtil {
 	}
 
 	/**
-	 * 
-	 * * Allow to restart after updating application starter core
-	 * 
-	 * @return process build when we can run new application
-	 * @param cl - class which we can find base jar or exe file.
-	 * @throws UnsupportedEncodingException
-	 * 
-	 */
-	/**
 	 * Allow to restart after updating application starter core or only restart
 	 * application with starter core
 	 * 

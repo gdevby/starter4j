@@ -1,6 +1,3 @@
-/**
- * 
- */
 package by.gdev.http.upload.download.downloader;
 
 import java.time.Duration;

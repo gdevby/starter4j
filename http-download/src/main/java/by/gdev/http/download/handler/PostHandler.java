@@ -1,6 +1,3 @@
-/**
- * 
- */
 package by.gdev.http.download.handler;
 
 import by.gdev.http.upload.download.downloader.DownloadElement;
