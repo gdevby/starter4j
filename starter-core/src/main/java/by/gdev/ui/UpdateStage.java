@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class UpdateStage extends Stage {
+public final class UpdateStage extends Stage {
 
     private AtomicInteger userChoose = new AtomicInteger();
 

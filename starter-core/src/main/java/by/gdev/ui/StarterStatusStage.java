@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 @Slf4j
-public class StarterStatusStage extends Stage {
+public final class StarterStatusStage extends Stage {
 
     private ProgressBar progressBar;
     private Label uploadStatus = new Label();
