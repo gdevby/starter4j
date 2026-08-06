@@ -428,7 +428,7 @@ public class DesktopUtil {
 		if (zip.getName().endsWith(".tar.gz")) {
 			try (TarArchiveInputStream zis = new TarArchiveInputStream(
 					new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(zip))))) {
-				TarArchiveEntry ze = zis.getNextTarEntry();
+				TarArchiveEntry ze = zis.getNextEntry();
 				return ze.getName();
 			}
 		} else if (zip.getName().endsWith(".zip")) {

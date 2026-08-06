@@ -82,13 +82,12 @@ public class ArchiveHandler implements PostHandler {
 		try (TarArchiveInputStream zis = new TarArchiveInputStream(
 				new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(zip))))) {
 			TarArchiveEntry ze;
-			while ((ze = (TarArchiveEntry) zis.getNextEntry()) != null) {
+			while ((ze = zis.getNextEntry()) != null) {
 				String fileName = Paths.get(DownloaderJavaContainer.JRE_DEFAULT, ze.getName()).toString();
 				if (ze.isDirectory())
 					continue;
 				unZipAndTarGz(fileName, folder, replace, zis, deleteEmptyFile);
 			}
-			zis.close();
 		}
 	}
 
