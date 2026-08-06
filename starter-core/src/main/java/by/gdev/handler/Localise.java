@@ -29,7 +29,7 @@ public class Localise {
 				}
 				if (lang.contains("_")) {
 					String[] ar = lang.split("_");
-					locale = new Locale(ar[0], ar[1]);
+                    locale = Locale.of(ar[0], ar[1]);
 				} else
 					locale = new Locale.Builder().setLanguage(lang).build();
 			} else
