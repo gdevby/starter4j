@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class UpdateStage extends Stage {
 
-    private static final long serialVersionUID = 2832387031191814036L;
     private AtomicInteger userChoose = new AtomicInteger();
 
     public UpdateStage(Stage progressStage, ResourceBundle resourceBundle, AppLocalConfig appLocalConfig,

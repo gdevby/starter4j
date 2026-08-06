@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
 
 @Slf4j
 public class StarterStatusStage extends Stage {
-    private static final long serialVersionUID = 1L;
+
     private ProgressBar progressBar;
     private Label uploadStatus = new Label();
     private Label uploadWord = new Label();
