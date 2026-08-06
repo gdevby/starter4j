@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import by.gdev.util.model.GPUDescription;
 import by.gdev.util.model.GPUDriverVersion;
@@ -72,17 +72,17 @@ public class WindowsExecutor implements OSExecutor {
 		GPUsDescriptionDTO desc = new GPUsDescriptionDTO();
 		desc.setRawDescription(list.stream().collect(Collectors.joining(System.lineSeparator())));
 		for (String s : list.stream().map(String::toLowerCase).collect(Collectors.toList())) {
-			if (StringUtils.contains(s, "card name:")) {
+			if (Strings.CS.contains(s, "card name:")) {
 				GPUDescription g = new GPUDescription();
 				g.setName(s.split(":")[1]);
 				gpus.add(g);
 			}
 			if (gpus.size() > 0) {
-				if (StringUtils.contains(s, "chip type:")) {
+				if (Strings.CS.contains(s, "chip type:")) {
 					gpus.get(gpus.size() - 1).setChipType(s.split(":")[1]);
-				} else if (StringUtils.contains(s, "display memory:")) {
+				} else if (Strings.CS.contains(s, "display memory:")) {
 					gpus.get(gpus.size() - 1).setMemory(s.split(":")[1]);
-				} else if (StringUtils.contains(s, "current mode:")) {
+				} else if (Strings.CS.contains(s, "current mode:")) {
 					String cm = s.split(":")[1].trim();
 					if (!UNKNOWN.equalsIgnoreCase(cm) && set.size() > 1)
 						gpus.remove(gpus.size() - 1);

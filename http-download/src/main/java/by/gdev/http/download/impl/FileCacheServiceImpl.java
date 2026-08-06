@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import com.google.gson.Gson;
 
@@ -136,9 +136,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 				RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 				log.info("do head request -> {} {} local file {}", url, localMetadata, urlPath);
 				if (Objects.nonNull(localMetadata) && Objects.nonNull(localMetadata.getETag())
-						&& StringUtils.equals(serverMetadata.getETag(), localMetadata.getETag())
-						&& StringUtils.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
-						&& StringUtils.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
+						&& Strings.CS.equals(serverMetadata.getETag(), localMetadata.getETag())
+						&& Strings.CS.equals(serverMetadata.getLastModified(), localMetadata.getLastModified())
+						&& Strings.CS.equals(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"),
 								localMetadata.getSha1())) {
 					localMetadata.setLastAccessAt(System.currentTimeMillis());
 					fileMapperService.write(localMetadata, metaFile.toString());
