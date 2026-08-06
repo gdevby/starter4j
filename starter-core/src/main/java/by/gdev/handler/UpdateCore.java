@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -16,29 +17,30 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+
+import com.google.common.eventbus.EventBus;
+
+import by.gdev.Main;
+import by.gdev.http.download.exeption.HashSumAndSizeError;
 import by.gdev.http.download.exeption.StatusExeption;
 import by.gdev.http.download.handler.PostHandlerImpl;
 import by.gdev.http.download.impl.DownloaderImpl;
 import by.gdev.http.download.service.Downloader;
-import by.gdev.http.upload.download.downloader.DownloaderContainer;
-import by.gdev.util.model.download.Repo;
-import com.google.common.eventbus.EventBus;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import org.apache.commons.io.IOUtils;
-
-import by.gdev.Main;
-import by.gdev.http.download.exeption.HashSumAndSizeError;
 import by.gdev.http.download.service.GsonService;
+import by.gdev.http.upload.download.downloader.DownloaderContainer;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.model.UpdateApp;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo.OSType;
 import by.gdev.util.model.InternetServerMap;
 import by.gdev.util.model.download.Metadata;
+import by.gdev.util.model.download.Repo;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.config.RequestConfig;
 
 @AllArgsConstructor
 @Slf4j
@@ -51,7 +53,8 @@ public class UpdateCore {
 	private StarterAppConfig starterConfig;
 	private InternetServerMap domainAvailability;
 
-	public void checkUpdates(OSType osType) throws IOException, StatusExeption, ExecutionException, InterruptedException {
+	public void checkUpdates(OSType osType)
+			throws IOException, StatusExeption, ExecutionException, InterruptedException {
 		UpdateApp ua = getUpdateFile();
 		File jarFile = new File(
 				URLDecoder.decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
@@ -103,8 +106,9 @@ public class UpdateCore {
 			}
 			log.info("from {} to {}", temp.toString(), jarFile.toPath().toString());
 			if (jarFile.toString().endsWith("exe")) {
-				File oldFile = new File(jarFile.getAbsolutePath() + "." +
-						LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				File oldFile = new File(
+						jarFile.getAbsolutePath() + "." + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				Files.deleteIfExists(oldFile.toPath());
 				if (jarFile.renameTo(oldFile)) {
 					if (!temp.toFile().renameTo(jarFile)) {
 						throw new RuntimeException("error with move " + temp);
@@ -114,7 +118,7 @@ public class UpdateCore {
 				}
 			} else {
 				try (OutputStream outputStream = new FileOutputStream(jarFile);
-					 FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
+						FileInputStream fileInputStream = new FileInputStream(temp.toFile())) {
 					IOUtils.copy(fileInputStream, outputStream);
 				}
 			}
