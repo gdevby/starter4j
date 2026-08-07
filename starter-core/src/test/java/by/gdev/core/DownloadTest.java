@@ -12,9 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.core5.util.Timeout;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -82,14 +80,12 @@ public class DownloadTest {
 
 	private static void initialization(Path testFolder, Gson gson) {
 		EventBus eventBus = new EventBus();
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(60000))
-				.setResponseTimeout(Timeout.ofMilliseconds(60000)).build();
 		CloseableHttpClient client = HttpClientConfig.getInstanceHttpClient();
 		HttpService httpService = new HttpServiceImpl(null, client, new InternetServerMap());
 		FileCacheService fileService = new FileCacheServiceImpl(httpService, gson, StandardCharsets.UTF_8, testFolder,
 				600000, new InternetServerMap());
 		gsonService = new GsonServiceImpl(gson, fileService, httpService, new InternetServerMap());
-		downloader = new DownloaderImpl(eventBus, client, requestConfig, new InternetServerMap(), false);
+		downloader = new DownloaderImpl(eventBus, client, new InternetServerMap(), false);
 	}
 
 	@AfterClass

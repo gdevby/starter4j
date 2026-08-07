@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.core5.util.Timeout;
 
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -90,7 +88,6 @@ public class Starter {
 	private StarterStatusStage starterStatusStage;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
-	private RequestConfig requestConfig;
 	@Getter
 	private FileMapperService fileMapperService;
 	private FileCacheService fileService;
@@ -108,8 +105,6 @@ public class Starter {
 		starterStatusStage = stage;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
-		requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(starterConfig.getConnectTimeout()))
-				.setResponseTimeout(Timeout.ofMilliseconds(starterConfig.getSocketTimeout())).build();
 		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
 		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
 		if (domainAvailability.hasInternet()) {
@@ -121,7 +116,7 @@ public class Starter {
 				Paths.get(starterConfig.getWorkDirectory(), "cache"), starterConfig.getTimeToLife(),
 				domainAvailability);
 		gsonService = new GsonServiceImpl(Main.GSON, fileService, httpService, domainAvailability);
-		updateCore = new UpdateCore(eventBus, requestConfig, bundle, gsonService, starterConfig, domainAvailability);
+		updateCore = new UpdateCore(eventBus, bundle, gsonService, starterConfig, domainAvailability);
 		workDir = starterConfig.getWorkDirectory();
 
 	}
@@ -160,7 +155,7 @@ public class Starter {
 				Platform.runLater(() -> System.exit(4));
 				return;
 			}
-			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, domainAvailability, false);
 			DownloaderContainer container = new DownloaderContainer();
 			String serverFileUrn = starterConfig.getServerFileConfig(starterConfig, starterConfig.getVersion());
 			Repo resources;

@@ -269,7 +269,7 @@ public class DesktopUtil {
 					try {
 						HttpGet http = new HttpGet(link);
 						host = http.getUri().getHost();
-						http.setConfig(RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(time1))
+						http.setConfig(RequestConfig.custom()
 								.setResponseTimeout(Timeout.ofMilliseconds(time1)).build());
 						log.info("check internet connection {} timeout {} ms", link, time1);
 						HttpClientResponseHandler<Boolean> handler = response -> response.getCode() == 200;

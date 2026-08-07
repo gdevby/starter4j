@@ -47,7 +47,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UpdateCore {
 
 	private EventBus eventBus;
-	private RequestConfig requestConfig;
 	private ResourceBundle bundle;
 	private GsonService gsonService;
 	private StarterAppConfig starterConfig;
@@ -72,7 +71,7 @@ public class UpdateCore {
 			boolean downloadNative = m.getRelativeUrl().endsWith("exe");
 			pb = DesktopUtil.preparedRestart(jarFile.getAbsolutePath(), Paths.get("").toAbsolutePath().toFile(), null,
 					null, downloadNative);
-			Downloader downloader = new DownloaderImpl(eventBus, Main.client, requestConfig, domainAvailability, false);
+			Downloader downloader = new DownloaderImpl(eventBus, Main.client, domainAvailability, false);
 			DownloaderContainer container = new DownloaderContainer();
 			PostHandlerImpl postHandler = new PostHandlerImpl();
 			String workDir = starterConfig.getWorkDirectory();

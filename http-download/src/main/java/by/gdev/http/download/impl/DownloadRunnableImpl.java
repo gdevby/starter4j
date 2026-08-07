@@ -14,7 +14,6 @@ import java.util.Queue;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.Header;
@@ -42,7 +41,6 @@ public class DownloadRunnableImpl implements Runnable {
 	private Queue<DownloadElement> downloadElements;
 	private List<DownloadElement> processedElements;
 	private CloseableHttpClient httpclient;
-	private RequestConfig requestConfig;
 	private EventBus eventBus;
 
 	private InternetServerMap workedServers;
@@ -50,12 +48,11 @@ public class DownloadRunnableImpl implements Runnable {
 	private boolean resumeDownload;
 
 	public DownloadRunnableImpl(Queue<DownloadElement> downloadElements, List<DownloadElement> processedElements,
-			CloseableHttpClient httpclient, RequestConfig requestConfig, EventBus eventBus,
+			CloseableHttpClient httpclient, EventBus eventBus,
 			InternetServerMap workedServers, int downloadMaxAttemps, boolean resumeDownloadFile) {
 		this.downloadElements = downloadElements;
 		this.processedElements = processedElements;
 		this.httpclient = httpclient;
-		this.requestConfig = requestConfig;
 		this.eventBus = eventBus;
 		this.workedServers = workedServers;
 		this.downloadMaxAttemps = downloadMaxAttemps;

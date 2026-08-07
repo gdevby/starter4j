@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
@@ -60,7 +59,6 @@ public class DownloaderImpl implements Downloader {
 	private String pathToDownload;
 	private EventBus eventBus;
 	private CloseableHttpClient httpclient;
-	private RequestConfig requestConfig;
 	/**
 	 * Put new elements to download them.
 	 */
@@ -81,13 +79,12 @@ public class DownloaderImpl implements Downloader {
 	private LocalTime start;
 	private long sizeDownloadNow;
 
-	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient, RequestConfig requestConfig,
+	public DownloaderImpl(EventBus eventBus, CloseableHttpClient httpclient,
 			InternetServerMap workedServers, boolean resumeDownload) {
 		this.eventBus = eventBus;
 		this.httpclient = httpclient;
-		this.requestConfig = requestConfig;
 		status = DownloaderStatusEnum.IDLE;
-		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, requestConfig, eventBus,
+		runnable = new DownloadRunnableImpl(downloadElements, processedElements, httpclient, eventBus,
 				workedServers, downloadMaxAttemps, resumeDownload);
 	}
 

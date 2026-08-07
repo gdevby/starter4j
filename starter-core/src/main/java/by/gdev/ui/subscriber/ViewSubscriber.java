@@ -164,7 +164,7 @@ public class ViewSubscriber {
 					g.close();
 					byte[] body = out.toByteArray();
 					method.setEntity(new ByteArrayEntity(body, null));
-					method.setConfig(RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(5000))
+					method.setConfig(RequestConfig.custom()
 							.setResponseTimeout(Timeout.ofMilliseconds(60000)).build());
 					response = Main.client.execute(method);
 					if (response.getCode() >= 300) {

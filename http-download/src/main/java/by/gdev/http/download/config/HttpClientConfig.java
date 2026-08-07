@@ -2,6 +2,7 @@ package by.gdev.http.download.config;
 
 
 
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
@@ -24,7 +25,11 @@ public class HttpClientConfig {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setDefaultMaxPerRoute(maxPerRoute);
 		cm.setMaxTotal(maxTotalPool);
-		RequestConfig config = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+		ConnectionConfig connectionConfig = ConnectionConfig.custom()
+				.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout))
+				.build();
+		cm.setDefaultConnectionConfig(connectionConfig);
+		RequestConfig config = RequestConfig.custom()
 				.setResponseTimeout(Timeout.ofMilliseconds(socketTimeout))
 				.build();
 		CloseableHttpClient builder = HttpClients.custom()
