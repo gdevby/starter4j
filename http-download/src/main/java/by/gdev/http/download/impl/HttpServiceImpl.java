@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -108,7 +108,7 @@ public class HttpServiceImpl implements HttpService {
 				for (Map.Entry<String, String> e : headers.entrySet())
 					httpGet.addHeader(e.getKey(), e.getValue());
 			}
-			CloseableHttpResponse response = getResponse(httpGet);
+			ClassicHttpResponse response = getResponse(httpGet);
 			int statusCode = response.getCode();
 			if (HttpStatus.SC_OK == statusCode) {
 				in = response.getEntity().getContent();
@@ -126,7 +126,7 @@ public class HttpServiceImpl implements HttpService {
 
 	private RequestMetadata getMetadata(String url) throws IOException {
 		HttpHead httpUrl = new HttpHead(url);
-		CloseableHttpResponse response = getResponse(httpUrl);
+		ClassicHttpResponse response = getResponse(httpUrl);
 		RequestMetadata request = generateRequestMetadata(response);
 		return request;
 	}
@@ -139,7 +139,7 @@ public class HttpServiceImpl implements HttpService {
 		if (!path.toFile().getParentFile().exists())
 			path.toFile().getParentFile().mkdirs();
 		Path temp = Paths.get(path.toAbsolutePath().toString() + ".temp");
-		CloseableHttpResponse response;
+		ClassicHttpResponse response;
 		Lock lock = fileLocks.computeIfAbsent(temp, key -> new ReentrantLock());
 		lock.lock();
 		try {
@@ -170,11 +170,11 @@ public class HttpServiceImpl implements HttpService {
 
 	}
 
-	private CloseableHttpResponse getResponse(HttpUriRequestBase http) throws IOException {
-		return httpclient.execute(http);
+	private ClassicHttpResponse getResponse(HttpUriRequestBase http) throws IOException {
+		return httpclient.executeOpen(null, http, null);
 	}
 
-	private RequestMetadata generateRequestMetadata(CloseableHttpResponse response) {
+	private RequestMetadata generateRequestMetadata(ClassicHttpResponse response) {
 		RequestMetadata requestMetadata = new RequestMetadata();
 		if (response.containsHeader(Headers.ETAG.getValue()))
 			requestMetadata.setETag(response.getFirstHeader(Headers.ETAG.getValue()).getValue().replaceAll("\"", ""));

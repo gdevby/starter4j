@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
@@ -119,7 +119,7 @@ public class DownloadRunnableImpl implements Runnable {
 				}
 				if (resumeDownload)
 					resume = tryDownloadPart(element, file, httpGet);
-				try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+				try (ClassicHttpResponse response = httpclient.executeOpen(null, httpGet, null)) {
 
 					int statusCode = response.getCode();
 
@@ -164,7 +164,7 @@ public class DownloadRunnableImpl implements Runnable {
 		if (file.exists() && Objects.nonNull(element.getMetadata().getSha1())
 				&& file.length() < element.getMetadata().getSize()) {
 			HttpHead hh = new HttpHead(httpGet.getUri());
-			try (CloseableHttpResponse response = httpclient.execute(hh)) {
+			try (ClassicHttpResponse response = httpclient.executeOpen(null, hh, null)) {
 				Header h = response.getFirstHeader("accept-ranges");
 				if (Objects.nonNull(h) && "bytes".equals(h.getValue())) {
 					log.info("download part with accept-ranges current size {}, full size {}", file.length(),

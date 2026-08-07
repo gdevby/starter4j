@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -155,7 +155,7 @@ public class ViewSubscriber {
 			Pair<String, byte[]> pair = null;
 			for (String s : starterConfig.getLogURIService()) {
 				HttpPost method = new HttpPost(s);
-				CloseableHttpResponse response = null;
+				ClassicHttpResponse response = null;
 				try {
 					pair = CoreUtil.readFileLog();
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -166,7 +166,7 @@ public class ViewSubscriber {
 					method.setEntity(new ByteArrayEntity(body, null));
 					method.setConfig(RequestConfig.custom()
 							.setResponseTimeout(Timeout.ofMilliseconds(60000)).build());
-					response = Main.client.execute(method);
+					response = Main.client.executeOpen(null, method, null);
 					if (response.getCode() >= 300) {
                         log.info("not proper code {} {}", response.getCode(), response.getReasonPhrase());
                         showError(stackPane, pair);
