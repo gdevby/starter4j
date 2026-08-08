@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.Queue;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpHead;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 import com.google.common.eventbus.EventBus;
 
@@ -73,8 +73,8 @@ public class DownloadRunnableImpl implements Runnable {
 				if (Objects.nonNull(element)) {
 					Throwable ex = null;
 					processedElements.add(element);
-					for (String repo : workedServers
-							.getAliveDomainsOrUseAllWithSort(element.getRepo().getRepositories())) {
+					for (String repo : workedServers.getAliveDomainsOrUseAllWithSort(
+							element.getRepo().getRepositories(), element.getMetadata().getRelativeUrl())) {
 						try {
 							download(element, repo);
 							for (PostHandler h : element.getHandlers()) {

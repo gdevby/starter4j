@@ -1,4 +1,4 @@
-package util;
+package by.gdev.http.util;
 
 import java.io.IOException;
 import java.util.List;

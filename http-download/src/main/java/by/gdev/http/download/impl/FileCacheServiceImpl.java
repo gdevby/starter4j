@@ -60,17 +60,15 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	@Override
-	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache)
-			throws IOException {
+	public Path getRawObject(List<String> urls, Metadata metadata, boolean cache) throws IOException {
 		String urn = metadata.getRelativeUrl();
 		return getRawObject1(urls, urn, cache);
 	}
 
-	protected Path getRawObject1(List<String> urls, String urn, boolean cache)
-			throws IOException {
+	protected Path getRawObject1(List<String> urls, String urn, boolean cache) throws IOException {
 		IOException ex = null;
 		Path savedPath = buildPath(urls.get(0) + urn);
-		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls)) {
+		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls, urn)) {
 			try {
 				return getRawObject(url + urn, cache, savedPath);
 			} catch (IOException e) {
@@ -81,8 +79,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 	}
 
 	@Override
-	public Path getRawObject(List<String> urls, String urn, boolean cache)
-			throws IOException {
+	public Path getRawObject(List<String> urls, String urn, boolean cache) throws IOException {
 		return getRawObject1(urls, urn, cache);
 	}
 
@@ -110,8 +107,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		return null;
 	}
 
-	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath)
-			throws IOException {
+	private Path getResourceWithoutHttpHead(String url, Path metaFile, Path urlPath) throws IOException {
 		if (urlPath.toFile().exists() && Files.exists(metaFile)) {
 			RequestMetadata localMetadata = fileMapperService.read(metaFile.toString(), RequestMetadata.class);
 			String sha = DesktopUtil.getChecksum(urlPath.toFile(), Headers.SHA1.getValue());
@@ -132,8 +128,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 	}
 
-	private Path getResourceWithHttpHead(String url, Path metaFile, Path urlPath)
-			throws IOException {
+	private Path getResourceWithHttpHead(String url, Path metaFile, Path urlPath) throws IOException {
 		boolean fileExists = urlPath.toFile().exists();
 		try {
 			if (fileExists) {
@@ -160,8 +155,7 @@ public class FileCacheServiceImpl implements FileCacheService {
 		}
 	}
 
-	private Path generateRequestMetadata(String url, Path urlPath, Path metaFile)
-			throws IOException {
+	private Path generateRequestMetadata(String url, Path urlPath, Path metaFile) throws IOException {
 		RequestMetadata requestMetadata = httpService.getRequestByUrlAndSave(url, urlPath);
 		requestMetadata.setSha1(DesktopUtil.getChecksum(urlPath.toFile(), "SHA-1"));
 		requestMetadata.setLastAccessAt(System.currentTimeMillis());
@@ -180,10 +174,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 		long now = System.currentTimeMillis();
 		long ttlMillis = timeToLife * 1000L;
 
-        try (Stream<Path> stream = Files.walk(directory)) {
+		try (Stream<Path> stream = Files.walk(directory)) {
 
-			stream.filter(Files::isRegularFile)
-					.filter(path -> path.getFileName().toString().endsWith(".metadata"))
+			stream.filter(Files::isRegularFile).filter(path -> path.getFileName().toString().endsWith(".metadata"))
 					.filter(path -> {
 
 						RequestMetadata metadata = fileMapperService.read(path.toString(), RequestMetadata.class);
@@ -192,9 +185,9 @@ public class FileCacheServiceImpl implements FileCacheService {
 						}
 						long lastAccessAt = metadata.getLastAccessAt();
 
-                        return now - lastAccessAt > ttlMillis;
+						return now - lastAccessAt > ttlMillis;
 
-                    }).toList().forEach(path -> {
+					}).toList().forEach(path -> {
 						Path dataFile = Paths.get(path.toString().replace(".metadata", ""));
 						try {
 							Files.deleteIfExists(path);
@@ -207,8 +200,8 @@ public class FileCacheServiceImpl implements FileCacheService {
 					});
 
 		} catch (IOException e) {
-            log.error("Failed to walk cache directory {}: {}", directory, e.getMessage());
-        }
-    }
+			log.error("Failed to walk cache directory {}: {}", directory, e.getMessage());
+		}
+	}
 
 }

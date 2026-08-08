@@ -69,8 +69,7 @@ public class GsonServiceImpl implements GsonService {
 	}
 
 	@Override
-	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1)
-			throws IOException {
+	public <T> T getLocalObject(List<String> uris, String urn, Class<T> class1) throws IOException {
 		return getLocalObject1(uris, urn, class1, null);
 	}
 
@@ -106,7 +105,7 @@ public class GsonServiceImpl implements GsonService {
 	protected <T> T doRequest(List<String> urls, String urn, Class<T> class1, Type type, Map<String, String> headers)
 			throws IOException {
 		IOException ex = null;
-		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls)) {
+		for (String url : workedServers.getAliveDomainsOrUseAllWithSort(urls, urn)) {
 			try {
 				String s = httpService.getRequestByUrl(url + urn, headers);
 				return Objects.nonNull(class1) ? gson.fromJson(s, class1) : gson.fromJson(s, type);

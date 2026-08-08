@@ -71,6 +71,11 @@
   "allDeclaredFields":true
 },
 {
+  "name":"by.gdev.util.comporator.InternetServerMapComparator",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":["java.util.concurrent.ConcurrentHashMap","java.lang.String"] }]
+},
+{
   "name":"by.gdev.util.model.InternetServer",
   "allDeclaredFields":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]

@@ -269,5 +269,4 @@ Wiki-инструкции (EN/RU дублируют друг друга):
 ## Связанные репозитории
 
 - **origin:** `https://github.com/gdevby/starter4j.git` — публичный GitHub
-- **gitlab:** `https://gitlab.gdev.by/gdev-company-group/launcher/desktop-starter-launch-update-bootstrap.git` — внутренний mirror/fork
 - **starter-app:** тестовое Hello World приложение, пример server layout и установщиков

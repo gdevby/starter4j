@@ -1,13 +1,14 @@
 package by.gdev.util.model;
 
+import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.hc.core5.http.impl.io.HttpService;
 
+import by.gdev.util.comporator.InternetServerMapComparator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,18 @@ public class InternetServerMap extends ConcurrentHashMap<String, InternetServer>
 	@Setter
 	private volatile int maxAttemps = 3;
 
-	private int maxResponseFromServerForComparing = 10000;
+	/**
+	 * Used for getAliveDomainsOrUseAllWithSort to sort with any order
+	 * 
+	 * 
+	 */
+	@Getter
+	@Setter
+	private Class<? extends InternetServerMapComparator> comparator;
+
+	public InternetServerMap() {
+		this.comparator = InternetServerMapComparator.class;
+	}
 
 	public boolean isSkippedURL(String url) {
 		if (!availableInternet) {
@@ -63,32 +75,22 @@ public class InternetServerMap extends ConcurrentHashMap<String, InternetServer>
 	 * order.
 	 * 
 	 * @param list will analyze proxies
+	 * @param urn  used any comparator in the future, Can be empty.
 	 * @return find worked servers
 	 */
-	public List<String> getAliveDomainsOrUseAllWithSort(List<String> list) {
+	public List<String> getAliveDomainsOrUseAllWithSort(List<String> list, String urn) {
 		List<String> l1 = filter(list);
 		if (l1.isEmpty()) {
 			return list;
 		}
-		l1.sort(new Comparator<String>() {
-
-			@Override
-			public int compare(String o1, String o2) {
-				Optional<Entry<String, InternetServer>> op1 = entrySet().stream().filter(e -> o1.contains(e.getKey()))
-						.findAny();
-				Optional<Entry<String, InternetServer>> op2 = entrySet().stream().filter(e -> o2.contains(e.getKey()))
-						.findAny();
-				long longOp1 = op1
-						.orElseGet(() -> new SimpleEntry<String, InternetServer>("",
-								new InternetServer(true, maxResponseFromServerForComparing)))
-						.getValue().getResponseTime();
-				long longOp2 = op2
-						.orElseGet(() -> new SimpleEntry<String, InternetServer>("",
-								new InternetServer(true, maxResponseFromServerForComparing)))
-						.getValue().getResponseTime();
-				return Math.abs(longOp1 - longOp2) < 100 ? 0 : Long.compare(longOp1, longOp2);
-			}
-		});
+		try {
+			Constructor<? extends InternetServerMapComparator> constructor = comparator
+					.getDeclaredConstructor(ConcurrentHashMap.class, String.class);
+			Comparator<String> sorter = constructor.newInstance(this, urn);
+			l1.sort(sorter);
+		} catch (Exception e) {
+			log.error("not proper comparator", e);
+		}
 		return l1;
 	}
 
