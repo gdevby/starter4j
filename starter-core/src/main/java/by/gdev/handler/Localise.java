@@ -23,11 +23,15 @@ public class Localise {
 			String language = property.getProperty("language");
 			String[] parts = language.split(",");
 			if (ArrayUtils.contains(parts, Locale.getDefault().getLanguage())) {
-				if (Locale.getDefault().getLanguage().contains("_")) {
-					String[] ar = Locale.getDefault().getLanguage().split("_");
+				String lang = Locale.getDefault().getLanguage();
+				if ("uk".equals(lang)) {
+					lang = "ua";
+				}
+				if (lang.contains("_")) {
+					String[] ar = lang.split("_");
 					locale = new Locale(ar[0], ar[1]);
 				} else
-					locale = new Locale.Builder().setLanguage(Locale.getDefault().getLanguage()).build();
+					locale = new Locale.Builder().setLanguage(lang).build();
 			} else
 				locale = new Locale.Builder().setLanguage("en").build();
 		} catch (IOException e) {
