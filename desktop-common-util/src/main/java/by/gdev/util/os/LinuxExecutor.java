@@ -24,7 +24,7 @@ public class LinuxExecutor implements OSExecutor {
 
 	@Override
 	public String execute(String command, int seconds) throws IOException, InterruptedException {
-		Process p = Runtime.getRuntime().exec(command);
+		Process p = new ProcessBuilder("sh", "-c", command).start();
 		p.waitFor(seconds, TimeUnit.SECONDS);
 		String res = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
 		p.getInputStream().close();

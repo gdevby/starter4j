@@ -32,7 +32,7 @@ public class WindowsExecutor implements OSExecutor {
 
 	@Override
 	public String execute(String command, int seconds) throws IOException, InterruptedException {
-		Process p = Runtime.getRuntime().exec("cmd.exe /C chcp 437 & " + command);
+		Process p = new ProcessBuilder("cmd.exe", "/C", "chcp 437 & " + command).start();
 		p.waitFor(seconds, TimeUnit.SECONDS);
 		String res = IOUtils.toString(p.getInputStream(), "IBM437");
 		p.getInputStream().close();
