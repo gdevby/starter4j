@@ -24,9 +24,6 @@ public class Localise {
 			String[] parts = language.split(",");
 			if (ArrayUtils.contains(parts, Locale.getDefault().getLanguage())) {
 				String lang = Locale.getDefault().getLanguage();
-				if ("uk".equals(lang)) {
-					lang = "ua";
-				}
 				if (lang.contains("_")) {
 					String[] ar = lang.split("_");
 					locale = new Locale(ar[0], ar[1]);
