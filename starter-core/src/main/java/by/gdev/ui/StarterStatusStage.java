@@ -121,7 +121,7 @@ public class StarterStatusStage extends Stage {
     private void updateUploadProgressBar(DownloaderStatus status) {
         int uploaded = (int) status.getDownloadSize() / (1024 * 1024);
         int allUpload = (int) status.getAllDownloadSize() / (1024 * 1024);
-        double progress = (double) uploaded / allUpload;
+        double progress = (double) status.getDownloadSize() / status.getAllDownloadSize();
         uploadPercent.setText((int)(progress * 100) + "%");
         uploadWord.setText(resourceBundle.getString("uploading"));
         uploadStatus.setText(String.format("%s/%s %s ", uploaded, allUpload, resourceBundle.getString("mb")));
