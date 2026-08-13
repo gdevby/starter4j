@@ -35,6 +35,7 @@ import com.google.gson.GsonBuilder;
 import by.gdev.component.Starter;
 import by.gdev.handler.Localise;
 import by.gdev.http.download.config.HttpClientConfig;
+import by.gdev.model.AppLocalConfig;
 import by.gdev.model.ExceptionMessage;
 import by.gdev.model.StarterAppConfig;
 import by.gdev.subscruber.ConsoleSubscriber;
@@ -42,6 +43,7 @@ import by.gdev.ui.StarterStatusStage;
 import by.gdev.ui.subscriber.ViewSubscriber;
 import by.gdev.util.DesktopUtil;
 import by.gdev.util.OSInfo;
+import by.gdev.utils.service.FileMapperService;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
@@ -113,6 +115,10 @@ public class Main extends Application {
 			client = HttpClientConfig.getInstanceHttpClient(starterConfig.getConnectTimeout(),
 					starterConfig.getSocketTimeout(), 5, 20);
 			bundle = ResourceBundle.getBundle("application", new Localise().getLocal());
+			FileMapperService fileMapperService = new FileMapperService(Main.GSON, Main.charset,
+					starterConfig.getWorkDirectory());
+			AppLocalConfig appLocalConfig = fileMapperService.read(StarterAppConfig.APP_STARTER_LOCAL_CONFIG,
+					AppLocalConfig.class);
 			StarterStatusStage starterStatusStage = null;
 			ResourceBundle finalBundle = bundle;
 			CompletableFuture<StarterStatusStage> starterStatusStageFuture = new CompletableFuture<>();
@@ -131,7 +137,8 @@ public class Main extends Application {
 						starterConfig.getServerFile(), StarterAppConfig.URI_APP_CONFIG);
 				throw new RuntimeException(errorMessage);
 			}
-			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusStage);
+			Starter s = new Starter(eventBus, starterConfig, bundle, starterStatusStage, appLocalConfig,
+					fileMapperService);
 			eventBus.register(new ConsoleSubscriber(bundle, s.getFileMapperService(), starterConfig));
 			s.cleanCache();
 			s.updateApplication();

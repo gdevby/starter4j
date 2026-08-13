@@ -100,17 +100,19 @@ public class Starter {
 	private JvmRepo java;
 	private InternetServerMap domainAvailability;
 
-	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusStage stage)
+	public Starter(EventBus eventBus, StarterAppConfig starterConfig, ResourceBundle bundle, StarterStatusStage stage,
+				   AppLocalConfig appLocalConfig, FileMapperService fileMapperService)
 			throws UnsupportedOperationException, IOException, InterruptedException {
 		osType = OSInfo.getOSType();
 		osArc = OSInfo.getJavaBit();
 		this.eventBus = eventBus;
+		this.appLocalConfig = appLocalConfig;
 		starterStatusStage = stage;
 		this.bundle = bundle;
 		this.starterConfig = starterConfig;
 		requestConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofMilliseconds(starterConfig.getConnectTimeout()))
 				.setResponseTimeout(Timeout.ofMilliseconds(starterConfig.getSocketTimeout())).build();
-		fileMapperService = new FileMapperService(Main.GSON, Main.charset, starterConfig.getWorkDirectory());
+		this.fileMapperService = fileMapperService;
 		domainAvailability = DesktopUtil.testServers(starterConfig.getTestURLs(), Main.client);
 		if (domainAvailability.hasInternet()) {
 			domainAvailability.setMaxAttemps(starterConfig.getMaxAttempts());
@@ -246,7 +248,8 @@ public class Starter {
 	private void updateApp(GsonService gsonService, FileMapperService fileMapperService)
             throws FileNotFoundException, IOException, ExecutionException, InterruptedException {
 		StringVersionComparator versionComparator = new StringVersionComparator();
-		if (Objects.nonNull(appLocalConfig) && versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
+		if (Objects.nonNull(appLocalConfig) && Objects.nonNull(appLocalConfig.getCurrentAppVersion())
+				&& versionComparator.compare(appLocalConfig.getCurrentAppVersion(),
 				remoteAppConfig.getAppVersion()) == -1) {
 			// used old config without update
 			if (appLocalConfig.isSkippedVersion(remoteAppConfig.getAppVersion())) {
