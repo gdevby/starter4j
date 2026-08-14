@@ -19,3 +19,4 @@ tempAppConfig.json
 **/.factorypath
 /install.sh
 /.settings/
+**/mockserver-ca.pem

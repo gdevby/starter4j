@@ -21,6 +21,7 @@ import org.mockserver.configuration.ConfigurationProperties;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.socket.tls.ForwardProxyTLSX509CertificatesTrustManager;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.eventbus.EventBus;
@@ -61,6 +62,9 @@ public class DownloadTest {
 		Repo repo = new FileMapperService(gson, StandardCharsets.UTF_8, "").read("src/test/resources/dependencies.json",
 				Repo.class);
 		String str = gson.toJson(repo, Repo.class);
+		ConfigurationProperties.tlsAllowInsecureProtocols(false);
+		ConfigurationProperties.forwardProxyTLSX509CertificatesTrustManagerType(
+				ForwardProxyTLSX509CertificatesTrustManager.JVM);
 		mockServer = ClientAndServer.startClientAndServer(port);
 		ConfigurationProperties.disableSystemOut(true);
 		mockServer.when(request().withMethod("GET").withPath("/dependencises.json"))
