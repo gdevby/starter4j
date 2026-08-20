@@ -19,6 +19,7 @@ import by.gdev.http.download.service.GsonService;
 
 public class StarterCoreTest {
 	static HttpServer server;
+	static int serverPort;
 	static GsonService gsonService;
 	static Downloader downloader;
 	static AppConfigModel acm = AppConfigModel.DEFAULT_APP_CONFIG_MODEL;
@@ -28,10 +29,11 @@ public class StarterCoreTest {
 	@BeforeClass
 	public static void init() throws IOException {
 		SocketConfig config = SocketConfig.copy(SocketConfig.DEFAULT).setSoReuseAddress(true).build();
-		server = ServerBootstrap.bootstrap().setListenerPort(65079).setCanonicalHostName("127.0.0.1")
+		server = ServerBootstrap.bootstrap().setListenerPort(0).setCanonicalHostName("127.0.0.1")
 				.setSocketConfig(config)
 				.register("*", new HttpRequestHandlerServer(acm)).create();
 		server.start();
+		serverPort = server.getLocalPort();
 
 		if (jre.exists()) {
 			FileUtils.deleteDirectory(jre);
@@ -51,11 +53,12 @@ public class StarterCoreTest {
 
 	@Test
 	public void mainTest() throws Exception {
-		String[] configGenerator = { "-name", "test-core", "-version", "0.9", "-url", "http://127.0.0.1:65079/",
+		String baseUrl = "http://127.0.0.1:" + serverPort + "/";
+		String[] configGenerator = { "-name", "test-core", "-version", "0.9", "-url", baseUrl,
 				"-mainClass", "desktop.starter.app.Main" };
 		by.gdev.generator.Main.main(configGenerator);
 		FileUtils.copyDirectory(new File(acm.getJavaFolder()), jre);
-		String[] starterCoreArg = { "-uriAppConfig", "http://127.0.0.1:65079/test-core/", "-version", "0.9",
+		String[] starterCoreArg = { "-uriAppConfig", baseUrl + "test-core/", "-version", "0.9",
 				"-workDirectory", Paths.get(testWorkDirectory).toAbsolutePath().toString().concat("/"), "-stop" };
 		by.gdev.Launcher.main(starterCoreArg);
 	}
